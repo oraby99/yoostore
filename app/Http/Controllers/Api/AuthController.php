@@ -36,9 +36,7 @@ class AuthController extends Controller
     {
         $data = $request->validated();
         $user = User::where('email', $request->email)->first();
-
         if (!$user) {
-            // Proceed with user creation
             $data['verification_code'] = $this->generateVerificationCode();
             try {
                 $user = User::create($data);
@@ -57,13 +55,12 @@ class AuthController extends Controller
                 ], 500);
             }
         } else {
-            // Handle case where user already exists
             if ($user->email_verified_at == null) {
                 Mail::to($user->email)->send(new SendVerificationCode($user->verification_code));
                 return response()->json([
                     'status'  => 200,
                     'message' => 'Account already exists but is not verified',
-                    'OTP'     => $user->verification_code,
+                    'verification_code'     => $user->verification_code,
                 ], 200);
             } else {
                 return response()->json([
@@ -77,10 +74,7 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $data = $request->validated();
-        // Attempt to find the user by email
         $user = $this->model->where('email', $data['email'])->first();
-
-        // Check if user exists and if the password is correct
         if (!$user || !Hash::check($data['password'], $user->password)) {
             return response()->json([
                 'data' => null,
@@ -88,74 +82,52 @@ class AuthController extends Controller
                 'message' => 'Invalid email or password. Please check your credentials and try again.',
             ], 401);
         }
-        // Check if the user is verified
         if (is_null($user->email_verified_at)) {
             return response()->json([
-                'data'                  => null,
-                'status'                => 403, // 403 Forbidden indicates that the user cannot proceed
+                'status'                => 403,
                 'message'               => 'Your account is not verified. Please verify your email.',
                 'verification_code'     => $user->verification_code,
             ], 403);
         }
-        // If verified, proceed with generating the token
         $token = $user->createToken('user Token')->plainTextToken;
-        // Add the token to the user data
         $user->token = $token;
-        // Return the successful response
         return response()->json([
             'data' => new UserResource($user),
             'status' => 200,
             'message' => 'Login successful. Welcome back!',
-        ]);
-    }
-    public function deleteaccount($id)
-    {
-        $user = User::findOrFail($id);
-        $user->update(['status' => 2]);
-        return $this->success((new UserResource($user)));
+        ],200);
     }
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
         $data = $request->validated();
         $user = User::where('email', $request->email)->first();
-        Mail::to($user->email)->send(new SendVerificationCode($user->verification_code));
-        $user->update([
-            'password' => Hash::make($data['password']),
-        ]);
-        return response()->json([
-            'message' => 'Password Changed',
-            'status' => 200,
-            'data' => NULL
-        ]);
+        if($user) {
+            $user->update(['verification_code' => $this->generateVerificationCode()]);
+            Mail::to($user->email)->send(new SendVerificationCode($user->verification_code));
+            return response()->json([
+                'message' => 'verification code sent succesfuly',
+                'status' => 200,
+                'data' => NULL
+            ]);
+        }    
     }
     public function changePassword(ChangePasswordRequest $request): JsonResponse
     {
         $data = $request->validated();
-
         $user = User::where('verification_code', $data['verification_code'])->first();
-
         if ($user) {
-            // Update the user's password
             $user->update(['password' => Hash::make($data['password'])]);
-
-            // Log the user in
             Auth::login($user);
-
-            // Update the device token if provided
             if (Arr::exists($data, 'device_token')) {
                 $user->update(['device_token' => $data['device_token']]);
             }
-
-            // Generate a new token for the user
-            $user['token'] = $user->createToken('fly-easy')->plainTextToken;
-
+            $user['token'] = $user->createToken('user Token')->plainTextToken;
             return response()->json([
                 'status'  => 200,
                 'message' => 'Password changed successfully',
                 'data'    => new UserResource($user),
             ], 200);
         } else {
-            // Return an error response if the verification code is invalid
             return response()->json([
                 'status'  => 400,
                 'message' => 'Invalid verification code',
@@ -226,5 +198,11 @@ class AuthController extends Controller
             Log::error('Error while creating verification code for new user', ['error' => $e->getMessage(), 'trace' => $e->__toString()]);
             return false;
         }
+    }
+    public function deleteaccount($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+        return $this->success((new UserResource($user)));
     }
 }
