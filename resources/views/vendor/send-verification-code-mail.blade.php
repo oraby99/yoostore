@@ -3,20 +3,16 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <title>{{ __('mail.registration-verification.title') }}</title>
-
-        <link rel="icon" href="{{ asset('portal/images/OIG__36_-removebg') }}">
-        <link rel="stylesheet" href="{{ asset('portal/css/bootstrap.min.css') }}">
-        <link rel="stylesheet" href="{{ asset('portal/css/mail.css') }}">
+        <title>{{ __('site.mail.title') }}</title>
+        <link rel="icon" href="{{ asset('images/yoostore.png') }}">
     </head>
     <body class="registration-verification-body">
         <div class="container">
             <section class="registration-verification">
                 <div class="logo">
                     <img
-                        alt="{{ __('mail.registration-verification.alt-logo') }}"
-                        src="{{ asset('storage/global/Frame.png') }}"
+                        alt="{{ __('site.mail.alt-logo') }}"
+                        src="{{ asset('images/yoostore.png') }}"
                         class="logo"
                     />
                 </div>
@@ -24,7 +20,7 @@
                 <div class="content">
                     <div class="verification-code">
                         <h3>
-                            {{ __('mail.registration-verification.verification-code-title') }}
+                            {{ __('site.mail.verification-code-title') }}
                         </h3>
                         <p class="font-weight-bold">
                             <strong>
@@ -32,12 +28,12 @@
                             </strong>
                         </p>
                         <span>
-                            {{ __('mail.registration-verification.verification-code-note') }}
+                            {{ __('site.mail.verification-code-note') }}
                         </span>
                         <div>
                             <strong>
                                 Regards,
-                                Teams Layered Team
+                                Yoo Store Team
                             </strong>
                         </div>
                     </div>

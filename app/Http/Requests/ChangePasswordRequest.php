@@ -23,7 +23,7 @@ class ChangePasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code'          => ['required', 'exists:users,verification_code'],
+            'verification_code'          => ['required', 'exists:users,verification_code'],
             'password'      => ['required', 'string', 'min:6', 'max:30'],
             'device_token'  => ['sometimes', 'nullable', 'string']
         ];
@@ -33,8 +33,8 @@ class ChangePasswordRequest extends FormRequest
     {
         if(request()->is('api/*')) {
             return [
-                'code.required'         => 'code_required',
-                'code.exists'           => 'code_not_correct',
+                'verification_code.required'    => 'code_required',
+                'verification_code.exists'      => 'code_not_correct',
                 'password.required'     => 'password_required',
                 'password.string'       => 'password_format_not_valid',
                 'password.min'          => 'password_min_6',

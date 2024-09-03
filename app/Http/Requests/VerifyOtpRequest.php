@@ -23,7 +23,7 @@ class VerifyOtpRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code'          => ['required', 'exists:users,verification_code'],
+            'verification_code'          => ['required', 'exists:users,verification_code'],
             'device_token'  => ['sometimes', 'nullable', 'string']
         ];
     }
@@ -32,9 +32,9 @@ class VerifyOtpRequest extends FormRequest
     {
         if(request()->is('api/*')) {
             return [
-                'code.required'         => 'code_required',
-                'code.exists'           => 'code_not_correct',
-                'device_token.string'   => 'device_token_format_not_valid'
+                'verification_code.required'         => 'code_required',
+                'verification_code.exists'           => 'code_not_correct',
+                'device_token.string'                => 'device_token_format_not_valid'
             ];
         }
 

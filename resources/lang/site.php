@@ -5,6 +5,12 @@ return
     /**
      * Navigation bar translations
      */
+    'mail' => [
+        'alt-logo'                => 'alt-logo',
+        'title'                   => 'title',
+        'verification-code-title' => 'verification-code-title',
+        'verification-code-note'  => 'verification-code-note',
+    ],
     'nav' => [
         'get in touch' => 'get in touch',
     ],

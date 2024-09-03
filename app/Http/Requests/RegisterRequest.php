@@ -8,25 +8,17 @@ use App\Enums\LanguageEnum;
 
 class RegisterRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array|string>
-     */
     public function rules(): array
     {
         return [
             'name'          => ['required', 'string', 'min:3', 'max:50'],
-            'email'         => ['required', 'email'],
-            'phone'         => ['required', 'string'],
+            'email'         => ['required', 'email', 'unique:users,email'],
+            'phone'         => ['required', 'string', 'unique:users,phone'],
             'country_code'  => ['required', 'string'],
             'password'      => ['required', 'string', 'min:6', 'max:30'],
         ];
@@ -34,7 +26,7 @@ class RegisterRequest extends FormRequest
 
     public function messages(): array
     {
-        if(request()->is('api/*')) {
+        if (request()->is('api/*')) {
             return [
                 'name.required'         => 'name_required',
                 'name.string'           => 'name_format_not_valid',
