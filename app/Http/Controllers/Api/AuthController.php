@@ -190,7 +190,7 @@ class AuthController extends Controller
     {
         try {
             do {
-                $code = random_int(111111, 999999);
+                $code = random_int(1111, 9999);
                 $exists = User::where('verification_code', $code)->exists();
             } while ($exists);
             return $code;

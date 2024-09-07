@@ -6,18 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 
-class Category extends Model
+class Banner extends Model
 {
     use HasFactory, HasTranslations;
     protected $guarded = [];
-    protected $fillable = ['name', 'image','banner','tag'];
+    protected $fillable = ['name','image','tag'];
     public $translatable = ['name','tag'];
-    public function subcategories()
-    {
-        return $this->hasMany(sub_category::class);
-    }
-    public function products()
-    {
-        return $this->hasMany(Product::class);
-    }
 }

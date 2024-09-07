@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CategoryResource\Pages;
-use App\Filament\Resources\CategoryResource\RelationManagers;
-use App\Models\Category;
+use App\Filament\Resources\BannerResource\Pages;
+use App\Filament\Resources\BannerResource\RelationManagers;
+use App\Models\Banner;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
@@ -15,14 +15,12 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class CategoryResource extends Resource
+class BannerResource extends Resource
 {
     use Translatable;
-    protected static ?string $model = Category::class;
+    protected static ?string $model = Banner::class;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationLabel = 'Main Category';
-    protected static ?string $navigationGroup = 'Categories';
-
+    protected static ?string $navigationGroup = 'Banner Sections';
     public static function form(Form $form): Form
     {
         return $form
@@ -30,9 +28,9 @@ class CategoryResource extends Resource
                 Forms\Components\TextInput::make('name')->required(),
                 Forms\Components\TextInput::make('tag')->required(),
                 FileUpload::make('image')->imageEditor()->required(),
-                FileUpload::make('banner')->imageEditor()->required(),
             ]);
     }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -40,7 +38,6 @@ class CategoryResource extends Resource
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('tag'),
                 Tables\Columns\ImageColumn::make('image'),
-                Tables\Columns\ImageColumn::make('banner'),
             ])
             ->filters([
                 //
@@ -70,12 +67,13 @@ class CategoryResource extends Resource
             //
         ];
     }
+
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCategories::route('/'),
-            'create' => Pages\CreateCategory::route('/create'),
-            'edit' => Pages\EditCategory::route('/{record}/edit'),
+            'index' => Pages\ListBanners::route('/'),
+            'create' => Pages\CreateBanner::route('/create'),
+            'edit' => Pages\EditBanner::route('/{record}/edit'),
         ];
     }
 }
