@@ -10,6 +10,6 @@ class Banner extends Model
 {
     use HasFactory, HasTranslations;
     protected $guarded = [];
-    protected $fillable = ['name','image','tag'];
-    public $translatable = ['name','tag'];
+    protected $fillable = ['name','image','tag','bannertag','bannerimage'];
+    public $translatable = ['name','tag','bannertag'];
 }

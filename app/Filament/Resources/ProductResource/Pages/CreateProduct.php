@@ -32,6 +32,9 @@ class CreateProduct extends CreateRecord
                 'color'      => $item['color'] ?? null,
                 'size'       => $item['size'] ?? null,
                 'image'      => $item['image'] ?? null,
+                'size'       => $item['size'] ?? null,
+                'attributes' => $item['attributes'] ?? null,
+
             ]);
         }
     }

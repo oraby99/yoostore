@@ -31,6 +31,7 @@ class CategoryResource extends Resource
                 Forms\Components\TextInput::make('tag')->required(),
                 FileUpload::make('image')->imageEditor()->required(),
                 FileUpload::make('banner')->imageEditor()->required(),
+                FileUpload::make('bannerimage')->imageEditor()->required(),
             ]);
     }
     public static function table(Table $table): Table
@@ -38,9 +39,10 @@ class CategoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('tag'),
+                Tables\Columns\TextColumn::make('tag')->label('banner tag'),
                 Tables\Columns\ImageColumn::make('image'),
                 Tables\Columns\ImageColumn::make('banner'),
+                Tables\Columns\ImageColumn::make('bannerimage'),
             ])
             ->filters([
                 //

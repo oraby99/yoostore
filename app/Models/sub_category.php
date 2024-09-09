@@ -10,9 +10,9 @@ class sub_category extends Model
 {
     use HasFactory, HasTranslations;
     protected $guarded = [];
-    protected $fillable = ['name', 'image','banner','category_id'];
+    protected $fillable = ['name', 'image','banner','category_id','bannertag','bannerimage'];
 
-    public $translatable = ['name'];
+    public $translatable = ['name','bannertag'];
     public function category()
     {
         return $this->belongsTo(Category::class);

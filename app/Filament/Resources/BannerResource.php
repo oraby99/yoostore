@@ -20,7 +20,7 @@ class BannerResource extends Resource
     use Translatable;
     protected static ?string $model = Banner::class;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Banner Sections';
+    protected static ?string $navigationGroup = 'Sections';
     public static function form(Form $form): Form
     {
         return $form
@@ -28,6 +28,8 @@ class BannerResource extends Resource
                 Forms\Components\TextInput::make('name')->required(),
                 Forms\Components\TextInput::make('tag')->required(),
                 FileUpload::make('image')->imageEditor()->required(),
+                Forms\Components\TextInput::make('bannertag')->required(),
+                FileUpload::make('bannerimage')->imageEditor()->required(),
             ]);
     }
 
@@ -38,6 +40,8 @@ class BannerResource extends Resource
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('tag'),
                 Tables\Columns\ImageColumn::make('image'),
+                Tables\Columns\TextColumn::make('bannertag'),
+                Tables\Columns\ImageColumn::make('bannerimage'),
             ])
             ->filters([
                 //

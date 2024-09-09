@@ -12,6 +12,7 @@ class ProductDetail extends Model
     protected $fillable = ['product_id', 'price', 'discount', 'stock', 'image', 'color', 'size', 'attributes'];
     protected $casts = [
         'attributes' => 'array',
+        'size' => 'array',
     ];
     public function product()
     {

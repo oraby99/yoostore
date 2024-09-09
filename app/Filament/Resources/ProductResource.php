@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\sub_category;
 use Closure;
 use Filament\Forms;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -32,6 +33,7 @@ class ProductResource extends Resource
             ->schema([
                 TextInput::make('name')->required(),
                 TextInput::make('description')->required(),
+                TextInput::make('longdescription')->required(),
                 TextInput::make('tag')->required(),
                 TextInput::make('deliverytime')->label('Delivery Time')->numeric()->required(),
                 Select::make('category_id')
@@ -57,35 +59,41 @@ class ProductResource extends Resource
                 ->directory('product-images') 
                 ->required(),           
                 Forms\Components\Repeater::make('details')
-                    ->label('Product Details')
-                    ->schema([
-                        TextInput::make('color')
+                ->label('Product Details')
+                ->schema([
+                    TextInput::make('color')
                         ->label('Color'),
-                        TextInput::make('size')
-                        ->label('Size'),
-                        Forms\Components\FileUpload::make('image')
+                    Select::make('size')
+                        ->label('Size')
+                        ->multiple() // Allows multiple sizes
+                        ->options([
+                            'S' => 'Small',
+                            'M' => 'Medium',
+                            'L' => 'Large',
+                            'XL' => 'Extra Large',
+                        ]),
+                    Forms\Components\FileUpload::make('image')
                         ->imageEditor()
                         ->label('Image')
                         ->directory('product-detail-images')
                         ->preserveFilenames()
-                        ->nullable(),                    
-                        TextInput::make('price')
-                            ->label('Price')
-                            ->numeric()
-                            ->required(),
-                        TextInput::make('discount')
-                            ->label('Price After Discount')
-                            ->numeric()
-                            ->placeholder('Leave blank to use price value')
-                            ->default(null)
-                            ->nullable(),
-                        TextInput::make('stock')
-                            ->label('Stock')
-                            ->numeric(),
-
-                    ])
-                    ->defaultItems(1)
-                    ->required(),
+                        ->nullable(),
+                    TextInput::make('price')
+                        ->label('Price')
+                        ->numeric()
+                        ->required(),
+                    TextInput::make('discount')
+                        ->label('Price After Discount')
+                        ->numeric()
+                        ->nullable(),
+                    TextInput::make('stock')
+                        ->label('Stock')
+                        ->numeric(),
+                        KeyValue::make('attributes'),
+                ])
+                ->defaultItems(1)
+                ->required(),
+            
                 
             ]);
     }
@@ -103,6 +111,7 @@ class ProductResource extends Resource
                     }),
                 TextColumn::make('category.name')->label('Category Name'),
                 TextColumn::make('subCategory.name')->label('Sub Category Name'),
+
             ])
             ->filters([
                 //

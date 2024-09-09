@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('discount', 8, 2)->nullable();
             $table->string('image');
             $table->string('color');
-            $table->string('size');
+            $table->json('size')->nullable();
             $table->integer('stock')->nullable();
             $table->json('attributes')->nullable();
             $table->timestamps();

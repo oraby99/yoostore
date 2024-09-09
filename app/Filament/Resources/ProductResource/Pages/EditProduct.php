@@ -30,6 +30,8 @@ class EditProduct extends EditRecord
                 'color'    => $detail->color,
                 'size'     => $detail->size,
                 'image'    => $detail->image ? [$detail->image] : [],  // Wrap in array
+                'attributes' => $item['attributes'] ?? null,
+
             ];
         })->toArray();
         $data['images'] = $product->images->pluck('image_path')->toArray(); 
@@ -50,15 +52,14 @@ class EditProduct extends EditRecord
     }    
     private function updateSizesWithPrices(Product $product, array $sizesWithPrices)
     {
-        $product->productDetails()->delete(); // Clear existing details
-    
+        $product->productDetails()->delete();
         foreach ($sizesWithPrices as $item) {
             $image = null;
             if (isset($item['image'])) {
                 if (is_array($item['image']) && count($item['image']) > 0) {
-                    $image = $item['image'][0]; // Use the first image in the array
+                    $image = $item['image'][0];
                 } elseif (is_string($item['image'])) {
-                    $image = $item['image']; // Use the string image path directly
+                    $image = $item['image'];
                 }
             }
             ProductDetail::create([
@@ -69,12 +70,14 @@ class EditProduct extends EditRecord
                 'color'      => $item['color'] ?? null,
                 'size'       => $item['size'] ?? null,
                 'image'      => $image,
+                'attributes' => $item['attributes'] ?? null,
+
             ]);
         }
     }
     private function saveImages(Product $product, array $images)
     {
-        $product->images()->delete(); // Clear existing images
+        $product->images()->delete();
         foreach ($images as $image) {
             if ($image) {
                 $product->images()->create(['image_path' => $image]);
