@@ -34,7 +34,7 @@ class SubCategoryResource extends Resource
                 FileUpload::make('image')->imageEditor()->required(),
                 Forms\Components\Select::make('category_id')->options($categories)->required(),
                 FileUpload::make('banner')->imageEditor()->required(),
-                FileUpload::make('bannerimage')->imageEditor()->required(),
+                FileUpload::make('bannerimage')->imageEditor()->required()->label('Second Banner'),
                 Forms\Components\TextInput::make('bannertag')->required(),
 
 
@@ -49,7 +49,7 @@ class SubCategoryResource extends Resource
                 Tables\Columns\TextColumn::make('category.name')->label('Category Name'),
                 Tables\Columns\ImageColumn::make('image'),
                 Tables\Columns\ImageColumn::make('banner'),
-                Tables\Columns\ImageColumn::make('bannerimage'),
+                Tables\Columns\ImageColumn::make('bannerimage')->label('Second Banner'),
                 Tables\Columns\TextColumn::make('bannertag'),
 
             ])

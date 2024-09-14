@@ -17,6 +17,8 @@ return new class extends Migration
             $table->text('description');
             $table->text('longdescription');
             $table->string('tag');
+            $table->integer('discount')->nullable();
+            $table->json('attributes')->nullable();
             $table->string('deliverytime');
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categories');

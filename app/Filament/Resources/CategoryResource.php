@@ -28,10 +28,10 @@ class CategoryResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')->required(),
-                Forms\Components\TextInput::make('tag')->required(),
+                Forms\Components\TextInput::make('tag')->required()->label('Banner Tag'),
                 FileUpload::make('image')->imageEditor()->required(),
                 FileUpload::make('banner')->imageEditor()->required(),
-                FileUpload::make('bannerimage')->imageEditor()->required(),
+                FileUpload::make('bannerimage')->imageEditor()->required()->label('Second Banner'),
             ]);
     }
     public static function table(Table $table): Table
@@ -42,7 +42,7 @@ class CategoryResource extends Resource
                 Tables\Columns\TextColumn::make('tag')->label('banner tag'),
                 Tables\Columns\ImageColumn::make('image'),
                 Tables\Columns\ImageColumn::make('banner'),
-                Tables\Columns\ImageColumn::make('bannerimage'),
+                Tables\Columns\ImageColumn::make('bannerimage')->label('Second Banner'),
             ])
             ->filters([
                 //

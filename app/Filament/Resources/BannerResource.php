@@ -21,15 +21,29 @@ class BannerResource extends Resource
     protected static ?string $model = Banner::class;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Sections';
+    protected static ?string $navigationLabel  = 'Sections';
+    protected static ?string $navigationTitle = 'Sections';
+    public static function getNavigationLabel(): string
+    {
+        return 'Sections';
+    }
+    public static function getPluralLabel(): string
+    {
+        return 'Sections';
+    }
+    public static function getLabel(): string
+    {
+        return 'Sections';
+    }
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')->required(),
                 Forms\Components\TextInput::make('tag')->required(),
-                FileUpload::make('image')->imageEditor()->required(),
-                Forms\Components\TextInput::make('bannertag')->required(),
-                FileUpload::make('bannerimage')->imageEditor()->required(),
+                FileUpload::make('image')->imageEditor()->required()->label('Banner'),
+                Forms\Components\TextInput::make('bannertag')->label('Banner Tag')->required(),
+                FileUpload::make('bannerimage')->imageEditor()->label('Second Banner')->required(),
             ]);
     }
 
@@ -39,23 +53,23 @@ class BannerResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('tag'),
-                Tables\Columns\ImageColumn::make('image'),
-                Tables\Columns\TextColumn::make('bannertag'),
-                Tables\Columns\ImageColumn::make('bannerimage'),
+                Tables\Columns\ImageColumn::make('image')->label('Banner'),
+                Tables\Columns\TextColumn::make('bannertag')->label('Banner Tag'),
+                Tables\Columns\ImageColumn::make('bannerimage')->label('Second Banner'),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make()
+                    //Tables\Actions\DeleteAction::make()
                 ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    //Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])->emptyStateActions([
                 Tables\Actions\CreateAction::make(),

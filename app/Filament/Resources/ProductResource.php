@@ -11,6 +11,7 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
@@ -28,14 +29,15 @@ class ProductResource extends Resource
     protected static ?string $navigationGroup = 'Products';
     public static function form(Form $form): Form
     {
-        $categories = sub_category::all()->pluck('name', 'id');
         return $form
             ->schema([
                 TextInput::make('name')->required(),
                 TextInput::make('description')->required(),
-                TextInput::make('longdescription')->required(),
+                TextInput::make('longdescription')->required()->label('long description'),
                 TextInput::make('tag')->required(),
                 TextInput::make('deliverytime')->label('Delivery Time')->numeric()->required(),
+                KeyValue::make('attributes'),
+                TextInput::make('discount')->label('discount')->numeric(),
                 Select::make('category_id')
                     ->label('Category')
                     ->options(Category::all()->pluck('name', 'id')->toArray())
@@ -53,48 +55,74 @@ class ProductResource extends Resource
                         return [];
                     }),
                 Forms\Components\FileUpload::make('images')
-                ->label('Images')
-                ->multiple() // Make sure 'multiple' is enabled for multiple files
-                ->imageEditor()
-                ->directory('product-images') 
-                ->required(),           
-                Forms\Components\Repeater::make('details')
-                ->label('Product Details')
-                ->schema([
-                    TextInput::make('color')
-                        ->label('Color'),
-                    Select::make('size')
-                        ->label('Size')
-                        ->multiple() // Allows multiple sizes
-                        ->options([
-                            'S' => 'Small',
-                            'M' => 'Medium',
-                            'L' => 'Large',
-                            'XL' => 'Extra Large',
-                        ]),
-                    Forms\Components\FileUpload::make('image')
-                        ->imageEditor()
-                        ->label('Image')
-                        ->directory('product-detail-images')
-                        ->preserveFilenames()
-                        ->nullable(),
-                    TextInput::make('price')
-                        ->label('Price')
-                        ->numeric()
-                        ->required(),
-                    TextInput::make('discount')
-                        ->label('Price After Discount')
-                        ->numeric()
-                        ->nullable(),
-                    TextInput::make('stock')
-                        ->label('Stock')
-                        ->numeric(),
-                        KeyValue::make('attributes'),
-                ])
-                ->defaultItems(1)
-                ->required(),
-            
-                
+                    ->label('Images')
+                    ->multiple()
+                    ->imageEditor()
+                    ->directory('product-images') 
+                    ->required(),
+                    
+                Toggle::make('is_product_details')
+                    ->label('Use Product Details')
+                    ->default(true)
+                    ->reactive()
+                    ->afterStateUpdated(function (callable $set, $state) {
+                        // Clear the other repeater fields based on the toggle state
+                        if ($state) {
+                            $set('type_details', []);
+                        } else {
+                            $set('product_details', []);
+                        }
+                    }),
+    
+                Forms\Components\Repeater::make('product_details')
+                    ->label('Product Details')
+                    ->visible(fn (callable $get) => $get('is_product_details'))
+                    ->schema([
+                        TextInput::make('color')->label('Color'),
+                        Select::make('size')
+                            ->label('Size')
+                            ->multiple()
+                            ->options([
+                                'S' => 'Small',
+                                'M' => 'Medium',
+                                'L' => 'Large',
+                                'XL' => 'Extra Large',
+                            ]),
+                        Forms\Components\FileUpload::make('image')
+                            ->imageEditor()
+                            ->label('Image')
+                            ->directory('product-detail-images')
+                            ->preserveFilenames()
+                            ->nullable(),
+                        TextInput::make('price')
+                            ->label('Price')
+                            ->numeric(),
+                        TextInput::make('stock')
+                            ->label('Stock')
+                            ->numeric(),
+                    ])
+                    ->defaultItems(1),
+    
+                Forms\Components\Repeater::make('type_details')
+                    ->label('Product Type Details')
+                    ->visible(fn (callable $get) => !$get('is_product_details'))
+                    ->schema([
+                        TextInput::make('typename')
+                            ->label('Type Name'),
+                        Forms\Components\FileUpload::make('typeimage')
+                            ->imageEditor()
+                            ->label('Type Image')
+                            ->directory('product-detail-images')
+                            ->preserveFilenames()
+                            ->nullable(),
+                        TextInput::make('typeprice')
+                            ->label('Type Price')
+                            ->numeric(),
+                        TextInput::make('typestock')
+                            ->label('Type Stock')
+                            ->numeric(),
+                    ])
+                    ->defaultItems(1),
             ]);
     }
     public static function table(Table $table): Table

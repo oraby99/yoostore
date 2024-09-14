@@ -12,29 +12,41 @@ class CreateProduct extends CreateRecord
     protected static string $resource = ProductResource::class;
     protected function handleRecordCreation(array $data): Product
     {
-        $sizesWithPrices = $data['details'];
-        unset($data['details']);
+        $product = Product::create($data);
         $images = $data['images'];
         unset($data['images']);
-        $product = Product::create($data);
-        $this->updateSizesWithPrices($product, $sizesWithPrices);
+        
+        if ($data['is_product_details']) {
+            $this->updateProductDetails($product, $data['product_details']);
+        } else {
+            $this->updateTypeDetails($product, $data['type_details']);
+        }
+    
         $this->saveImages($product, $images);
         return $product;
-    }
-    private function updateSizesWithPrices(Product $product, array $sizesWithPrices)
+    }    
+    private function updateProductDetails(Product $product, array $productDetails)
     {
-        foreach ($sizesWithPrices as $item) {
+        foreach ($productDetails as $item) {
             ProductDetail::create([
                 'product_id' => $product->id,
                 'price'      => $item['price'],
-                'discount'   => $item['discount'] ?? $item['price'],
                 'stock'      => $item['stock'] ?? 0,
                 'color'      => $item['color'] ?? null,
                 'size'       => $item['size'] ?? null,
                 'image'      => $item['image'] ?? null,
-                'size'       => $item['size'] ?? null,
-                'attributes' => $item['attributes'] ?? null,
-
+            ]);
+        }
+    }
+    private function updateTypeDetails(Product $product, array $typeDetails)
+    {
+        foreach ($typeDetails as $item) {
+            ProductDetail::create([
+                'product_id' => $product->id,
+                'typename'   => $item['typename'] ?? null,
+                'typeprice'  => $item['typeprice'],
+                'typestock'  => $item['typestock'] ?? 0,
+                'typeimage'  => $item['typeimage'] ?? null,
             ]);
         }
     }

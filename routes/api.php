@@ -25,7 +25,10 @@ Route::controller('App\Http\Controllers\Api\AuthController')->group(function () 
     });
 
 });
-Route::get('/banners-products', [BannerProductController::class, 'getBannersWithProducts']);
+Route::get('/banners-sections',      [BannerProductController::class, 'getBannersWithProducts']);
+Route::get('/products',              [BannerProductController::class, 'products']);
+Route::get('/categories',            [BannerProductController::class, 'categories']);
+Route::get('/subcategory/{id}',      [BannerProductController::class, 'subcategory']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
