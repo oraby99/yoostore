@@ -12,4 +12,9 @@ class Banner extends Model
     protected $guarded = [];
     protected $fillable = ['name','image','tag','bannertag','bannerimage'];
     public $translatable = ['name','tag','bannertag'];
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'tag', 'tag');
+    }
+
 }

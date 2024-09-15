@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Api\Banners;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\BannerResource;
+use App\Http\Resources\ProductResource;
 use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Product;
@@ -15,21 +18,19 @@ class BannerProductController extends Controller
         $banners = Banner::all();
         $response = [];
         foreach ($banners as $index => $banner) {
-            $bannerTag = $banner->getTranslation('tag', 'en'); 
+            $bannerTag = $banner->getTranslation('tag', 'en');
             if ($index < 3) {
                 $products = Product::where('tag->en', $bannerTag)
-                                    ->with('productDetails')
-                                    ->take(10)
-                                    ->get();
+                    ->with('productDetails')
+                    ->take(10)
+                    ->get();
             } else {
                 $products = [];
             }
-            $response[] = [
-                'banner' => $banner,
-                'products' => $products
-            ];
+            $banner->products = $products;
+            $response[] = new BannerResource($banner);
         }
-        return response()->json($response);
+        return ApiResponse::send(true, 'Banners with products retrieved successfully', $response);
     }
     public function categories()
     {
@@ -45,13 +46,13 @@ class BannerProductController extends Controller
     }
     public function products(Request $request)
     {
-        $searchKey = $request->query('search');     // Search for name or description
-        $page = $request->query('page', 1);         // Pagination page, default is 1
-        $perPage = $request->query('per_page', 10); // Items per page, default is 10
-        $tag = $request->query('tag');              // Tag to filter by
-        $categoryId = $request->query('cat_id');    // Category ID to filter by
-        $subCategoryId = $request->query('sub_id'); // Subcategory ID to filter by
-        $query = Product::with('productDetails');
+        $searchKey = $request->query('search'); 
+        $page = $request->query('page', 1);
+        $perPage = $request->query('per_page', 10);
+        $tag = $request->query('tag');
+        $categoryId = $request->query('cat_id');
+        $subCategoryId = $request->query('sub_id');
+        $query = Product::with('productDetails')->with('images');
         if ($searchKey) {
             $query->where(function ($q) use ($searchKey) {
                 $q->where('name->en', 'like', '%' . $searchKey . '%')
@@ -68,6 +69,7 @@ class BannerProductController extends Controller
             $query->where('sub_category_id', $subCategoryId);
         }
         $products = $query->paginate($perPage, ['*'], 'page', $page);
+        return ProductResource::collection($products);
         return response()->json($products);
     }
     
