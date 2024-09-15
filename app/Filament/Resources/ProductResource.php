@@ -36,7 +36,7 @@ class ProductResource extends Resource
                 TextInput::make('longdescription')->required()->label('long description'),
                 TextInput::make('tag')->required(),
                 TextInput::make('deliverytime')->label('Delivery Time')->numeric()->required(),
-                KeyValue::make('attributes'),
+                KeyValue::make('attributes')->required(),
                 TextInput::make('discount')->label('discount')->numeric(),
                 Select::make('category_id')
                     ->label('Category')
@@ -78,8 +78,8 @@ class ProductResource extends Resource
                     ->label('Product Details')
                     ->visible(fn (callable $get) => $get('is_product_details'))
                     ->schema([
-                        TextInput::make('color')->label('Color'),
-                        Select::make('size')
+                        TextInput::make('color')->label('Color')->required(),
+                        Select::make('size')->required()
                             ->label('Size')
                             ->multiple()
                             ->options([
@@ -93,13 +93,13 @@ class ProductResource extends Resource
                             ->label('Image')
                             ->directory('product-detail-images')
                             ->preserveFilenames()
-                            ->nullable(),
+                            ->required(),
                         TextInput::make('price')
                             ->label('Price')
-                            ->numeric(),
+                            ->numeric()->required(),
                         TextInput::make('stock')
                             ->label('Stock')
-                            ->numeric(),
+                            ->numeric()->required(),
                     ])
                     ->defaultItems(1),
     
@@ -108,19 +108,19 @@ class ProductResource extends Resource
                     ->visible(fn (callable $get) => !$get('is_product_details'))
                     ->schema([
                         TextInput::make('typename')
-                            ->label('Type Name'),
+                            ->label('Type Name')->required(),
                         Forms\Components\FileUpload::make('typeimage')
                             ->imageEditor()
                             ->label('Type Image')
                             ->directory('product-detail-images')
                             ->preserveFilenames()
-                            ->nullable(),
+                            ->required(),
                         TextInput::make('typeprice')
                             ->label('Type Price')
-                            ->numeric(),
+                            ->numeric()->required(),
                         TextInput::make('typestock')
                             ->label('Type Stock')
-                            ->numeric(),
+                            ->numeric()->required(),
                     ])
                     ->defaultItems(1),
             ]);

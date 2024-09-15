@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api\Banners;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BannerResource;
+use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\SubCategoryResource;
 use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Product;
@@ -32,17 +34,31 @@ class BannerProductController extends Controller
         }
         return ApiResponse::send(true, 'Banners with products retrieved successfully', $response);
     }
+    public function getFourthBannerProducts(Request $request)
+    {
+        $banner = Banner::skip(3)->first();
+        if ($banner) {
+            $bannerTag = $banner->getTranslation('tag', 'en');
+            $perPage = $request->query('per_page', 10);
+            $products = Product::where('tag->en', $bannerTag)
+                ->with('productDetails')
+                ->paginate($perPage);
+            $banner->products = $products;
+            return ApiResponse::send(true, 'Products related to the fourth banner retrieved successfully', [
+                new BannerResource($banner)
+            ]);
+        }
+        return ApiResponse::send(false, 'Fourth banner not found', []);
+    }
     public function categories()
     {
         $categories = Category::with('subcategories')->get();
-        return response()->json($categories);
-
+        return CategoryResource::collection($categories);
     }
     public function subcategory($id)
     {
-        $categories = sub_category::where('category_id',$id)->get();
-        return response()->json($categories);
-        
+        $subcategories = sub_category::where('category_id', $id)->get();
+        return SubCategoryResource::collection($subcategories);
     }
     public function products(Request $request)
     {
@@ -72,6 +88,5 @@ class BannerProductController extends Controller
         return ProductResource::collection($products);
         return response()->json($products);
     }
-    
 }
 

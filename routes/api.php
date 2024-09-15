@@ -26,6 +26,7 @@ Route::controller('App\Http\Controllers\Api\AuthController')->group(function () 
 
 });
 Route::get('/banners-sections',      [BannerProductController::class, 'getBannersWithProducts']);
+Route::get('/fourth-banner-products', [BannerProductController::class, 'getFourthBannerProducts']);
 Route::get('/products',              [BannerProductController::class, 'products']);
 Route::get('/categories',            [BannerProductController::class, 'categories']);
 Route::get('/subcategory/{id}',      [BannerProductController::class, 'subcategory']);

@@ -14,6 +14,16 @@ class ProductResource extends JsonResource
      */
     public function toArray($request)
     {
+        $productDetails = ProductDetailResource::collection($this->productDetails);
+        $productPrices = $productDetails->map(function($detail) {
+            return $detail->price;
+        })->filter();
+        $typeDetails = TypeDetailResource::collection($this->productDetails);
+        $typePrices = $typeDetails->map(function($detail) {
+            return $detail->typeprice;
+        })->filter();
+        $allPrices = $productPrices->merge($typePrices);    
+        $minPrice = $allPrices->min();
         return [
             'id' => $this->id,
             'name' => $this->getTranslations('name'),
@@ -25,8 +35,9 @@ class ProductResource extends JsonResource
             'deliverytime' => $this->deliverytime,
             'category_id' => $this->category_id,
             'sub_category_id' => $this->sub_category_id,
-            'product_details' => ProductDetailResource::collection($this->productDetails),
-            'type_details' => TypeDetailResource::collection($this->productDetails),
+            'min_price' => $minPrice,
+            'product_details' => $productDetails,
+            'type_details' => $typeDetails,
             'images' => $this->images->map(function ($image) {
                 return [
                     'id' => $image->id,
@@ -36,4 +47,6 @@ class ProductResource extends JsonResource
             }),
         ];
     }
+    
+    
 }

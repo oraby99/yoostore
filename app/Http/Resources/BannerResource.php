@@ -17,10 +17,10 @@ class BannerResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->getTranslations('name'),
-            'image' => $this->image,
+            'image' => $this->image ? url('storage/' . $this->image) : null,
             'tag' => $this->getTranslations('tag'),
             'bannertag' => $this->getTranslations('bannertag'),
-            'bannerimage' => $this->bannerimage,
+            'bannerimage' => $this->bannerimage ? url('storage/' . $this->bannerimage) : null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'products' => ProductResource::collection($this->products),
