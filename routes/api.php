@@ -25,11 +25,13 @@ Route::controller('App\Http\Controllers\Api\AuthController')->group(function () 
     });
 
 });
-Route::get('/banners-sections',      [BannerProductController::class, 'getBannersWithProducts']);
+Route::get('/banners-sections',       [BannerProductController::class, 'getBannersWithProducts']);
 Route::get('/fourth-banner-products', [BannerProductController::class, 'getFourthBannerProducts']);
-Route::get('/products',              [BannerProductController::class, 'products']);
-Route::get('/categories',            [BannerProductController::class, 'categories']);
-Route::get('/subcategory/{id}',      [BannerProductController::class, 'subcategory']);
+Route::get('/products',               [BannerProductController::class, 'products']);
+Route::get('/categories',             [BannerProductController::class, 'categories']);
+Route::get('/subcategory/{id}',       [BannerProductController::class, 'subcategory']);
+Route::get('/offers',                 [BannerProductController::class, 'getOffers']);
+Route::get('/offers-by-tag',          [BannerProductController::class, 'getOffersByTag']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
