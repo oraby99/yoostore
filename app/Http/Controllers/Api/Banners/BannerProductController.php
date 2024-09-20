@@ -8,11 +8,13 @@ use App\Http\Resources\BannerResource;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\OfferResource;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\ProfileResource;
 use App\Http\Resources\SubCategoryResource;
 use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Offer;
 use App\Models\Product;
+use App\Models\Profile;
 use App\Models\sub_category;
 use Illuminate\Http\Request;
 class BannerProductController extends Controller
@@ -106,6 +108,32 @@ class BannerProductController extends Controller
                 ->paginate($perPage);
             return ApiResponse::send(true, 'Offer and related products retrieved successfully', [
                 'offer' => new OfferResource($offer),
+                'products' => [
+                    'data' => ProductResource::collection($products),
+                    'pagination' => [
+                        'total' => $products->total(),
+                        'current_page' => $products->currentPage(),
+                        'per_page' => $products->perPage(),
+                        'last_page' => $products->lastPage(),
+                        'next_page_url' => $products->nextPageUrl(),
+                        'prev_page_url' => $products->previousPageUrl(),
+                    ]
+                ]
+            ]);
+        }
+        return ApiResponse::send(false, 'No offer found', []);
+    }
+    public function getProfileByTag(Request $request)
+    {
+        $perPage = $request->query('per_page', 10);
+        $offer = Profile::first();
+        if ($offer) {
+            $offerTag = $offer->getTranslation('tag', 'en');
+            $products = Product::where('tag->en', $offerTag)
+                ->with('productDetails')
+                ->paginate($perPage);
+            return ApiResponse::send(true, 'Profile product and related products retrieved successfully', [
+                'offer' => new ProfileResource($offer),
                 'products' => [
                     'data' => ProductResource::collection($products),
                     'pagination' => [

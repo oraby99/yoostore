@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Banners\BannerProductController;
+use App\Http\Controllers\Api\General\FavoriteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,8 +33,8 @@ Route::get('/categories',             [BannerProductController::class, 'categori
 Route::get('/subcategory/{id}',       [BannerProductController::class, 'subcategory']);
 Route::get('/offers',                 [BannerProductController::class, 'getOffers']);
 Route::get('/offers-by-tag',          [BannerProductController::class, 'getOffersByTag']);
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-
+Route::get('/profile-by-tag',         [BannerProductController::class, 'getProfileByTag']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/favorite', [FavoriteController::class, 'addFavorite']);
+    Route::delete('/favorite/{productId}', [FavoriteController::class, 'removeFavorite']);
 });

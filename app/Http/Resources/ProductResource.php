@@ -24,6 +24,12 @@ class ProductResource extends JsonResource
         })->filter();
         $allPrices = $productPrices->merge($typePrices);    
         $minPrice = $allPrices->min();
+        $user = auth()->user();
+        $isFav = null;
+        if ($user) {
+            $isFav = $this->favorites()->where('user_id', $user->id)->exists() ? 1 : 0;
+        }
+
         return [
             'id' => $this->id,
             'name' => $this->getTranslations('name'),
@@ -36,6 +42,7 @@ class ProductResource extends JsonResource
             'category_id' => $this->category_id,
             'sub_category_id' => $this->sub_category_id,
             'min_price' => $minPrice,
+            'is_fav' => $isFav,
             'product_details' => $productDetails,
             'type_details' => $typeDetails,
             'images' => $this->images->map(function ($image) {
