@@ -149,5 +149,18 @@ class BannerProductController extends Controller
         }
         return ApiResponse::send(false, 'No offer found', []);
     }
+    public function productById($productId)
+    {
+        $favorite = Product::where('id', $productId)
+                    ->with('productDetails')->with('images')->first();
+        if ($favorite) {
+            $favoriteProduct = new ProductResource($favorite);
+            return ApiResponse::send(true, 'Product retrieved successfully', $favoriteProduct);
+        } else {
+            return ApiResponse::send(false, 'Product not found', null);
+        }
+    }
+    
+    
 }
 

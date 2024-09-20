@@ -1,35 +1,33 @@
 <?php
-
 namespace App\Http\Resources;
 
+use App\Models\Favorite;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
     public function toArray($request)
     {
         $productDetails = ProductDetailResource::collection($this->productDetails);
+        $typeDetails = TypeDetailResource::collection($this->typeDetails); // Use the typeDetails relationship
+    
         $productPrices = $productDetails->map(function($detail) {
             return $detail->price;
         })->filter();
-        $typeDetails = TypeDetailResource::collection($this->productDetails);
+    
         $typePrices = $typeDetails->map(function($detail) {
-            return $detail->typeprice;
+            return $detail->typeprice; // Assuming you have a typeprice field
         })->filter();
-        $allPrices = $productPrices->merge($typePrices);    
+    
+        $allPrices = $productPrices->merge($typePrices);
         $minPrice = $allPrices->min();
-        $user = auth()->user();
+    
         $isFav = null;
-        if ($user) {
-            $isFav = $this->favorites()->where('user_id', $user->id)->exists() ? 1 : 0;
+        $favs = Favorite::where('product_id', $this->id)->first();
+        if ($favs) {
+            $isFav = $favs->is_favorite;
         }
-
+    
         return [
             'id' => $this->id,
             'name' => $this->getTranslations('name'),
@@ -44,7 +42,7 @@ class ProductResource extends JsonResource
             'min_price' => $minPrice,
             'is_fav' => $isFav,
             'product_details' => $productDetails,
-            'type_details' => $typeDetails,
+            'type_details' => $typeDetails, // Ensure this is correctly referencing the relationship
             'images' => $this->images->map(function ($image) {
                 return [
                     'id' => $image->id,
@@ -54,6 +52,5 @@ class ProductResource extends JsonResource
             }),
         ];
     }
-    
     
 }
