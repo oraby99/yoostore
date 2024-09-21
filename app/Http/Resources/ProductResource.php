@@ -10,24 +10,19 @@ class ProductResource extends JsonResource
     {
         $productDetails = ProductDetailResource::collection($this->productDetails);
         $typeDetails = TypeDetailResource::collection($this->typeDetails); // Use the typeDetails relationship
-    
         $productPrices = $productDetails->map(function($detail) {
             return $detail->price;
         })->filter();
-    
         $typePrices = $typeDetails->map(function($detail) {
-            return $detail->typeprice; // Assuming you have a typeprice field
+            return $detail->typeprice;
         })->filter();
-    
         $allPrices = $productPrices->merge($typePrices);
         $minPrice = $allPrices->min();
-    
         $isFav = null;
         $favs = Favorite::where('product_id', $this->id)->first();
         if ($favs) {
             $isFav = $favs->is_favorite;
         }
-    
         return [
             'id' => $this->id,
             'name' => $this->getTranslations('name'),
@@ -42,7 +37,7 @@ class ProductResource extends JsonResource
             'min_price' => $minPrice,
             'is_fav' => $isFav,
             'product_details' => $productDetails,
-            'type_details' => $typeDetails, // Ensure this is correctly referencing the relationship
+            'type_details' => $typeDetails,
             'images' => $this->images->map(function ($image) {
                 return [
                     'id' => $image->id,

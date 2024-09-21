@@ -34,9 +34,10 @@ Route::get('/subcategory/{id}',       [BannerProductController::class, 'subcateg
 Route::get('/offers',                 [BannerProductController::class, 'getOffers']);
 Route::get('/offers-by-tag',          [BannerProductController::class, 'getOffersByTag']);
 Route::get('/profile-by-tag',         [BannerProductController::class, 'getProfileByTag']);
+Route::post('/product/{productId}',   [BannerProductController::class, 'productById']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/favorites',               [FavoriteController::class, 'getFavorites']);
     Route::post('/favorite',               [FavoriteController::class, 'addFavorite']);
     Route::delete('/favorite/{productId}', [FavoriteController::class, 'removeFavorite']);
-    Route::post('/product/{productId}',    [BannerProductController::class, 'productById']);
+    
 }); 

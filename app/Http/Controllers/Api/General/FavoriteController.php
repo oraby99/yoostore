@@ -33,10 +33,9 @@ class FavoriteController extends Controller
         ]);
         return response()->json(['message' => 'Product added to favorites'], 200);
     }
-    public function removeFavorite(Request $request)
+    public function removeFavorite($productId)
     {
         $user = auth()->user();
-        $productId = $request->input('product_id');
         $favorite = Favorite::where('user_id', $user->id)
                              ->where('product_id', $productId)
                              ->first();
