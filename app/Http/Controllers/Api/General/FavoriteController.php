@@ -57,6 +57,5 @@ class FavoriteController extends Controller
         });
         return ApiResponse::send(true, 'Favorites retrieved successfully', $favoriteProducts);
     }
-    
 }
 
