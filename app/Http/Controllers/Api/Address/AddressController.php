@@ -43,7 +43,14 @@ class AddressController extends Controller
     {
         $user = auth()->user();
         Address::where('user_id', $user->id)->update(['is_default' => 0]);
-        $address = Address::where('user_id', $user->id)->findOrFail($id);
+        $address = Address::where('user_id', $user->id)->find($id);
+        if (!$address) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Address not found',
+                'data' => null,
+            ], 404);
+        }
         $address->update(['is_default' => 1]);
         return response()->json([
             'status' => true,
