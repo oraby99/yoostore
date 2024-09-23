@@ -22,6 +22,7 @@ use App\Http\Requests\ForgotPasswordRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -204,5 +205,41 @@ class AuthController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
         return $this->success((new UserResource($user)));
+    }
+    public function logout(Request $request)
+    {
+        $user = Auth::user();
+        $user->tokens()->delete();
+        return response()->json([
+            'status' => true,
+            'message' => 'Logged out successfully',
+        ], 200);
+    }
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'name'          => 'required|string|max:255',
+            'phone'         => 'required|string|max:15',
+            'country_code'  => 'required|string|max:5',
+            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $user = Auth::user();
+        if ($request->hasFile('profile_image')) {
+            if ($user->profile_image) {
+                // Remove old profile image
+                Storage::delete('public/profile_images/' . basename($user->profile_image));
+            }
+            $image = $request->file('profile_image');
+            $imageName = 'profile-' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->storeAs('public/profile_images', $imageName);
+            $user->profile_image = url('storage/profile_images/' . $imageName);
+        }
+        $user->update($request->only('name', 'phone', 'country_code'));
+        return response()->json([
+            'status'  => true,
+            'message' => 'Profile updated successfully',
+            'data'    => $user,
+        ], 200);
     }
 }

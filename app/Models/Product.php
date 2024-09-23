@@ -43,5 +43,10 @@ class Product extends Model
     {
         return $this->hasMany(Favorite::class, 'product_id');
     }
+    public function rates()
+{
+    return $this->hasMany(Rate::class);
+}
+
 }
 

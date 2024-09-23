@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Address\AddressController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Banners\BannerProductController;
 use App\Http\Controllers\Api\General\FavoriteController;
 use App\Http\Controllers\Api\General\RateController;
@@ -46,4 +47,8 @@ use Illuminate\Support\Facades\Route;
     Route::patch('/address/{id}/default',    [AddressController::class, 'setDefault']);
     Route::post('/product/{productId}/rate', [RateController::class, 'store']);
     Route::get('/product/{productId}/rates', [RateController::class, 'getRatesByProduct']);
+    //========================================================================================================
+    Route::post('/logout',                   [AuthController::class, 'logout']);
+    Route::post('/profile/update',           [AuthController::class, 'updateProfile']);
+
 }); 

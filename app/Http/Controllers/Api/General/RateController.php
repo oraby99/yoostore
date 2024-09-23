@@ -38,8 +38,6 @@ class RateController extends Controller
         ]);
         return new RateResource($rate);
     }
-    
-    
     public function getRatesByProduct($productId)
     {
         $rates = Rate::where('product_id', $productId)->with('user')->get();

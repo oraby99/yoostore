@@ -160,7 +160,5 @@ class BannerProductController extends Controller
             return ApiResponse::send(false, 'Product not found', null);
         }
     }
-    
-    
 }
 
