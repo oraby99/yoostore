@@ -11,28 +11,27 @@ class ProductResource extends JsonResource
     {
         $productDetails = ProductDetailResource::collection($this->productDetails);
         $typeDetails = TypeDetailResource::collection($this->typeDetails);
-        
         $productPrices = $productDetails->map(function($detail) {
             return $detail->price;
         })->filter();
-
         $typePrices = $typeDetails->map(function($detail) {
             return $detail->typeprice;
         })->filter();
-
         $allPrices = $productPrices->merge($typePrices);
         $minPrice = $allPrices->min();
-
-        // Calculate the average rate and format it
         $averageRate = $this->rates()->avg('rate');
         $formattedAverageRate = $averageRate ? number_format($averageRate) : '0';
-
         $isFav = null;
-        $favs = Favorite::where('product_id', $this->id)->first();
-        if ($favs) {
-            $isFav = $favs->is_favorite;
+        if (auth()->check()) {
+            $favorite = Favorite::where('product_id', $this->id)
+                                ->where('user_id', auth()->id())
+                                ->first();
+            if ($favorite) {
+                $isFav = 1;
+            } else {
+                $isFav = 0;
+            }
         }
-
         return [
             'id' => $this->id,
             'name' => $this->getTranslations('name'),
@@ -45,7 +44,7 @@ class ProductResource extends JsonResource
             'category_id' => $this->category_id,
             'sub_category_id' => $this->sub_category_id,
             'min_price' => $minPrice,
-            'average_rate' => $formattedAverageRate,  // Return formatted average rate
+            'average_rate' => $formattedAverageRate,
             'is_fav' => $isFav,
             'product_details' => $productDetails,
             'type_details' => $typeDetails,

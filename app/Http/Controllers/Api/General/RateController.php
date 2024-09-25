@@ -13,7 +13,7 @@ class RateController extends Controller
     public function store(Request $request, $productId)
     {
         $request->validate([
-            'rate'        => 'required|integer|min:1|max:5',
+            'rate'        => 'required',
             'title'       => 'required|string|max:255',
             'description' => 'required|string',
             'images.*'    => 'image|mimes:jpg,jpeg,png,bmp|max:2048',

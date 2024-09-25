@@ -14,6 +14,7 @@ use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Offer;
 use App\Models\Product;
+use App\Models\ProductHistory;
 use App\Models\Profile;
 use App\Models\sub_category;
 use Illuminate\Http\Request;
@@ -151,11 +152,24 @@ class BannerProductController extends Controller
     }
     public function productById($productId)
     {
-        $favorite = Product::where('id', $productId)
-                    ->with('productDetails')->with('images')->first();
-        if ($favorite) {
-            $favoriteProduct = new ProductResource($favorite);
-            return ApiResponse::send(true, 'Product retrieved successfully', $favoriteProduct);
+        $product = Product::where('id', $productId)
+                          ->with('productDetails')
+                          ->with('images')
+                          ->first();
+        if ($product) {
+            if (auth()->check()) {
+                $existingHistory = ProductHistory::where('user_id', auth()->id())
+                                                 ->where('product_id', $productId)
+                                                 ->first();
+                if (!$existingHistory) {
+                    ProductHistory::create([
+                        'user_id' => auth()->id(),
+                        'product_id' => $productId
+                    ]);
+                }
+            }
+            $productResource = new ProductResource($product);
+            return ApiResponse::send(true, 'Product retrieved successfully', $productResource);
         } else {
             return ApiResponse::send(false, 'Product not found', null);
         }
