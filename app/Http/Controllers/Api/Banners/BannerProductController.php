@@ -17,6 +17,7 @@ use App\Models\Product;
 use App\Models\ProductHistory;
 use App\Models\Profile;
 use App\Models\sub_category;
+use Exception;
 use Illuminate\Http\Request;
 class BannerProductController extends Controller
 {
@@ -66,20 +67,21 @@ class BannerProductController extends Controller
         return SubCategoryResource::collection($subcategories);
     }
     public function products(Request $request)
-    {
+    {   
         $searchKey = $request->query('search'); 
         $page = $request->query('page', 1);
         $perPage = $request->query('per_page', 10);
         $tag = $request->query('tag');
         $categoryId = $request->query('cat_id');
         $subCategoryId = $request->query('sub_id');
+        $currency = $request->header('currency', 'KWD');
         $query = Product::with('productDetails')->with('images');
         if ($searchKey) {
             $query->where(function ($q) use ($searchKey) {
                 $q->where('name->en', 'like', '%' . $searchKey . '%')
                   ->orWhere('description->en', 'like', '%' . $searchKey . '%');
             });
-        }    
+        }
         if ($tag) {
             $query->where('tag->en', $tag);
         }
@@ -90,9 +92,8 @@ class BannerProductController extends Controller
             $query->where('sub_category_id', $subCategoryId);
         }
         $products = $query->paginate($perPage, ['*'], 'page', $page);
-        return ProductResource::collection($products);
-        return response()->json($products);
-    }
+        return ProductResource::collection($products)->additional(['currency' => $currency]);
+    }    
     public function getOffers()
     {
         $offers = Offer::all();

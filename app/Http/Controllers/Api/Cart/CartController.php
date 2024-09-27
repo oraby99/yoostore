@@ -16,13 +16,21 @@ class CartController extends Controller
         $request->validate([
             'product_id'        => 'required|exists:products,id',
             'product_detail_id' => 'nullable|exists:product_details,id',
-            'size'              => 'string|nullable',
-        ]);
-        $cartItem = Cart::where('user_id', Auth::id())
-            ->where('product_id', $request->product_id)
-            ->where('product_detail_id', $request->product_detail_id)
-            ->where('size', $request->size)
-            ->first();
+            'size'              => 'nullable|string',
+        ]);    
+        $cartItem = Cart::with(['product', 'productDetail'])
+        ->where('user_id', Auth::id())
+        ->where('product_id', $request->product_id)
+        ->where('product_detail_id', $request->product_detail_id)
+        ->where(function ($query) use ($request) {
+            if ($request->size) {
+                $query->where('size', $request->size);
+            } else {
+                $query->whereNull('size');
+            }
+        })
+        ->first();
+
         if ($cartItem) {
             $cartItem->increment('quantity');
         } else {
@@ -40,6 +48,7 @@ class CartController extends Controller
             'data'    => new CartResource($cartItem),
         ]);
     }
+    
     public function deleteFromCart($cartId)
     {
         $cartItem = Cart::where('user_id', Auth::id())->findOrFail($cartId);

@@ -5,33 +5,50 @@ namespace App\Http\Resources;
 use App\Models\Favorite;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+use Illuminate\Support\Facades\Http;
+
 class ProductResource extends JsonResource
 {
     public function toArray($request)
     {
-        $productDetails = ProductDetailResource::collection($this->productDetails);
-        $typeDetails = TypeDetailResource::collection($this->typeDetails);
-        $productPrices = $productDetails->map(function($detail) {
-            return $detail->price;
-        })->filter();
-        $typePrices = $typeDetails->map(function($detail) {
-            return $detail->typeprice;
-        })->filter();
+        $currency = $request->header('currency') ?? 'KWD';
+        $exchangeRate = $this->getExchangeRate($currency);
+        
+        // Retrieve the product_detail_id from the request
+        $productDetailId = $request->product_detail_id;
+
+        // Filter product details to return only the one with the matching product_detail_id
+        $filteredProductDetails = $this->productDetails->filter(function ($detail) use ($productDetailId) {
+            return $detail->id == $productDetailId;
+        });
+
+        // Map the filtered product detail to return only one
+        $productDetails = ProductDetailResource::collection($filteredProductDetails)->map(function ($detail) use ($exchangeRate) {
+            $detail->price = round($detail->price * $exchangeRate, 2);
+            return $detail;
+        });
+
+        $typeDetails = TypeDetailResource::collection($this->typeDetails)->map(function ($detail) use ($exchangeRate) {
+            $detail->typeprice = round($detail->typeprice * $exchangeRate, 2);
+            return $detail;
+        });
+
+        $productPrices = $productDetails->pluck('price')->filter();
+        $typePrices = $typeDetails->pluck('typeprice')->filter();
         $allPrices = $productPrices->merge($typePrices);
-        $minPrice = $allPrices->min();
+        $minPrice = $allPrices->isNotEmpty() ? round($allPrices->min() * $exchangeRate, 2) : null;
+
         $averageRate = $this->rates()->avg('rate');
-        $formattedAverageRate = $averageRate ? number_format($averageRate) : '0';
+        $formattedAverageRate = $averageRate ? number_format($averageRate, 2) : '0';
+
         $isFav = null;
         if (auth()->check()) {
             $favorite = Favorite::where('product_id', $this->id)
                                 ->where('user_id', auth()->id())
                                 ->first();
-            if ($favorite) {
-                $isFav = 1;
-            } else {
-                $isFav = 0;
-            }
+            $isFav = $favorite ? 1 : 0;
         }
+
         return [
             'id' => $this->id,
             'name' => $this->getTranslations('name'),
@@ -46,7 +63,7 @@ class ProductResource extends JsonResource
             'min_price' => $minPrice,
             'average_rate' => $formattedAverageRate,
             'is_fav' => $isFav,
-            'product_details' => $productDetails,
+            'product_details' => $productDetails->isNotEmpty() ? $productDetails->first() : null, // Return only the first matching detail
             'type_details' => $typeDetails,
             'images' => $this->images->map(function ($image) {
                 return [
@@ -57,4 +74,24 @@ class ProductResource extends JsonResource
             }),
         ];
     }
+    private function getExchangeRate($currency)
+    {
+        if ($currency == 'KWD') {
+            return 1;
+        }
+        $response = Http::get('https://apilayer.net/api/live', [
+            'access_key' => '37469631e33a35df1d8349fd069149e6',
+            'currencies' => $currency,
+            'source' => 'KWD',
+            'format' => 1,
+        ]);
+        if ($response->successful()) {
+            $exchangeRates = $response->json();
+            return $exchangeRates['quotes']['KWD' . $currency] ?? 1;
+        }
+        return 1;
+    }
 }
+
+
+
