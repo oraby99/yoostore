@@ -23,7 +23,7 @@ class CartResource extends JsonResource
             'quantity'        => $this->quantity,
             'created_at'      => $this->created_at,
             'updated_at'      => $this->updated_at,
-            'default_address' => $defaultAddress ? new AddressResource($defaultAddress) : null,  // Include default address
+            'default_address' => $defaultAddress ? new AddressResource($defaultAddress) : null,
         ];
     }
 }

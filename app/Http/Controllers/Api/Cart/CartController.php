@@ -40,7 +40,6 @@ class CartController extends Controller
             'data'    => new CartResource($cartItem),
         ]);
     }
-    
     public function deleteFromCart($cartId)
     {
         $cartItem = Cart::where('user_id', Auth::id())->findOrFail($cartId);
@@ -57,7 +56,7 @@ class CartController extends Controller
         return response()->json([
             'status'  => true,
             'message' => 'All Product cart',
-            'data'    => new CartResource($cartItems),
+            'data'    => CartResource::collection($cartItems),
         ]);
     }
     public function incrementCart($cartId)
