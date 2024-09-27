@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Address\AddressController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Banners\BannerProductController;
+use App\Http\Controllers\Api\Cart\CartController;
 use App\Http\Controllers\Api\General\FavoriteController;
 use App\Http\Controllers\Api\General\ProductHistoryController;
 use App\Http\Controllers\Api\General\RateController;
@@ -49,8 +50,12 @@ use Illuminate\Support\Facades\Route;
     Route::get('/addresses',                 [AddressController::class, 'index']);
     Route::patch('/address/{id}/default',    [AddressController::class, 'setDefault']);
     Route::post('/product/{productId}/rate', [RateController::class, 'store']);
-    //========================================================================================================
     Route::post('/logout',                   [AuthController::class, 'logout']);
     Route::post('/profile/update',           [AuthController::class, 'updateProfile']);
-
+    //========================================================================================================
+    Route::post('/cart',                     [CartController::class, 'addToCart']);
+    Route::delete('/cart/{cartId}',          [CartController::class, 'deleteFromCart']);
+    Route::get('/cart',                      [CartController::class, 'getUserCarts']);
+    Route::patch('/cart/{cartId}/increment', [CartController::class, 'incrementCart']);
+    Route::patch('/cart/{cartId}/decrement', [CartController::class, 'decrementCart']);
 }); 
