@@ -26,7 +26,7 @@ class CartController extends Controller
         if ($cartItem) {
             $cartItem->increment('quantity');
         } else {
-            Cart::create([
+            $cartItem = Cart::create([
                 'user_id'           => Auth::id(),
                 'product_id'        => $request->product_id,
                 'product_detail_id' => $request->product_detail_id,
@@ -40,6 +40,7 @@ class CartController extends Controller
             'data'    => new CartResource($cartItem),
         ]);
     }
+    
     public function deleteFromCart($cartId)
     {
         $cartItem = Cart::where('user_id', Auth::id())->findOrFail($cartId);
