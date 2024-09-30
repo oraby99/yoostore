@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
@@ -40,5 +41,8 @@ class Product extends Model
     {
         return $this->hasMany(Rate::class);
     }
+    protected $casts = [
+        'attributes' => 'array',
+    ];
 }
 
