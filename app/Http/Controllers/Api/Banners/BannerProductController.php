@@ -169,11 +169,14 @@ class BannerProductController extends Controller
                     ]);
                 }
             }
-            $productResource = new ProductResource($product);
+            $productResource = new ProductResource($product, auth()->check() ? auth()->id() : null);
             return ApiResponse::send(true, 'Product retrieved successfully', $productResource);
         } else {
             return ApiResponse::send(false, 'Product not found', null);
         }
     }
+    
+    
+    
 }
 

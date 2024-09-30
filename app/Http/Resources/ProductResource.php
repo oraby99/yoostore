@@ -9,46 +9,65 @@ use Illuminate\Support\Facades\Http;
 
 class ProductResource extends JsonResource
 {
+    protected $userId;
+    public function __construct($resource, $userId = null)
+    {
+        parent::__construct($resource);
+        $this->userId = $userId;
+    }
     public function toArray($request)
     {
         $currency = $request->header('currency') ?? 'KWD';
         $exchangeRate = $this->getExchangeRate($currency);
-        
-        // Retrieve the product_detail_id from the request
         $productDetailId = $request->product_detail_id;
-
-        // Filter product details to return only the one with the matching product_detail_id
-        $filteredProductDetails = $this->productDetails->filter(function ($detail) use ($productDetailId) {
+        $filteredProductDetails = $productDetailId ? $this->productDetails->filter(function ($detail) use ($productDetailId) {
             return $detail->id == $productDetailId;
-        });
-
-        // Map the filtered product detail to return only one
+        }) : $this->productDetails;
         $productDetails = ProductDetailResource::collection($filteredProductDetails)->map(function ($detail) use ($exchangeRate) {
-            $detail->price = round($detail->price * $exchangeRate, 2);
+            if ($detail->price) {
+                $detail->price = round($detail->price * $exchangeRate, 2);
+            }
             return $detail;
         });
-
         $typeDetails = TypeDetailResource::collection($this->typeDetails)->map(function ($detail) use ($exchangeRate) {
-            $detail->typeprice = round($detail->typeprice * $exchangeRate, 2);
+            if ($detail->typeprice) {
+                $detail->typeprice = round($detail->typeprice * $exchangeRate, 2);
+            }
             return $detail;
         });
-
-        $productPrices = $productDetails->pluck('price')->filter();
-        $typePrices = $typeDetails->pluck('typeprice')->filter();
+        $productPrices = $productDetails->pluck('price')->filter(function ($price) {
+            return !is_null($price) && $price > 0;
+        });
+        $typePrices = $typeDetails->pluck('typeprice')->filter(function ($price) {
+            return !is_null($price) && $price > 0;
+        });
         $allPrices = $productPrices->merge($typePrices);
-        $minPrice = $allPrices->isNotEmpty() ? round($allPrices->min() * $exchangeRate, 2) : null;
-
+        $minPrice = $allPrices->isNotEmpty() ? round($allPrices->min(), 2) : null;
         $averageRate = $this->rates()->avg('rate');
         $formattedAverageRate = $averageRate ? number_format($averageRate, 2) : '0';
-
         $isFav = null;
-        if (auth()->check()) {
+        if ($this->userId) {
             $favorite = Favorite::where('product_id', $this->id)
-                                ->where('user_id', auth()->id())
+                                ->where('user_id', $this->userId)
                                 ->first();
-            $isFav = $favorite ? 1 : 0;
-        }
 
+            //\Log::info('Authenticated User ID: ' . $this->userId); // Log user ID for debugging
+            //\Log::info('Product ID: ' . $this->id); // Log product ID for debugging
+        // \Log::info('Favorite record: ', ['favorite' => $favorite]); // Log the favorite record
+            
+            $isFav = $favorite ? 1 : 0; // 1 if favorited, 0 if not
+        } else {
+            //\Log::info('User is not authenticated'); // Log if the user is not authenticated
+        }
+        $details = $this->productDetails->isNotEmpty() ? $this->productDetails->first() : ($this->typeDetails->isNotEmpty() ? $this->typeDetails->first() : null);
+        if ($details) {
+            if (isset($details->typeimage)) {
+                $details->typeimage = url('storage/' . $details->typeimage);
+            }
+            if (isset($details->image)) {
+                $details->image = url('storage/' . $details->image);
+            }
+        }
         return [
             'id' => $this->id,
             'name' => $this->getTranslations('name'),
@@ -56,15 +75,14 @@ class ProductResource extends JsonResource
             'longdescription' => $this->getTranslations('longdescription'),
             'tag' => $this->getTranslations('tag'),
             'discount' => $this->discount,
-            'attributes' => $this->attributes,
+            'attributes' => $this->getTranslations('attributes'),
             'deliverytime' => $this->deliverytime,
             'category_id' => $this->category_id,
             'sub_category_id' => $this->sub_category_id,
             'min_price' => $minPrice,
             'average_rate' => $formattedAverageRate,
             'is_fav' => $isFav,
-            'product_details' => $productDetails->isNotEmpty() ? $productDetails->first() : null, // Return only the first matching detail
-            'type_details' => $typeDetails,
+            'details' => $details ? $details->toArray() : null,
             'images' => $this->images->map(function ($image) {
                 return [
                     'id' => $image->id,
