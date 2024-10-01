@@ -10,65 +10,60 @@ use Illuminate\Support\Facades\Http;
 class ProductResource extends JsonResource
 {
     protected $userId;
-
     public function __construct($resource, $userId = null)
     {
         parent::__construct($resource);
         $this->userId = $userId;
     }
-
     public function toArray($request)
     {
-        // Get the exchange rate
         $currency = $request->header('currency') ?? 'KWD';
         $exchangeRate = $this->getExchangeRate($currency);
-
-        // Filter product details based on product_detail_id
+    
+        // Get Product Details
         $productDetailId = $request->product_detail_id;
         $filteredProductDetails = $productDetailId 
             ? $this->productDetails->filter(function ($detail) use ($productDetailId) {
                 return $detail->id == $productDetailId;
             }) 
             : $this->productDetails;
-
-        // Handle product details and type details with exchange rate conversion
+    
         $productDetails = ProductDetailResource::collection($filteredProductDetails)->map(function ($detail) use ($exchangeRate) {
             if ($detail->price) {
                 $detail->price = round($detail->price * $exchangeRate, 2);
             }
             return $detail;
         });
-
+    
+        // Get Type Details
         $typeDetails = TypeDetailResource::collection($this->typeDetails)->map(function ($detail) use ($exchangeRate) {
             if ($detail->typeprice) {
                 $detail->typeprice = round($detail->typeprice * $exchangeRate, 2);
             }
             return $detail;
         });
-
-        // Filter valid product and type details
+    
+        // Filter out null or invalid prices
         $validProductDetails = $productDetails->filter(function ($detail) {
-            return $detail->price !== null || $detail->image !== null || $detail->color !== null || $detail->size !== null || $detail->stock !== null;
+            return $detail->price !== null;
         });
-
+    
         $validTypeDetails = $typeDetails->filter(function ($detail) {
-            return $detail->typeprice !== null || $detail->typeimage !== null || $detail->typename !== null || $detail->typestock !== null;
+            return $detail->typeprice !== null;
         });
-
-        // Use product details if available, else type details
-        $details = $validProductDetails->isNotEmpty() ? $validProductDetails : $validTypeDetails;
-
-        // Calculate the minimum price
-        $allPrices = $details->pluck('price')->filter(function ($price) {
-            return !is_null($price) && $price > 0;
-        });
+    
+        // Combine product and type prices for min price calculation
+        $allPrices = $validProductDetails->pluck('price')
+                        ->merge($validTypeDetails->pluck('typeprice'))
+                        ->filter(function ($price) {
+                            return !is_null($price) && $price > 0;
+                        });
+    
         $minPrice = $allPrices->isNotEmpty() ? round($allPrices->min(), 2) : null;
-
-        // Calculate average rate
+    
         $averageRate = $this->rates()->avg('rate');
         $formattedAverageRate = $averageRate ? number_format($averageRate, 2) : '0';
-
-        // Determine if the product is a favorite (set to null if userId is not provided)
+    
         $isFav = null;
         if ($this->userId) {
             $favorite = Favorite::where('product_id', $this->id)
@@ -76,8 +71,7 @@ class ProductResource extends JsonResource
                                 ->first();
             $isFav = $favorite ? 1 : 0;
         }
-
-        // Return the product data
+    
         return [
             'id' => $this->id,
             'name' => $this->getTranslations('name'),
@@ -85,14 +79,14 @@ class ProductResource extends JsonResource
             'longdescription' => $this->getTranslations('longdescription'),
             'tag' => $this->getTranslations('tag'),
             'discount' => $this->discount,
-            'attributes' => $this->attributes, 
+            'attributes' => $this->attributes,
             'deliverytime' => $this->deliverytime,
             'category_id' => $this->category_id,
             'sub_category_id' => $this->sub_category_id,
             'min_price' => $minPrice,
             'average_rate' => $formattedAverageRate,
-            'is_fav' => $isFav,  // Set to null if no user_id is provided
-            'details' => $details,
+            'is_fav' => $isFav,
+            'details' => $validProductDetails->isNotEmpty() ? $validProductDetails : $validTypeDetails,
             'images' => $this->images->map(function ($image) {
                 return [
                     'id' => $image->id,
@@ -102,8 +96,6 @@ class ProductResource extends JsonResource
             }),
         ];
     }
-
-    // Exchange rate helper function
     private function getExchangeRate($currency)
     {
         if ($currency == 'KWD') {

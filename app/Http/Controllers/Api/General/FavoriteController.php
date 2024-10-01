@@ -52,10 +52,11 @@ class FavoriteController extends Controller
         $favorites = Favorite::where('user_id', $user->id)
             ->with(['product.productDetails', 'product.typeDetails'])
             ->get();
-        $favoriteProducts = $favorites->map(function ($favorite) {
-            return new ProductResource($favorite->product);
+        $favoriteProducts = $favorites->map(function ($favorite) use ($user) {
+            return new ProductResource($favorite->product, $user->id);
         });
         return ApiResponse::send(true, 'Favorites retrieved successfully', $favoriteProducts);
     }
+    
 }
 
