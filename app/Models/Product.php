@@ -12,7 +12,7 @@ class Product extends Model
     use HasFactory, HasTranslations;
     protected $guarded = [];
     protected $fillable = ['name', 'description', 'tag', 'longdescription', 'discount', 'attributes', 'deliverytime', 'category_id', 'sub_category_id'];
-    public $translatable = ['name', 'description', 'tag', 'longdescription', 'attributes'];
+    public $translatable = ['name', 'description', 'tag', 'longdescription',];
     public function productDetails()
     {
         return $this->hasMany(ProductDetail::class, 'product_id');

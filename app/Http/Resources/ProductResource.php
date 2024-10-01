@@ -23,42 +23,44 @@ class ProductResource extends JsonResource
         $filteredProductDetails = $productDetailId ? $this->productDetails->filter(function ($detail) use ($productDetailId) {
             return $detail->id == $productDetailId;
         }) : $this->productDetails;
+    
+        // Apply exchange rates to product details and type details
         $productDetails = ProductDetailResource::collection($filteredProductDetails)->map(function ($detail) use ($exchangeRate) {
             if ($detail->price) {
                 $detail->price = round($detail->price * $exchangeRate, 2);
             }
             return $detail;
         });
+        
         $typeDetails = TypeDetailResource::collection($this->typeDetails)->map(function ($detail) use ($exchangeRate) {
             if ($detail->typeprice) {
                 $detail->typeprice = round($detail->typeprice * $exchangeRate, 2);
             }
             return $detail;
         });
+    
         $productPrices = $productDetails->pluck('price')->filter(function ($price) {
             return !is_null($price) && $price > 0;
         });
+    
         $typePrices = $typeDetails->pluck('typeprice')->filter(function ($price) {
             return !is_null($price) && $price > 0;
         });
+    
         $allPrices = $productPrices->merge($typePrices);
         $minPrice = $allPrices->isNotEmpty() ? round($allPrices->min(), 2) : null;
         $averageRate = $this->rates()->avg('rate');
         $formattedAverageRate = $averageRate ? number_format($averageRate, 2) : '0';
+    
         $isFav = null;
         if ($this->userId) {
             $favorite = Favorite::where('product_id', $this->id)
                                 ->where('user_id', $this->userId)
                                 ->first();
-
-            //\Log::info('Authenticated User ID: ' . $this->userId); // Log user ID for debugging
-            //\Log::info('Product ID: ' . $this->id); // Log product ID for debugging
-        // \Log::info('Favorite record: ', ['favorite' => $favorite]); // Log the favorite record
-            
-            $isFav = $favorite ? 1 : 0; // 1 if favorited, 0 if not
-        } else {
-            //\Log::info('User is not authenticated'); // Log if the user is not authenticated
+            $isFav = $favorite ? 1 : 0;
         }
+    
+        // Handle product or type details for the response
         $details = $this->productDetails->isNotEmpty() ? $this->productDetails->first() : ($this->typeDetails->isNotEmpty() ? $this->typeDetails->first() : null);
         if ($details) {
             if (isset($details->typeimage)) {
@@ -68,6 +70,7 @@ class ProductResource extends JsonResource
                 $details->image = url('storage/' . $details->image);
             }
         }
+    
         return [
             'id' => $this->id,
             'name' => $this->getTranslations('name'),
@@ -75,7 +78,7 @@ class ProductResource extends JsonResource
             'longdescription' => $this->getTranslations('longdescription'),
             'tag' => $this->getTranslations('tag'),
             'discount' => $this->discount,
-            'attributes' => $this->getTranslations('attributes'),
+            'attributes' => $this->attributes, // Use plain attributes since they are not translatable
             'deliverytime' => $this->deliverytime,
             'category_id' => $this->category_id,
             'sub_category_id' => $this->sub_category_id,
@@ -92,6 +95,7 @@ class ProductResource extends JsonResource
             }),
         ];
     }
+    
     private function getExchangeRate($currency)
     {
         if ($currency == 'KWD') {

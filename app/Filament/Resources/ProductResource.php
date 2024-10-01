@@ -36,7 +36,11 @@ class ProductResource extends Resource
                 TextInput::make('longdescription')->required()->label('long description'),
                 TextInput::make('tag')->required(),
                 TextInput::make('deliverytime')->label('Delivery Time')->numeric()->required(),
-                KeyValue::make('attributes')->required(),
+                KeyValue::make('attributes')
+                ->label('Attributes')
+                ->keyLabel('Attribute Name')
+                ->valueLabel('Attribute Value')
+                ->required(),
                 TextInput::make('discount')->label('discount')->numeric(),
                 Select::make('category_id')
                     ->label('Category')
@@ -66,7 +70,6 @@ class ProductResource extends Resource
                     ->default(true)
                     ->reactive()
                     ->afterStateUpdated(function (callable $set, $state) {
-                        // Clear the other repeater fields based on the toggle state
                         if ($state) {
                             $set('type_details', []);
                         } else {
