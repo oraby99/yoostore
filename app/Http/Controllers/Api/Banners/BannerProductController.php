@@ -17,6 +17,7 @@ use App\Models\Product;
 use App\Models\ProductHistory;
 use App\Models\Profile;
 use App\Models\sub_category;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 class BannerProductController extends Controller
@@ -153,30 +154,35 @@ class BannerProductController extends Controller
     }
     public function productById($productId)
     {
+        $userId = request()->header('user_id'); // Retrieve the user_id from the request header
+        if ($userId && !User::where('id', $userId)->exists()) {
+            return ApiResponse::send(false, 'User not found', null);
+        }
+    
         $product = Product::where('id', $productId)
-                          ->with('productDetails')
-                          ->with('images')
+                          ->with('productDetails', 'images')
                           ->first();
+        
         if ($product) {
-            if (auth()->check()) {
-                $existingHistory = ProductHistory::where('user_id', auth()->id())
+            if ($userId) {
+                $existingHistory = ProductHistory::where('user_id', $userId)
                                                  ->where('product_id', $productId)
                                                  ->first();
                 if (!$existingHistory) {
                     ProductHistory::create([
-                        'user_id' => auth()->id(),
-                        'product_id' => $productId
+                        'user_id' => $userId,
+                        'product_id' => $productId,
                     ]);
                 }
             }
-            $productResource = new ProductResource($product, auth()->check() ? auth()->id() : null);
+            
+            // Pass the user_id (which could be null) to the resource
+            $productResource = new ProductResource($product, $userId);
             return ApiResponse::send(true, 'Product retrieved successfully', $productResource);
         } else {
             return ApiResponse::send(false, 'Product not found', null);
         }
     }
-    
-    
     
 }
 

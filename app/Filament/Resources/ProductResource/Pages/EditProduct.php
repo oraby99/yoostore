@@ -28,11 +28,9 @@ class EditProduct extends EditRecord
         $product = $this->record->load('productDetails', 'images');
     
         $data['attributes'] = $product->attributes ?? [];
-
     
         $data['images'] = $product->images->pluck('image_path')->toArray();
     
-        // Handle product details and type details
         if ($product->productDetails->isNotEmpty() && !$product->productDetails->first()->typename) {
             $data['is_product_details'] = true;
             $data['product_details'] = $product->productDetails->map(function ($detail) {
@@ -41,7 +39,7 @@ class EditProduct extends EditRecord
                     'stock' => $detail->stock,
                     'color' => $detail->color,
                     'size' => $detail->size,
-                    'image' => $detail->image ? [$detail->image] : [],
+                    'image' => $detail->image ? [$detail->image] : [],  // Ensure array for images
                 ];
             })->toArray();
             $data['type_details'] = [];
@@ -52,7 +50,7 @@ class EditProduct extends EditRecord
                     'typename' => $detail->typename,
                     'typeprice' => $detail->typeprice,
                     'typestock' => $detail->typestock,
-                    'typeimage' => $detail->typeimage ? [$detail->typeimage] : [],
+                    'typeimage' => $detail->typeimage ? [$detail->typeimage] : [],  // Ensure array for images
                 ];
             })->toArray();
             $data['product_details'] = [];
@@ -60,13 +58,12 @@ class EditProduct extends EditRecord
     
         return $data;
     }
-    
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $this->productDetails = $data['product_details'] ?? [];
         $this->typeDetails = $data['type_details'] ?? [];
         $this->images = isset($data['images']) ? (is_array($data['images']) ? $data['images'] : [$data['images']]) : [];
-        unset($data['images']);
+        unset($data['images']);  // Ensure images are handled separately
         return $data;
     }
     protected function handleRecordUpdate($record, array $data): \Illuminate\Database\Eloquent\Model
@@ -87,6 +84,15 @@ class EditProduct extends EditRecord
         if ($product === null) {
             return;
         }
+    
+        // Update or save product details
+        if (!empty($this->productDetails)) {
+            $this->updateProductDetails($product, $this->productDetails);
+        } else if (!empty($this->typeDetails)) {
+            $this->updateTypeDetails($product, $this->typeDetails);
+        }
+    
+        // Save product images
         $this->saveImages($product, $this->images);
     }
     private function updateProductDetails(Product $product, array $productDetails)
