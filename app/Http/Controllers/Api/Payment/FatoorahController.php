@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Services\FatoorahServices;
+use App\Models\Cart;
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 class FatoorahController extends Controller
@@ -16,7 +18,8 @@ class FatoorahController extends Controller
     public function checkout(Request $request)
     {
         $user = auth()->user();
-        $totalPrice = 100.00;
+
+        $totalPrice = $request->total;
         $data = [
             "CustomerName"       =>  $user->name,
             "Notificationoption" =>  "LNK",  
@@ -51,18 +54,27 @@ class FatoorahController extends Controller
         $response = $this->fatoorahServices->callAPI("https://apitest.myfatoorah.com/v2/getPaymentStatus", $apiKey, $postFields);
         $response = json_decode($response);
         $invoiceData = $response->Data;
-        if (!isset($response->Data->InvoiceId)) {
+        if (!isset($invoiceData->InvoiceId)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid payment or payment not found'
             ], 404);
         }
         if ($response->IsSuccess && $invoiceData->InvoiceStatus == "Paid") {
+            $user = auth()->user();
+            Cart::where('user_id', auth()->id())->delete();    
+            $order = Order::create([
+                'user_id'    => $user->id,
+                'total_price' => $invoiceData->InvoiceValue,
+                'invoice_id'  => $invoiceData->InvoiceId,
+                'status'      => 'Paid',
+            ]);
             return response()->json([
                 'success'        => true,
                 'invoice_id'     => $invoiceData->InvoiceId,
                 'invoice_status' => 'Paid',
-                'message'        => 'Payment successful'
+                'message'        => 'Payment successful',
+                'order_id'       => $order->id,
             ], 200);
         } else {
             return response()->json([

@@ -30,7 +30,14 @@ class User extends Authenticatable
         'device_token',
         'country_code',
     ];
-
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
     /**
      * The attributes that should be hidden for serialization.
      *
