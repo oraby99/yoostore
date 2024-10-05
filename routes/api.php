@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Cart\CartController;
 use App\Http\Controllers\Api\General\FavoriteController;
 use App\Http\Controllers\Api\General\ProductHistoryController;
 use App\Http\Controllers\Api\General\RateController;
+use App\Http\Controllers\Api\Payment\FatoorahController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -58,4 +59,9 @@ use Illuminate\Support\Facades\Route;
     Route::get('/cart',                      [CartController::class, 'getUserCarts']);
     Route::patch('/cart/{cartId}/increment', [CartController::class, 'incrementCart']);
     Route::patch('/cart/{cartId}/decrement', [CartController::class, 'decrementCart']);
+    //========================================================================================================
+    Route::post('/checkout',                 [FatoorahController::class, 'checkout']);
+    Route::post('/callback',                 [FatoorahController::class, 'callback']);
+    Route::get('/errorurl',                  [FatoorahController::class, 'errorurl']);
+
 }); 
