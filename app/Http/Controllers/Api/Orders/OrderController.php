@@ -71,15 +71,27 @@ class OrderController extends Controller
     public function getUserOrders()
     {
         $user = auth()->user();
-    
         $orders = Order::where('user_id', $user->id)
-                        ->with('products')  // Load associated products
+                        ->with(['products.product'])  // Load associated products through OrderProduct
                         ->get();
     
+        $orders->transform(function ($order) {
+            $order->products = $order->products->map(function ($orderProduct) {
+                return [
+                    'id'           => $orderProduct->product->id,
+                    'name'         => $orderProduct->product->name,
+                    'description'  => $orderProduct->product->description,
+                    'discount'     => $orderProduct->product->discount,
+                    'quantity'     => $orderProduct->quantity,
+                    'size'         => $orderProduct->size,
+                    'attributes'   => $orderProduct->product->attributes,
+                ];
+            });
+            return $order;
+        });
         return response()->json([
-            'status'   => true,
-            'data'     => $orders,
+            'status' => true,
+            'data'   => $orders,
         ], 200);
     }
-    
 }

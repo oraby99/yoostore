@@ -7,6 +7,7 @@ use App\Http\Services\FatoorahServices;
 use App\Models\Address;
 use App\Models\Cart;
 use App\Models\Order;
+use App\Models\OrderProduct;
 use Illuminate\Http\Request;
 
 class FatoorahController extends Controller
@@ -53,26 +54,20 @@ class FatoorahController extends Controller
         ];
         $response = $this->fatoorahServices->callAPI("https://apitest.myfatoorah.com/v2/getPaymentStatus", $apiKey, $postFields);
         $response = json_decode($response);
-    
         if (!$response || !$response->IsSuccess) {
             return redirect()->route('payment.failure')->with('message', 'Failed to fetch payment status');
         }
-    
         $invoiceData = $response->Data ?? null;
         if (!$invoiceData || !isset($invoiceData->InvoiceId)) {
             return redirect()->route('payment.failure')->with('message', 'Invoice not found');
         }
-    
         $userId = $request->query('user_id');
         $user = \App\Models\User::find($userId);
         if (!$user) {
             return redirect()->route('payment.failure')->with('message', 'User not found');
         }
-    
         if ($invoiceData->InvoiceStatus === "Paid") {
             $defaultAddress = Address::where('user_id', $user->id)->where('is_default', 1)->first();
-    
-            // Create the order
             $order = Order::create([
                 'user_id'        => $user->id,
                 'total_price'    => $invoiceData->InvoiceValue,
@@ -82,51 +77,106 @@ class FatoorahController extends Controller
                 'payment_status' => 'Paid',
                 'address_id'     => $defaultAddress->id
             ]);
-    
-            // Get cart items
+        
             $cartItems = Cart::where('user_id', $user->id)->get();
-    
-            // Add each product from the cart to the order_product pivot table
             foreach ($cartItems as $item) {
-                $order->products()->attach($item->product_id, [
-                    'quantity' => $item->quantity,
-                    'size'     => $item->size,
+                OrderProduct::create([
+                    'order_id'   => $order->id,
+                    'product_id' => $item->product_id,
+                    'quantity'   => $item->quantity,
+                    'size'       => $item->size,
                 ]);
             }
-    
-            // Delete the cart items after processing the order
+        
             Cart::where('user_id', $user->id)->delete();
-    
             return redirect()->route('payment.success')->with('invoiceId', $invoiceData->InvoiceId);
-        } else {
+        }
+         else {
             return redirect()->route('payment.failure')->with('message', 'Payment failed');
         }
-    }
-    
-    public function errorurl(Request $request)
-    {    
-        $paymentId = $request->query('paymentId');
-        return redirect()->route('payment.failure')->with('message', 'Payment process failed')->with('paymentId', $paymentId);
     }
     public function codCheckout(Request $request)
     {
         $user = auth()->user();
-        Cart::where('user_id', $user->id)->delete();
-        $totalPrice = $request->total;
-        $defaultAddress = Address::where('user_id', $user->id)->where('is_default', 1)->first();
-        $order = Order::create([
-            'user_id'        => $user->id,
-            'total_price'    => $totalPrice,
-            'status'         => 'recived',
-            'payment_method' => 'cod',
-            'payment_status' => 'paid',
-            'address_id'     => $defaultAddress->id
-        ]);
-        return response()->json([
-            'status'   => true,
-            'message'  => 'Order placed successfully under Cash on Delivery',
-            'order_id' => $order->id,
-            'order'    => $order
-        ], 200);
+        
+        // Retrieve the default address
+        $defaultAddress = Address::where('user_id', $user->id)
+                                 ->where('is_default', 1)
+                                 ->first();
+        
+        if (!$defaultAddress) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Default address not found.'
+            ], 400);
+        }
+    
+        // Start a database transaction
+        \DB::beginTransaction();
+        
+        try {
+            // Calculate total price from request or cart
+            $totalPrice = $request->total ?? Cart::where('user_id', $user->id)->sum('total_price');
+            
+            // Create the order
+            $order = Order::create([
+                'user_id'        => $user->id,
+                'total_price'    => $totalPrice,
+                'status'         => 'Received', // Status set to Received for COD
+                'payment_method' => 'cod',      // Payment method is COD
+                'payment_status' => 'Pending',  // Payment pending
+                'address_id'     => $defaultAddress->id
+            ]);
+    
+            // Retrieve all cart items
+            $cartItems = Cart::where('user_id', $user->id)->get();
+    
+            if ($cartItems->isEmpty()) {
+                // If no cart items, roll back and return an error
+                \DB::rollBack();
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'No items found in cart.'
+                ], 400);
+            }
+    
+            // Create order products
+            foreach ($cartItems as $item) {
+                OrderProduct::create([
+                    'order_id'   => $order->id,
+                    'product_id' => $item->product_id,
+                    'quantity'   => $item->quantity,
+                    'size'       => $item->size,
+                ]);
+            }
+    
+            // Clear the user's cart after order creation
+            Cart::where('user_id', $user->id)->delete();
+    
+            // Commit the transaction
+            \DB::commit();
+    
+            // Return a success response
+            return response()->json([
+                'status'   => true,
+                'message'  => 'Order placed successfully under Cash on Delivery',
+                'order_id' => $order->id,
+                'order'    => $order
+            ], 200);
+        
+        } catch (\Exception $e) {
+            // Rollback on error
+            \DB::rollBack();
+            \Log::error('COD Checkout Error: ' . $e->getMessage());
+            return response()->json([
+                'status'  => false,
+                'message' => 'Failed to place order. Please try again.'
+            ], 500);
+        }
+    }
+    public function errorurl(Request $request)
+    {    
+        $paymentId = $request->query('paymentId');
+        return redirect()->route('payment.failure')->with('message', 'Payment process failed')->with('paymentId', $paymentId);
     }
 }
