@@ -70,5 +70,4 @@ use Illuminate\Support\Facades\Route;
     Route::get('/order/track/{orderId}',     [OrderController::class, 'trackOrder']);
     Route::get('/orders',                    [OrderController::class, 'getUserOrders']);
     Route::get('/order/invoice/{invoiceId}', [OrderController::class, 'getOrderByInvoiceId']);
-
 }); 
