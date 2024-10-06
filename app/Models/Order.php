@@ -27,5 +27,14 @@ class Order extends Model
     {
         return $this->hasMany(OrderProduct::class);
     }
+    public function productDetails()
+    {
+        return $this->hasMany(ProductDetail::class, 'product_id');
+    }
+    public function statusChanges()
+{
+    return $this->hasMany(OrderStatusChange::class);
+}
+
 }
 

@@ -6,6 +6,7 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Address;
 use App\Models\Order;
+use App\Models\OrderStatusChange;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
@@ -24,7 +25,6 @@ class OrderResource extends Resource
     protected static ?string $navigationGroup = 'Orders'; 
     public static function form(Form $form): Form
     {
-        $user = Auth::user();
         return $form
             ->schema([
                 Forms\Components\Select::make('user_id')
@@ -42,15 +42,26 @@ class OrderResource extends Resource
                         'Cancelled' => 'Cancelled',
                     ])
                     ->required(),
-                    Forms\Components\Select::make('status')
+                Forms\Components\Select::make('status')
                     ->options([
-                        'recived'   => 'recived',
-                        'Cancelled' => 'Cancelled',
-                        'Delivered' => 'Delivered',
+                        'Received'   => 'Received',
+                        'Cancelled'  => 'Cancelled',
+                        'Delivered'  => 'Delivered',
                     ])
-                    ->required(),
-            
-                    
+                    ->required()
+                    ->afterStateUpdated(function (callable $set, $state, $get) {
+                        $orderId = $get('id'); // Get the order ID
+                        $originalStatus = $get('status'); // Get the original status
+
+                        // Check if the status is changed
+                       // if ($state !== $originalStatus) {
+                            // Store the status change in the OrderStatusChange model
+                            OrderStatusChange::create([
+                                'order_id' => $orderId,
+                                'status'   => $state,
+                            ]);
+                       // }
+                    }),
             ]);
     }
     public static function table(Table $table): Table
