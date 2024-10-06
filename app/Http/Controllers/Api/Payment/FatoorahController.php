@@ -53,35 +53,56 @@ class FatoorahController extends Controller
         ];
         $response = $this->fatoorahServices->callAPI("https://apitest.myfatoorah.com/v2/getPaymentStatus", $apiKey, $postFields);
         $response = json_decode($response);
+    
         if (!$response || !$response->IsSuccess) {
             return redirect()->route('payment.failure')->with('message', 'Failed to fetch payment status');
         }
+    
         $invoiceData = $response->Data ?? null;
         if (!$invoiceData || !isset($invoiceData->InvoiceId)) {
             return redirect()->route('payment.failure')->with('message', 'Invoice not found');
         }
+    
         $userId = $request->query('user_id');
         $user = \App\Models\User::find($userId);
         if (!$user) {
             return redirect()->route('payment.failure')->with('message', 'User not found');
         }
+    
         if ($invoiceData->InvoiceStatus === "Paid") {
             $defaultAddress = Address::where('user_id', $user->id)->where('is_default', 1)->first();
-            Cart::where('user_id', $user->id)->delete();
-            Order::create([
+    
+            // Create the order
+            $order = Order::create([
                 'user_id'        => $user->id,
                 'total_price'    => $invoiceData->InvoiceValue,
                 'invoice_id'     => $invoiceData->InvoiceId,
-                'status'         => 'recived',
+                'status'         => 'Received',
                 'payment_method' => 'gateway',
                 'payment_status' => 'Paid',
                 'address_id'     => $defaultAddress->id
             ]);
+    
+            // Get cart items
+            $cartItems = Cart::where('user_id', $user->id)->get();
+    
+            // Add each product from the cart to the order_product pivot table
+            foreach ($cartItems as $item) {
+                $order->products()->attach($item->product_id, [
+                    'quantity' => $item->quantity,
+                    'size'     => $item->size,
+                ]);
+            }
+    
+            // Delete the cart items after processing the order
+            Cart::where('user_id', $user->id)->delete();
+    
             return redirect()->route('payment.success')->with('invoiceId', $invoiceData->InvoiceId);
         } else {
             return redirect()->route('payment.failure')->with('message', 'Payment failed');
         }
-    }    
+    }
+    
     public function errorurl(Request $request)
     {    
         $paymentId = $request->query('paymentId');

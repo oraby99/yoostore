@@ -71,12 +71,15 @@ class OrderController extends Controller
     public function getUserOrders()
     {
         $user = auth()->user();
-        $Products = Cart::where('user_id', $user->id)->get();
-        $orders   = Order::where('user_id',$user->id )->get();
+    
+        $orders = Order::where('user_id', $user->id)
+                        ->with('products')  // Load associated products
+                        ->get();
+    
         return response()->json([
             'status'   => true,
             'data'     => $orders,
-            'Producrs' => $Products,
         ], 200);
     }
+    
 }

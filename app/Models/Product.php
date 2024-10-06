@@ -41,6 +41,12 @@ class Product extends Model
     {
         return $this->hasMany(Rate::class);
     }
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class, 'order_product')
+                    ->withPivot('quantity', 'size')
+                    ->withTimestamps();
+    }
     protected $casts = [
         'attributes' => 'array',
     ];
