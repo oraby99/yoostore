@@ -22,5 +22,9 @@ class Order extends Model
     {
         return $this->belongsTo(Address::class);
     }
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
 }
 

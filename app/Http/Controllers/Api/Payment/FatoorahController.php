@@ -90,6 +90,7 @@ class FatoorahController extends Controller
     public function codCheckout(Request $request)
     {
         $user = auth()->user();
+        Cart::where('user_id', $user->id)->delete();
         $totalPrice = $request->total;
         $defaultAddress = Address::where('user_id', $user->id)->where('is_default', 1)->first();
         $order = Order::create([
@@ -101,9 +102,10 @@ class FatoorahController extends Controller
             'address_id'     => $defaultAddress->id
         ]);
         return response()->json([
-            'status' => true,
-            'message' => 'Order placed successfully under Cash on Delivery',
-            'order_id' => $order->id
+            'status'   => true,
+            'message'  => 'Order placed successfully under Cash on Delivery',
+            'order_id' => $order->id,
+            'order'    => $order
         ], 200);
     }
 }

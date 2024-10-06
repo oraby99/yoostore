@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Orders;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderCancellation;
 use Illuminate\Http\Request;
@@ -70,10 +71,12 @@ class OrderController extends Controller
     public function getUserOrders()
     {
         $user = auth()->user();
-        $orders = Order::where('user_id',$user->id )->get();
+        $Products = Cart::where('user_id', $user->id)->get();
+        $orders   = Order::where('user_id',$user->id )->get();
         return response()->json([
-            'status' => true,
-            'data'   => $orders,
+            'status'   => true,
+            'data'     => $orders,
+            'Producrs' => $Products,
         ], 200);
     }
 }
