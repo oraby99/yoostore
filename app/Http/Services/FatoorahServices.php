@@ -46,4 +46,3 @@ class FatoorahServices{
         return $response;
     }
 }
-?>

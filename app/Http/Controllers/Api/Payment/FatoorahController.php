@@ -54,18 +54,23 @@ class FatoorahController extends Controller
         ];
         $response = $this->fatoorahServices->callAPI("https://apitest.myfatoorah.com/v2/getPaymentStatus", $apiKey, $postFields);
         $response = json_decode($response);
+        
         if (!$response || !$response->IsSuccess) {
             return redirect()->route('payment.failure')->with('message', 'Failed to fetch payment status');
         }
+    
         $invoiceData = $response->Data ?? null;
         if (!$invoiceData || !isset($invoiceData->InvoiceId)) {
             return redirect()->route('payment.failure')->with('message', 'Invoice not found');
         }
+    
         $userId = $request->query('user_id');
         $user = \App\Models\User::find($userId);
+    
         if (!$user) {
             return redirect()->route('payment.failure')->with('message', 'User not found');
         }
+    
         if ($invoiceData->InvoiceStatus === "Paid") {
             $defaultAddress = Address::where('user_id', $user->id)->where('is_default', 1)->first();
             $order = Order::create([
@@ -77,7 +82,7 @@ class FatoorahController extends Controller
                 'payment_status' => 'Paid',
                 'address_id'     => $defaultAddress->id
             ]);
-        
+    
             $cartItems = Cart::where('user_id', $user->id)->get();
             foreach ($cartItems as $item) {
                 OrderProduct::create([
@@ -87,14 +92,19 @@ class FatoorahController extends Controller
                     'size'       => $item->size,
                 ]);
             }
-        
+    
             Cart::where('user_id', $user->id)->delete();
-            return redirect()->route('payment.success')->with('invoiceId', $invoiceData->InvoiceId);
-        }
-         else {
+    
+            // Redirect to the success page with both invoiceId and paymentId as query parameters
+            return redirect()->route('payment.success', [
+                'invoiceId' => $invoiceData->InvoiceId,
+                'paymentId' => $request->paymentId
+            ]);
+        } else {
             return redirect()->route('payment.failure')->with('message', 'Payment failed');
         }
     }
+    
     public function codCheckout(Request $request)
     {
         $user = auth()->user();
