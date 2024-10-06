@@ -4,23 +4,27 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
+use App\Models\Address;
 use App\Models\Order;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Orders';
+    protected static ?string $navigationGroup = 'Orders'; 
     public static function form(Form $form): Form
     {
+        $user = Auth::user();
         return $form
             ->schema([
                 Forms\Components\Select::make('user_id')
@@ -31,17 +35,24 @@ class OrderResource extends Resource
                 Forms\Components\TextInput::make('total_price')
                     ->numeric()
                     ->required(),
-                Forms\Components\Select::make('status')
+                Forms\Components\Select::make('payment_status')
                     ->options([
-                        'Pending' => 'Pending',
-                        'Paid' => 'Paid',
+                        'Pending'   => 'Pending',
+                        'Paid'      => 'Paid',
                         'Cancelled' => 'Cancelled',
                     ])
                     ->required(),
+                    Forms\Components\Select::make('status')
+                    ->options([
+                        'recived'   => 'recived',
+                        'Cancelled' => 'Cancelled',
+                        'Delivered' => 'Delivered',
+                    ])
+                    ->required(),
+            
+                    
             ]);
     }
-    
-
     public static function table(Table $table): Table
     {
         return $table
@@ -49,7 +60,9 @@ class OrderResource extends Resource
             Tables\Columns\TextColumn::make('user.name')->label('User Name'),
             Tables\Columns\TextColumn::make('invoice_id')->label('Invoice ID'),
             Tables\Columns\TextColumn::make('total_price')->label('Total Price'),
-            Tables\Columns\TextColumn::make('status')->label('Status'),
+            Tables\Columns\TextColumn::make('payment_status')->label('payment_status'),
+            Tables\Columns\TextColumn::make('status')->label('Order Status'),
+            Tables\Columns\TextColumn::make('address.street')->label('Address'),
             Tables\Columns\TextColumn::make('created_at')->label('Order Date')->dateTime(),
         ])
             ->filters([
@@ -64,14 +77,12 @@ class OrderResource extends Resource
                 ]),
             ]);
     }
-
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-
     public static function getPages(): array
     {
         return [

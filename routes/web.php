@@ -23,7 +23,6 @@ Route::get('/', function () {
 Auth::routes();
 Route::get('/callback', [FatoorahController::class, 'callback']);
 Route::get('/errorurl', [FatoorahController::class, 'errorurl']);
-
 Route::get('/payment-success', function () {
     return view('payment.success');
 })->name('payment.success');
@@ -31,5 +30,4 @@ Route::get('/payment-success', function () {
 Route::get('/payment-failure', function () {
     return view('payment.failure');
 })->name('payment.failure');
-
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

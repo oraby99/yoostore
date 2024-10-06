@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Services\FatoorahServices;
+use App\Models\Address;
 use App\Models\Cart;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -18,21 +19,18 @@ class FatoorahController extends Controller
     public function checkout(Request $request)
     {
         $user = auth()->user();
-    
         $totalPrice = $request->total;
         $data = [
             "CustomerName"       => $user->name,
             "Notificationoption" => "LNK",
             "Invoicevalue"       => $totalPrice,
             "CustomerEmail"      => $user->email,
-            "CalLBackUrl"        => url('/callback?user_id=' . $user->id), // Pass the user ID here
+            "CalLBackUrl"        => url('/callback?user_id=' . $user->id),
             "Errorurl"           => url('/errorurl'),
             "Languagn"           => 'en',
             "DisplayCurrencyIna" => 'SAR'
         ];
-    
         $response = $this->fatoorahServices->sendPayment($data);
-    
         if (isset($response['IsSuccess']) && $response['IsSuccess'] == true) {
             return response()->json([
                 'success'     => true,
@@ -53,52 +51,59 @@ class FatoorahController extends Controller
             'Key'     => $request->paymentId,
             'KeyType' => 'paymentId'
         ];
-    
-        \Log::info('Fatoorah Payment Callback Request', $postFields);
-    
         $response = $this->fatoorahServices->callAPI("https://apitest.myfatoorah.com/v2/getPaymentStatus", $apiKey, $postFields);
         $response = json_decode($response);
-    
-        \Log::info('Fatoorah Payment Callback Response', (array) $response);
-    
         if (!$response || !$response->IsSuccess) {
             return redirect()->route('payment.failure')->with('message', 'Failed to fetch payment status');
         }
-    
         $invoiceData = $response->Data ?? null;
         if (!$invoiceData || !isset($invoiceData->InvoiceId)) {
             return redirect()->route('payment.failure')->with('message', 'Invoice not found');
         }
-    
-        // Retrieve the user_id from the callback URL
         $userId = $request->query('user_id');
-    
-        // Get the user by ID
         $user = \App\Models\User::find($userId);
-    
+        if (!$user) {
+            return redirect()->route('payment.failure')->with('message', 'User not found');
+        }
         if ($invoiceData->InvoiceStatus === "Paid") {
-            // Clear the cart and create the order
+            $defaultAddress = Address::where('user_id', $user->id)->where('is_default', 1)->first();
             Cart::where('user_id', $user->id)->delete();
             Order::create([
-                'user_id'    => $user->id,
-                'total_price' => $invoiceData->InvoiceValue,
-                'invoice_id'  => $invoiceData->InvoiceId,
-                'status'      => 'Paid',
+                'user_id'        => $user->id,
+                'total_price'    => $invoiceData->InvoiceValue,
+                'invoice_id'     => $invoiceData->InvoiceId,
+                'status'         => 'recived',
+                'payment_method' => 'gateway',
+                'payment_status' => 'Paid',
+                'address_id'     => $defaultAddress->id
             ]);
-    
-            // Redirect to the success route
             return redirect()->route('payment.success')->with('invoiceId', $invoiceData->InvoiceId);
         } else {
             return redirect()->route('payment.failure')->with('message', 'Payment failed');
         }
-    }
+    }    
     public function errorurl(Request $request)
-    {
-        // Log the paymentId and query params
-        \Log::info('Payment Error URL', $request->all());
-    
+    {    
         $paymentId = $request->query('paymentId');
         return redirect()->route('payment.failure')->with('message', 'Payment process failed')->with('paymentId', $paymentId);
     }
-    
+    public function codCheckout(Request $request)
+    {
+        $user = auth()->user();
+        $totalPrice = $request->total;
+        $defaultAddress = Address::where('user_id', $user->id)->where('is_default', 1)->first();
+        $order = Order::create([
+            'user_id'        => $user->id,
+            'total_price'    => $totalPrice,
+            'status'         => 'recived',
+            'payment_method' => 'cod',
+            'payment_status' => 'paid',
+            'address_id'     => $defaultAddress->id
+        ]);
+        return response()->json([
+            'status' => true,
+            'message' => 'Order placed successfully under Cash on Delivery',
+            'order_id' => $order->id
+        ], 200);
+    }
 }
