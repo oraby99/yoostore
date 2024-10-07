@@ -102,44 +102,50 @@ class OrderController extends Controller
         $orderProducts = OrderProduct::with(['product', 'productDetail'])
             ->whereIn('order_id', $orderIds)
             ->get();
+    
         $organizedOrders = [];
         foreach ($orders as $order) {
             $orderProductsForCurrentOrder = $orderProducts->where('order_id', $order->id);
             $productsGrouped = [];
+    
             foreach ($orderProductsForCurrentOrder as $orderProduct) {
-                $productId = $orderProduct->product_id;
-                if (!isset($productsGrouped[$productId])) {
-                    $productsGrouped[$productId] = [
-                        'id' => $productId,
-                        'name' => $orderProduct->product->name,
-                        'description' => $orderProduct->product->description,
-                        'longdescription' => $orderProduct->product->longdescription,
-                        'tag' => $orderProduct->product->tag,
-                        'discount' => $orderProduct->product->discount,
-                        'attributes' => $orderProduct->product->attributes,
-                        'deliverytime' => $orderProduct->product->deliverytime,
-                        'category_id' => $orderProduct->product->category_id,
-                        'sub_category_id' => $orderProduct->product->sub_category_id,
-                        'created_at' => $orderProduct->product->created_at,
-                        'updated_at' => $orderProduct->product->updated_at,
-                        'product_details' => []
+                // Ensure product and productDetail are not null
+                if ($orderProduct->product && $orderProduct->productDetail) {
+                    $productId = $orderProduct->product_id;
+    
+                    if (!isset($productsGrouped[$productId])) {
+                        $productsGrouped[$productId] = [
+                            'id' => $productId,
+                            'name' => $orderProduct->product->name,
+                            'description' => $orderProduct->product->description,
+                            'longdescription' => $orderProduct->product->longdescription,
+                            'tag' => $orderProduct->product->tag,
+                            'discount' => $orderProduct->product->discount,
+                            'attributes' => $orderProduct->product->attributes,
+                            'deliverytime' => $orderProduct->product->deliverytime,
+                            'category_id' => $orderProduct->product->category_id,
+                            'sub_category_id' => $orderProduct->product->sub_category_id,
+                            'created_at' => $orderProduct->product->created_at,
+                            'updated_at' => $orderProduct->product->updated_at,
+                            'product_details' => []
+                        ];
+                    }
+    
+                    $productsGrouped[$productId]['product_details'][] = [
+                        'id' => $orderProduct->productDetail->id,
+                        'price' => $orderProduct->productDetail->price,
+                        'image' => $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
+                        'color' => $orderProduct->productDetail->color,
+                        'size' => $orderProduct->productDetail->size,
+                        'stock' => $orderProduct->productDetail->stock,
+                        'typeprice' => $orderProduct->productDetail->typeprice,
+                        'typeimage' => $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
+                        'typename' => $orderProduct->productDetail->typename,
+                        'typestock' => $orderProduct->productDetail->typestock,
+                        'created_at' => $orderProduct->productDetail->created_at,
+                        'updated_at' => $orderProduct->productDetail->updated_at,
                     ];
                 }
-                    $productsGrouped[$productId]['product_details'][] = [
-                    'id' => $orderProduct->productDetail->id,
-                    'price' => $orderProduct->productDetail->price,
-                    'image' => $orderProduct->productDetail->image,
-                    'image' => $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
-                    'color' => $orderProduct->productDetail->color,
-                    'size' => $orderProduct->productDetail->size,
-                    'stock' => $orderProduct->productDetail->stock,
-                    'typeprice' => $orderProduct->productDetail->typeprice,
-                    'typeimage' => $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
-                    'typename' => $orderProduct->productDetail->typename,
-                    'typestock' => $orderProduct->productDetail->typestock,
-                    'created_at' => $orderProduct->productDetail->created_at,
-                    'updated_at' => $orderProduct->productDetail->updated_at,
-                ];
             }
     
             $organizedOrders[] = [
@@ -156,11 +162,13 @@ class OrderController extends Controller
                 'products' => array_values($productsGrouped)
             ];
         }
+    
         return response()->json([
             'status' => true,
             'orders' => $organizedOrders,
         ], 200);
     }
+    
     public function getOrderByInvoiceId($invoiceId)
     {
         $order = Order::with(['products', 'productDetails'])
