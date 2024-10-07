@@ -178,7 +178,7 @@ class FatoorahController extends Controller
                         'updated_at' => $orderProduct->product->updated_at,
                         'size' => $orderProduct->size,
                         'quantity' => $orderProduct->quantity,
-                        'product_details' => [
+                        'product_details' => 
                             [
                                 'id' => $orderProduct->productDetail->id,
                                 'price' => $orderProduct->productDetail->price,
@@ -192,7 +192,7 @@ class FatoorahController extends Controller
                                 'typestock' => $orderProduct->productDetail->typestock,
                                 'created_at' => $orderProduct->productDetail->created_at,
                                 'updated_at' => $orderProduct->productDetail->updated_at,
-                            ]
+                            
                         ]
                     ];
                 }

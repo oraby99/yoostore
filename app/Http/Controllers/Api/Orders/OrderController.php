@@ -123,7 +123,7 @@ class OrderController extends Controller
                         'updated_at' => $orderProduct->product->updated_at,
                         'size' => $orderProduct->size,
                         'quantity' => $orderProduct->quantity,
-                        'product_details' => [
+                        'product_details' => 
                             [
                                 'id' => $orderProduct->productDetail->id,
                                 'price' => $orderProduct->productDetail->price,
@@ -138,7 +138,7 @@ class OrderController extends Controller
                                 'created_at' => $orderProduct->productDetail->created_at,
                                 'updated_at' => $orderProduct->productDetail->updated_at,
                             ]
-                        ]
+                        
                     ];
                 }
             }
