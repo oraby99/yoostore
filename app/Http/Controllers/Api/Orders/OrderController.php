@@ -98,14 +98,15 @@ class OrderController extends Controller
     {
         $user = auth()->user();
         $orders = Order::where('user_id', $user->id)
-                        ->with(['products.product', 'productDetails'])
-                        ->get();
+            ->with(['products.product.productDetails']) // Load productDetails through product
+            ->get();
     
         return response()->json([
             'status' => true,
             'data'   => OrderResource::collection($orders),
         ], 200);
     }
+    
     public function getOrderByInvoiceId($invoiceId)
 {
     $order = Order::with(['products', 'productDetails'])
