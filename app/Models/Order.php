@@ -37,6 +37,10 @@ class Order extends Model
 {
     return $this->hasMany(OrderStatusChange::class);
 }
+public function orderProducts()
+{
+    return $this->hasMany(OrderProduct::class);
+}
 
 }
 

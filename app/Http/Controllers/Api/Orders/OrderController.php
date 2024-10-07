@@ -163,18 +163,21 @@ class OrderController extends Controller
     }
     public function getOrderByInvoiceId($invoiceId)
     {
-        $order = Order::with(['products', 'productDetails'])
+        $order = Order::with(['orderProducts.product', 'orderProducts.productDetail'])
                     ->where('invoice_id', $invoiceId)
                     ->first();
+    
         if (!$order) {
             return response()->json([
                 'status' => false,
                 'message' => 'Order not found',
             ], 404);
         }
+    
         return response()->json([
             'status' => true,
             'data' => new OrderResource($order),
         ], 200);
     }
+    
 }
