@@ -13,10 +13,6 @@ class Product extends Model
     protected $guarded = [];
     protected $fillable = ['name', 'description', 'tag', 'longdescription', 'discount', 'attributes', 'deliverytime', 'category_id', 'sub_category_id'];
     public $translatable = ['name', 'description', 'tag', 'longdescription',];
-    public function productDetails()
-    {
-        return $this->hasMany(ProductDetail::class, 'product_id');
-    }
     public function typeDetails()
     {
         return $this->hasMany(ProductDetail::class, 'product_id');
@@ -44,6 +40,10 @@ class Product extends Model
     public function orders()
     {
         return $this->hasMany(OrderProduct::class);
+    }
+    public function productDetails()
+    {
+        return $this->hasMany(ProductDetail::class);
     }
     protected $casts = [
         'attributes' => 'array',

@@ -7,6 +7,7 @@ use App\Http\Resources\OrderResource;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderCancellation;
+use App\Models\OrderProduct;
 use App\Models\OrderStatusChange;
 use Illuminate\Http\Request;
 
@@ -93,37 +94,87 @@ class OrderController extends Controller
             ],
         ], 200);
     }
-    
     public function getUserOrders()
     {
         $user = auth()->user();
-        $orders = Order::where('user_id', $user->id)
-            ->with(['products.product.productDetails']) // Load productDetails through product
+        $orders = Order::where('user_id', $user->id)->get();
+        $orderIds = $orders->pluck('id')->toArray();
+        $orderProducts = OrderProduct::with(['product', 'productDetail'])
+            ->whereIn('order_id', $orderIds)
             ->get();
+        $organizedOrders = [];
+        foreach ($orders as $order) {
+            $orderProductsForCurrentOrder = $orderProducts->where('order_id', $order->id);
+            $productsGrouped = [];
+            foreach ($orderProductsForCurrentOrder as $orderProduct) {
+                $productId = $orderProduct->product_id;
+                if (!isset($productsGrouped[$productId])) {
+                    $productsGrouped[$productId] = [
+                        'id' => $productId,
+                        'name' => $orderProduct->product->name,
+                        'description' => $orderProduct->product->description,
+                        'longdescription' => $orderProduct->product->longdescription,
+                        'tag' => $orderProduct->product->tag,
+                        'discount' => $orderProduct->product->discount,
+                        'attributes' => $orderProduct->product->attributes,
+                        'deliverytime' => $orderProduct->product->deliverytime,
+                        'category_id' => $orderProduct->product->category_id,
+                        'sub_category_id' => $orderProduct->product->sub_category_id,
+                        'created_at' => $orderProduct->product->created_at,
+                        'updated_at' => $orderProduct->product->updated_at,
+                        'product_details' => []
+                    ];
+                }
+                    $productsGrouped[$productId]['product_details'][] = [
+                    'id' => $orderProduct->productDetail->id,
+                    'price' => $orderProduct->productDetail->price,
+                    'image' => $orderProduct->productDetail->image,
+                    'image' => $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
+                    'color' => $orderProduct->productDetail->color,
+                    'size' => $orderProduct->productDetail->size,
+                    'stock' => $orderProduct->productDetail->stock,
+                    'typeprice' => $orderProduct->productDetail->typeprice,
+                    'typeimage' => $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
+                    'typename' => $orderProduct->productDetail->typename,
+                    'typestock' => $orderProduct->productDetail->typestock,
+                    'created_at' => $orderProduct->productDetail->created_at,
+                    'updated_at' => $orderProduct->productDetail->updated_at,
+                ];
+            }
     
+            $organizedOrders[] = [
+                'id' => $order->id,
+                'user_id' => $order->user_id,
+                'address_id' => $order->address_id,
+                'invoice_id' => $order->invoice_id,
+                'total_price' => $order->total_price,
+                'status' => $order->status,
+                'payment_method' => $order->payment_method,
+                'payment_status' => $order->payment_status,
+                'created_at' => $order->created_at,
+                'updated_at' => $order->updated_at,
+                'products' => array_values($productsGrouped)
+            ];
+        }
         return response()->json([
             'status' => true,
-            'data'   => OrderResource::collection($orders),
+            'orders' => $organizedOrders,
         ], 200);
     }
-    
     public function getOrderByInvoiceId($invoiceId)
-{
-    $order = Order::with(['products', 'productDetails'])
-                   ->where('invoice_id', $invoiceId)
-                   ->first();
-
-    if (!$order) {
+    {
+        $order = Order::with(['products', 'productDetails'])
+                    ->where('invoice_id', $invoiceId)
+                    ->first();
+        if (!$order) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Order not found',
+            ], 404);
+        }
         return response()->json([
-            'status' => false,
-            'message' => 'Order not found',
-        ], 404);
+            'status' => true,
+            'data' => new OrderResource($order),
+        ], 200);
     }
-
-    return response()->json([
-        'status' => true,
-        'data' => new OrderResource($order),
-    ], 200);
-}
-
 }

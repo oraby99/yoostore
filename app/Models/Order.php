@@ -25,7 +25,9 @@ class Order extends Model
     }
     public function products()
     {
-        return $this->hasMany(OrderProduct::class);
+        return $this->belongsToMany(Product::class, 'order_product')
+            ->withPivot('product_detail_id', 'quantity', 'size')
+            ->with('productDetails'); // Load product details only
     }
     public function productDetails()
     {

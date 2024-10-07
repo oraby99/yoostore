@@ -88,6 +88,7 @@ class FatoorahController extends Controller
                 OrderProduct::create([
                     'order_id'   => $order->id,
                     'product_id' => $item->product_id,
+                    'product_detail_id' => $item->product_detail_id,
                     'quantity'   => $item->quantity,
                     'size'       => $item->size,
                 ]);
@@ -154,6 +155,7 @@ class FatoorahController extends Controller
             foreach ($cartItems as $item) {
                 OrderProduct::create([
                     'order_id'   => $order->id,
+                    'product_detail_id' => $item->product_detail_id,
                     'product_id' => $item->product_id,
                     'quantity'   => $item->quantity,
                     'size'       => $item->size,
