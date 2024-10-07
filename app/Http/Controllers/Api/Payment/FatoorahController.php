@@ -105,16 +105,13 @@ class FatoorahController extends Controller
             return redirect()->route('payment.failure')->with('message', 'Payment failed');
         }
     }
-    
     public function codCheckout(Request $request)
     {
         $user = auth()->user();
-        
-        // Retrieve the default address
         $defaultAddress = Address::where('user_id', $user->id)
                                  ->where('is_default', 1)
                                  ->first();
-        
+    
         if (!$defaultAddress) {
             return response()->json([
                 'status'  => false,
@@ -122,28 +119,20 @@ class FatoorahController extends Controller
             ], 400);
         }
     
-        // Start a database transaction
         \DB::beginTransaction();
-        
         try {
-            // Calculate total price from request or cart
             $totalPrice = $request->total ?? Cart::where('user_id', $user->id)->sum('total_price');
-            
-            // Create the order
             $order = Order::create([
                 'user_id'        => $user->id,
                 'total_price'    => $totalPrice,
-                'status'         => 'Received', // Status set to Received for COD
-                'payment_method' => 'cod',      // Payment method is COD
-                'payment_status' => 'Pending',  // Payment pending
+                'status'         => 'Received',
+                'payment_method' => 'cod',
+                'payment_status' => 'Pending',
                 'address_id'     => $defaultAddress->id
             ]);
     
-            // Retrieve all cart items
             $cartItems = Cart::where('user_id', $user->id)->get();
-    
             if ($cartItems->isEmpty()) {
-                // If no cart items, roll back and return an error
                 \DB::rollBack();
                 return response()->json([
                     'status'  => false,
@@ -151,7 +140,6 @@ class FatoorahController extends Controller
                 ], 400);
             }
     
-            // Create order products
             foreach ($cartItems as $item) {
                 OrderProduct::create([
                     'order_id'   => $order->id,
@@ -162,22 +150,75 @@ class FatoorahController extends Controller
                 ]);
             }
     
-            // Clear the user's cart after order creation
+            // Delete cart items after creating the order
             Cart::where('user_id', $user->id)->delete();
     
-            // Commit the transaction
+            // Fetch the order products and details for the created order
+            $orderProducts = OrderProduct::with(['product', 'productDetail'])
+                ->where('order_id', $order->id)
+                ->get();
+    
+            // Organize the order product data similar to the getUserOrders structure
+            $productsGrouped = [];
+            foreach ($orderProducts as $orderProduct) {
+                if ($orderProduct->product && $orderProduct->productDetail) {
+                    $uniqueProductKey = $orderProduct->product_id . '-' . $orderProduct->product_detail_id;
+                    $productsGrouped[$uniqueProductKey] = [
+                        'id' => $orderProduct->product_id,
+                        'name' => $orderProduct->product->name,
+                        'description' => $orderProduct->product->description,
+                        'longdescription' => $orderProduct->product->longdescription,
+                        'tag' => $orderProduct->product->tag,
+                        'discount' => $orderProduct->product->discount,
+                        'attributes' => $orderProduct->product->attributes,
+                        'deliverytime' => $orderProduct->product->deliverytime,
+                        'category_id' => $orderProduct->product->category_id,
+                        'sub_category_id' => $orderProduct->product->sub_category_id,
+                        'created_at' => $orderProduct->product->created_at,
+                        'updated_at' => $orderProduct->product->updated_at,
+                        'size' => $orderProduct->size,
+                        'quantity' => $orderProduct->quantity,
+                        'product_details' => [
+                            [
+                                'id' => $orderProduct->productDetail->id,
+                                'price' => $orderProduct->productDetail->price,
+                                'image' => $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
+                                'color' => $orderProduct->productDetail->color,
+                                'size' => $orderProduct->productDetail->size,
+                                'stock' => $orderProduct->productDetail->stock,
+                                'typeprice' => $orderProduct->productDetail->typeprice,
+                                'typeimage' => $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
+                                'typename' => $orderProduct->productDetail->typename,
+                                'typestock' => $orderProduct->productDetail->typestock,
+                                'created_at' => $orderProduct->productDetail->created_at,
+                                'updated_at' => $orderProduct->productDetail->updated_at,
+                            ]
+                        ]
+                    ];
+                }
+            }
+    
             \DB::commit();
     
-            // Return a success response
+            // Return response with order and product details
             return response()->json([
                 'status'   => true,
                 'message'  => 'Order placed successfully under Cash on Delivery',
-                'order_id' => $order->id,
-                'order'    => $order
+                'order'    => [
+                    'id' => $order->id,
+                    'user_id' => $order->user_id,
+                    'address_id' => $order->address_id,
+                    'total_price' => $order->total_price,
+                    'status' => $order->status,
+                    'payment_method' => $order->payment_method,
+                    'payment_status' => $order->payment_status,
+                    'created_at' => $order->created_at,
+                    'updated_at' => $order->updated_at,
+                    'products' => array_values($productsGrouped)
+                ]
             ], 200);
-        
+    
         } catch (\Exception $e) {
-            // Rollback on error
             \DB::rollBack();
             \Log::error('COD Checkout Error: ' . $e->getMessage());
             return response()->json([
@@ -186,6 +227,7 @@ class FatoorahController extends Controller
             ], 500);
         }
     }
+    
     public function errorurl(Request $request)
     {    
         $paymentId = $request->query('paymentId');
