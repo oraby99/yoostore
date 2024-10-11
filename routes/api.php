@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Address\AddressController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Banners\BannerProductController;
 use App\Http\Controllers\Api\Cart\CartController;
+use App\Http\Controllers\Api\Chat\ChatController;
 use App\Http\Controllers\Api\General\FavoriteController;
 use App\Http\Controllers\Api\General\ProductHistoryController;
 use App\Http\Controllers\Api\General\RateController;
@@ -70,4 +71,9 @@ use Illuminate\Support\Facades\Route;
     Route::get('/order/track/{orderId}',     [OrderController::class, 'trackOrder']);
     Route::get('/orders',                    [OrderController::class, 'getUserOrders']);
     Route::get('/order/invoice/{invoiceId}', [OrderController::class, 'getOrderByInvoiceId']);
-}); 
+    //========================================================================================================
+    Route::get('/chats',                     [ChatController::class, 'index']);
+    Route::post('/chats',                    [ChatController::class, 'store']);
+    Route::put('/chats/{id}',                [ChatController::class, 'update']);
+    Route::delete('/chats/{id}',             [ChatController::class, 'destroy']);
+});  
