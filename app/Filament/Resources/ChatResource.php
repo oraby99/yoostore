@@ -3,37 +3,44 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ChatResource\Pages;
-use App\Filament\Resources\ChatResource\RelationManagers;
 use App\Models\Chat;
 use Filament\Forms;
 use Filament\Forms\Components\BelongsToSelect;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ChatResource extends Resource
 {
     protected static ?string $model = Chat::class;
     protected static ?string $navigationGroup = 'Chats';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string $view = 'vendor.filament.components.chats';
+    public function mount(): void
+    {
+        $this->chats = Chat::with(['user', 'product'])->get();
+    }
+    protected function getViewData(): array
+    {
+        return [
+            'chats' => $this->chats,
+        ];
+    }
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 BelongsToSelect::make('user_id')
-                    ->relationship('user', 'name') // Fetch user name via relationship
+                    ->relationship('user', 'name')
                     ->label('User')
-                    ->disabled(), // Make it non-editable
+                    ->disabled(),
                 BelongsToSelect::make('product_id')
-                    ->relationship('product', 'name->en') // Fetch product name via relationship
+                    ->relationship('product', 'name->en')
                     ->label('Product')
-                    ->disabled(), // Make it non-editable
+                    ->disabled(),
                 Textarea::make('message')
                     ->label('Message')
                     ->disabled(),
@@ -45,37 +52,45 @@ class ChatResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-        ->columns([
-            TextColumn::make('user.name')->label('User'),
-            TextColumn::make('product.name')->label('Product'),
-            TextColumn::make('message')->label('Message'),
-            TextColumn::make('reply')->label('Reply'),
-            TextColumn::make('created_at')->label('Created At')->sortable(),
-        ])
-            ->filters([
-                //
+            ->columns([
+                TextColumn::make('user.name')
+                    ->label('User')
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('product.name')
+                    ->label('Product')
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('message')
+                    ->label('Message')
+                    ->limit(50)
+                    ->tooltip(fn ($record) => $record->message),
+                TextColumn::make('reply')
+                    ->label('Reply')
+                    ->limit(50)
+                    ->tooltip(fn ($record) => $record->reply),
+                TextColumn::make('created_at')
+                    ->label('Sent At')
+                    ->sortable(),
             ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
+                Tables\Actions\DeleteBulkAction::make(),
+            ])
+            ->defaultSort('created_at', 'desc');
     }
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListChats::route('/'),
+            // Point the index page to CustomChatView
+            //'index' => Pages\ListChats::route('/'),
+            'index' => Pages\CustomChatView::route('/'),
             'create' => Pages\CreateChat::route('/create'),
             'edit' => Pages\EditChat::route('/{record}/edit'),
         ];
     }
+    
 }
