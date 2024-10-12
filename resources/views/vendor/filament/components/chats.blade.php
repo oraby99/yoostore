@@ -13,7 +13,7 @@
                     <h3 class="font-semibold">{{ $productName }}</h3>
                     <div class="space-y-2 mt-2 bg-dark">
                         @foreach ($chatsByProduct as $chat)
-                            <div class="p-2  rounded chat-bubble">
+                            <div class="p-2 bg-gray-100 rounded chat-bubble">
                                 <p class="font-semibold text-sm" style="color: black">{{ $chat->message }}</p>
                                 <p class="text-gray-500 text-sm">Reply: {{ $chat->reply ?? 'No reply yet' }}</p>
                                 <p class="text-xs text-gray-400">{{ $chat->created_at->format('d M Y, H:i') }}</p>
