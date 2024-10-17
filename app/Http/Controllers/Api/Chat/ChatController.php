@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Chat;
 
+use App\Filament\Resources\ProductResource;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
@@ -76,11 +77,28 @@ class ChatController extends Controller
         }
         $formattedChats = [];
         foreach ($chats as $productId => $chatGroup) {
+            $product = $chatGroup->first()->product;
+            $lastMessage = $chatGroup->last();
             $formattedChats[] = [
-                'product_id' => $productId,
-                'chats' => ChatResource::collection($chatGroup),
+                'last_message' => new ChatResource($lastMessage),
             ];
         }
         return ApiResponse::send(true, 'Chats retrieved successfully', $formattedChats);
     }
+    public function getChatByUserAndProduct(Request $request)
+    {
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
+        ]);
+        $user = auth()->user();
+        $chats = Chat::where('user_id', $user->id)
+            ->where('product_id', $validated['product_id'])
+            ->with('product')
+            ->get();
+        if ($chats->isEmpty()) {
+            return ApiResponse::send(false, 'No chats found for this product');
+        }
+        return ApiResponse::send(true, 'Chats retrieved successfully', ChatResource::collection($chats));
+    }
+
 }

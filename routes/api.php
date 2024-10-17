@@ -76,4 +76,5 @@ use Illuminate\Support\Facades\Route;
     Route::post('/chats',                    [ChatController::class, 'store']);
     Route::put('/chats/{id}',                [ChatController::class, 'update']);
     Route::delete('/chats/{id}',             [ChatController::class, 'destroy']);
+    Route::get('/chats/by-product',          [ChatController::class, 'getChatByUserAndProduct']);
 });  
