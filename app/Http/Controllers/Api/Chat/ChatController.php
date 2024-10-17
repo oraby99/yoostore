@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api\Chat;
 
-use App\Filament\Resources\ProductResource;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Resources\ChatResource;
+use App\Http\Resources\ProductResource;
 
 class ChatController extends Controller
 {
@@ -93,12 +93,18 @@ class ChatController extends Controller
         $user = auth()->user();
         $chats = Chat::where('user_id', $user->id)
             ->where('product_id', $validated['product_id'])
-            ->with('product')
             ->get();
         if ($chats->isEmpty()) {
             return ApiResponse::send(false, 'No chats found for this product');
         }
-        return ApiResponse::send(true, 'Chats retrieved successfully', ChatResource::collection($chats));
+        $product = Product::find($validated['product_id']);
+        if (!$product) {
+            return ApiResponse::send(false, 'Product not found');
+        }
+        $response = [
+            'product' => new ProductResource($product),
+            'chats' => ChatResource::collection($chats),
+        ];
+        return ApiResponse::send(true, 'Chats retrieved successfully', $response);
     }
-
 }
