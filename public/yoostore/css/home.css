@@ -1,0 +1,305 @@
+
+
+
+
+
+
+
+
+
+.section1{
+    height: 800px;
+}
+
+.section1 img {
+    width: 100%;
+    /* height: 500px; */
+    background-image: url('images/banner1.jpeg');
+    background-size: object-fit; 
+    background-position: center; 
+    background-repeat: no-repeat; 
+}
+.section1 div button {
+    background-color: #FA8232;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 18px;
+    font-weight: 500;
+    border: none;
+    width: 191px;
+    height: 56px;
+}
+
+.section1 div{
+    margin-top: 100px;
+    position: relative;
+    z-index: 1;
+    top: -600px;
+    left: 200px;
+}
+.section1 :first-child {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.section1 .p1 {
+    color: white;
+    font-size: 96px;
+    width: 300px;
+    line-height: 90px;
+    
+}
+
+.section1 .p2 {
+    color: white;
+    width: 356px;
+    font-size: 20px;
+}
+
+
+
+/* section2 */
+.feature-section {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+}
+
+.feature-item .icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.feature-item h6 {
+    font-weight: 600;
+    margin-bottom: 0;
+    font-size: 14px;
+}
+
+.feature-item p {
+    font-size: 12px;
+    color: #777;
+    margin: 0;
+}
+
+.feature-item i{
+    font-size: 30px;
+}
+.divider {
+    border-left: 1px solid #ccc;
+    height: 40px;
+}
+
+
+
+
+/* section 3 */
+
+.slider-container {
+    position: relative;
+    max-width: 1000px;
+    margin: auto;
+    overflow: hidden;
+}
+
+.slider {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 300%; /* 100% per slide * number of slides */
+}
+
+.slide {
+    width: 100%; /* Full width per slide */
+    height: 400px; /* Set the desired height */
+}
+
+.prev, .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.prev {
+    left: 0;
+}
+
+.next {
+    right: 0;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* section 4 */
+.custom-card {
+    width: 234px;
+    height: 320px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.custom-card .card-img-top {
+    width: 100%;
+    height: 200px; /* Adjust image height */
+    object-fit: cover;
+}
+
+.custom-card .badge {
+    font-size: 12px;
+}
+
+.card-body h5 {
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.rating {
+    font-size: 12px;
+}
+
+.card-body
+.pricee {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2DA5F3;
+}
+
+
+
+
+/* section 5 */
+
+.section5 {
+ height: 716px;
+}
+
+.banner2{
+    height: 288px;
+    width: 100%;
+    background-color: #F3DE6D;
+}
+
+.banner2 p {
+    font-weight: 600;
+}
+
+.banner2 button {
+    background-color: #FA8232;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 18px;
+    font-weight: 500;
+    border: none;
+    width: 191px;
+    height: 56px;
+    margin-top: 20px;
+}
+
+.featuerd span {
+    margin-right: 10px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #5F6C72;
+}
+
+.featuerd span i {
+    font-size: 18px;
+    color: #FA8232;
+}
+
+
+
+.featuerd span :hover {
+    color: black;
+    border-bottom: 3px solid #FA8232;
+}
+
+
+.featureitem {
+    cursor: pointer; /* Pointer on hover */
+    transition: color 0.3s ease, border-bottom 0.3s ease; /* Smooth transitions */
+}
+
+.featureitem:hover {
+    color: black;
+    border-bottom: 5px solid #FA8232; /* Default hover effect */
+}
+
+.active {
+    color: black;
+    border-bottom: 3px solid #FA8232;
+}
+
+
+.section6 {
+    width: 75%;
+    background-color: black;
+    height: 336px;
+}
+
+.section6  button {
+    background-color: #FA8232;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 18px;
+    font-weight: 500;
+    border: none;
+    width: 191px;
+    height: 56px;
+    margin-top: 5px;
+
+}
+
+.section6 div img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.w-25 button {
+    background-color: #2DA5F3;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 18px;
+    font-weight: 500;
+    border: none;
+    width: 191px;
+    height: 56px;
+    margin-top: 5px;
+}
+
+.section8 {
+    height: 324px;
+    width: 100%;
+    background-color: coral;
+}
+
+

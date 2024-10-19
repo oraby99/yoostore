@@ -1,0 +1,202 @@
+
+
+
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+  }
+  
+  .navbarr-head {
+    background-color: #fa8232;
+    height: 52px;
+  }
+  
+  .navbarr {
+    background-color: white;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    margin: 0;
+  }
+  
+  .navbarr-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 50px;
+  }
+  
+  .logo {
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+  }
+  .social-media {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 24px;
+    color: white;
+  }
+  .social-media-icons {
+    /* width: 20px; */
+    margin: 0 10px;
+    padding: 10px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 12px;
+    border-right: 1px solid rgba(255, 255, 255, 0.5);
+  }
+  .social-media-icons i {
+    color: white;
+  font-size: 15px;
+  }
+  .navbarr-select select {
+    padding: 5px;
+    border-radius: 4px;
+    background-color: transparent;
+    border: none;
+    color: inherit;
+  }
+  
+  .page-title {
+    width: 170px;
+    height: 45px;
+  }
+  .search-bar {
+    position: relative;
+  }
+  .search-bar input {
+    width: 500px;
+    height: 48px;
+    padding: 14px 20px 14px 20px;
+    gap: 8px;
+    border-radius: 22px;
+    border: 1px solid #fa8232;
+  }
+  .search-bar i {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    size: 20px;
+  }
+  .shopping-icons {
+    display: flex;
+    gap: 20px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+  }
+  .shopping-icons a i {
+    color: #fa8232;
+  font-size: 24px;
+  }
+  .options{
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      align-items: center;
+      font-size: 15px;
+  }
+  .categories select {
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #F2F4F5;
+    border: none;
+    font-size: 17px;
+    margin-right: 5px;
+  }
+  
+  .options a {
+    color: #5F6C72 ;
+    text-decoration: none;
+  }
+  #a1,
+  #a2{
+      color: #fa8232;
+  }
+  .phone{
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+  }
+  .whatsapp{
+      width: 30px;
+      height: 30px;
+      background-image: url(../assets/whatsapp.png);
+      background-size: cover;
+  }
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.main
+{
+    margin-top: 100px;
+}
+
+.inputs p{
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.inputs input
+{
+    width: 400px;
+    border-radius:  3px;
+    border: 1px solid #E4E7E9;
+    padding: 10px;
+    height: 56px;
+}
+
+button
+{
+    background-color: #FA8232;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 18px;
+    font-weight: 500;
+    border: none;
+    width: 190px;
+    height: 56px;
+}

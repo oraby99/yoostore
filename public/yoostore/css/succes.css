@@ -1,0 +1,55 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.container{
+    margin-top: 100px;
+    height: 70vh;
+}
+
+.container div p{
+    width: 424;
+}
+.rightbutton{
+    background-color: #FA8232;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 18px;
+    text-decoration: none;
+    font-weight: 500;
+    border: none;
+    width: 191px;
+    height: 56px;
+}
+.leftbutton{
+    background-color: white;
+    color: #FA8232;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 18px;
+border: #FA8232 1px solid;
+    font-weight: 500;
+    width: 191px;
+    height: 56px;
+}
