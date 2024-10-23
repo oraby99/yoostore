@@ -1,3 +1,8 @@
+@php
+$categories = App\Models\Category::with('subcategories')->get();
+@endphp
+
+
 
 <div>
   <footer class="FOOTER">
@@ -16,15 +21,11 @@
       <div class="FOOTER-col">
         <h4 class="title">Top Category</h4>
         <ul>
-          <li><a href="#">Computer & Laptop</a></li>
-          <li><a href="#">SmartPhone</a></li>
-          <li><a href="#">Headphone</a></li>
-          <li class="title_2">
-            <i style="color: yellow" class="fa-solid fa-minus"></i>
-            Accessories
-          </li>
-          <li><a href="#">Camera & Photo</a></li>
-          <li><a href="#">TV & Homes</a></li>
+        @foreach($categories as $category)
+        @foreach($category->subcategories as $subcategory)
+        <li><a href="#">{{ $subcategory->name }}</a></li>
+        @endforeach
+        @endforeach
           <li>
             <a href="#" style="color: yellow">Browse All Product <i class="fa-solid fa-arrow-right"></i></a>
           </li>
@@ -35,13 +36,12 @@
       <div class="FOOTER-col">
         <h4 class="title">Quick Links</h4>
         <ul>
-          <li><a href="#">Shop Product</a></li>
-          <li><a href="#">Shopping Cart</a></li>
-          <li><a href="#">Wishlist</a></li>
-          <li><a href="#">Compare</a></li>
-          <li><a href="#">Track Order</a></li>
-          <li><a href="#">Customer Help</a></li>
-          <li><a href="#">About Us</a></li>
+          <li><a href="{{ route('home') }}">Shop Product</a></li>
+          <li><a href="{{ route('cart') }}">Shopping Cart</a></li>
+          <li><a href="">Wishlist</a></li>
+          <li><a href="{{route('track')}}">Track Order</a></li>
+          <li><a href="">Customer Help</a></li>
+          <li><a href="">About Us</a></li>
         </ul>
       </div>
   
@@ -53,7 +53,7 @@
             <a href="#">
               <div>
                 <i
-                  style="font-size: 30px"
+                  style="font-size: 5px"
                   class="fa-brands fa-google-play"></i>
               </div>
               <div class="details">
