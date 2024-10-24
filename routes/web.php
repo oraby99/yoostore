@@ -52,12 +52,13 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 
 Route::get('/index', [HomeController::class, 'index'])->name('index');
-Route::get('/product', [ProductController::class, 'index'])->name('product');
+Route::get('/product/{id}', [ProductController::class, 'index'])->name('product');
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 Route::get('/orderDetails', [OrderdetailController::class, 'index'])->name('orderDetails');
 Route::get('/track', [TrackController::class, 'index'])->name('track');
 Route::get('/success', [SuccessController::class, 'index'])->name('success');
-Route::get('/signup', [AuthController::class, 'index'])->name('signup');
+Route::get('/signup', [AuthController::class, 'signupView'])->name('signup');
+Route::get('/login', [AuthController::class, 'loginView'])->name('login');
 
 

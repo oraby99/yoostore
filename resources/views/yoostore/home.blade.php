@@ -134,9 +134,9 @@
             <span class="text-warning">★★★★★</span>
             <span>(738)</span>
           </div>
-          <h5 class="card-title">
-            {{ $product->name }}
-          </h5>
+          <h4 class="card-title">
+            <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black"> {{ $product->name }}</a>
+          </h4>
         </div>
       </div>
     </div>
@@ -196,7 +196,9 @@
                 <span class="text-warning">★★★★★</span>
                 <span>(738)</span>
               </div>
-              <h5 class="card-title">     {{ $product->name }}</h5>
+              <h4 class="card-title">
+                <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black"> {{ $product->name }}</a>
+              </h4>
               <h4 class="pricee"></h4>
             </div>
           </div>
@@ -257,7 +259,7 @@
         <span class="featureitem">{{ $subcategory->name }}</span>
         @endforeach
         @endforeach
-        <span style="color: #fa8232">View All Products <i class="fa-solid fa-arrow-right-long"></i></span>
+        <span style="color: #fa8232">View Products <i class="fa-solid fa-arrow-right-long"></i></span>
       </div>
     </div>
 
@@ -278,7 +280,9 @@
                 <span class="text-warning">★★★★★</span>
                 <span>(738)</span>
               </div>
-              <h5 class="card-title">     {{ $product->name }}</h5>
+              <h4 class="card-title">
+                <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black"> {{ $product->name }}</a>
+              </h4>
               <h4 class="pricee"></h4>
             </div>
           </div>

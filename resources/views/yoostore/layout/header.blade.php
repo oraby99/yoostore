@@ -43,7 +43,7 @@ $categories = App\Models\Category::with('subcategories')->get();
                 <a href="{{ route('cart') }}"><i class="fa-solid fa-cart-shopping"></i></a>
                 <a href=""><i class="fa-regular fa-heart"></i></a>
                 <a href="{{ route('signup') }}"><i class="fa-regular fa-user"></i></a>
-                <a href=""><i class="fa-solid fa-right-from-bracket"></i></a>
+                <livewire:auth.logout>
             </div>
         </div>
 

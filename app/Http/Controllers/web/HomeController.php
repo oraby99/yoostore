@@ -19,11 +19,15 @@ class HomeController extends Controller
         $categories = Category::with('subcategories')->get();
 
         
-        // dd( $banners);
+        // $user = auth()->user();
+        // dd( $user);
         return view('yoostore.home' , [
             'products' => $products,
             'categories' => $categories,
             'banner4' => $banner4
         ]);
     }
+
+
+  
 }

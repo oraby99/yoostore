@@ -36,7 +36,7 @@
             </div>
 
             <h5 style="margin-bottom: 25px">
-              2020 Apple MacBook Pro with Apple M1 Chip
+              {{$product->name}}
             </h5>
             <div class="row info">
               <div class="col-6">
@@ -45,7 +45,7 @@
               </div>
               <div class="col-6">
                 <p><span>Availability</span>: Instock</p>
-                <p><span>Category</span>: Laptop</p>
+                <p><span>Category</span>: {{$product->category->name}}</p>
               </div>
             </div>
 

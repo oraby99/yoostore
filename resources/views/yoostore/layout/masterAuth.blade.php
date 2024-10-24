@@ -17,21 +17,17 @@
 
 
     @yield('css')
-    @livewireStyles
     
 </head>
 <body>
 
-@include('yoostore.layout.header')
 
 @yield('content')
-@include('yoostore.layout.footer')
 
 
 
 
 
-@livewireScripts
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
