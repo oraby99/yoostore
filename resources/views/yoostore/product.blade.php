@@ -45,7 +45,7 @@
               </div>
               <div class="col-6">
                 <p><span>Availability</span>: Instock</p>
-                <p><span>Category</span>: {{$product->category->name}}</p>
+                <p><span>Category</span>: {{$product->category->name}}: {{$product->subCategory->name}}</p>
               </div>
             </div>
 
@@ -59,7 +59,11 @@
               <div class="row mb-3">
                 <div class="col-md-6">
                   <div class="mb-3 color">
-                    <label for="color">Color:</label>
+                    <label for="color">Color: 
+                      @foreach ($product->productDetails as $color) 
+                        -{{ $color->color }}
+                      @endforeach
+                    </label> 
                     <span class="rounded-circle"></span>
                   </div>
                   <div class="mb-3">
