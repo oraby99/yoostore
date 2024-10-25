@@ -61,4 +61,4 @@ Route::get('/success', [SuccessController::class, 'index'])->name('success');
 Route::get('/signup', [AuthController::class, 'signupView'])->name('signup');
 Route::get('/login', [AuthController::class, 'loginView'])->name('login');
 
-
+Route::view('/settings', 'yoostore.dashboard.settings')->name('settings');
