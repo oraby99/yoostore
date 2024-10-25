@@ -90,6 +90,10 @@ class AuthController extends Controller
                 'verification_code'     => $user->verification_code,
             ], 403);
         }
+        if (isset($data['device_token'])) {
+            $user->device_token = $data['device_token'];
+            $user->save();
+        }
         $token = $user->createToken('user Token')->plainTextToken;
         $user->token = $token;
         return response()->json([
