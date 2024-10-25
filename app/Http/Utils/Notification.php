@@ -12,13 +12,17 @@ class Notification{
         $user = User::find($id);
         $message = $type == 'Received' ? 'Congratulations, your order request has been created' : 'Unfortunately, your request to publish the order has been cancelled. Please try again';
         $fcm = $user->device_token;
-        $credentialsFilePath = Http::get(asset('yoo-store-ed4ba-de6f28257b6d.json'));
+        //$credentialsFilePath = Http::get(asset('yoo-store-ed4ba-de6f28257b6d.json'));
+        $credentialsFilePath = storage_path('app/yoo-store-ed4ba-de6f28257b6d.json');
         $client = new Google_Client();
         $client->setAuthConfig($credentialsFilePath);
         $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
         $token = $client->getAccessToken();
-        $access_token = $token['device_token'];
-        $headers = [
+        $access_token = $token['device_token'] ?? null;
+        if (!$access_token) {
+            return response()->json(['status' => false, 'message' => 'Device token not found.'], 400);
+        }
+                $headers = [
             "Authorization: Bearer $access_token",
             'Content-Type: application/json'
         ];
@@ -66,4 +70,5 @@ class Notification{
             ]);
         }
     }
+    
 }

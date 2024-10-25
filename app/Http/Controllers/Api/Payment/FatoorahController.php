@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Services\FatoorahServices;
+use App\Http\Utils\Notification as UtilsNotification;
 use App\Models\Address;
 use App\Models\Cart;
 use App\Models\Notification;
@@ -15,7 +16,7 @@ class FatoorahController extends Controller
 {
     private $fatoorahServices;
     private $notification;
-    public function __construct(FatoorahServices $fatoorahServices , Notification $notification)
+    public function __construct(FatoorahServices $fatoorahServices , UtilsNotification $notification)
     {
          $this->fatoorahServices = $fatoorahServices;
          $this->notification = $notification;
@@ -133,7 +134,7 @@ class FatoorahController extends Controller
                 'payment_status' => 'Pending',
                 'address_id'     => $defaultAddress->id
             ]);
-    
+            $result =  $this->notification->send('Received',$user->id,$user->device_token,$order->id);
             $cartItems = Cart::where('user_id', $user->id)->get();
             if ($cartItems->isEmpty()) {
                 \DB::rollBack();
@@ -150,6 +151,7 @@ class FatoorahController extends Controller
                     'product_id' => $item->product_id,
                     'quantity'   => $item->quantity,
                     'size'       => $item->size,
+                    'result'     => $result
                 ]);
             }
     
@@ -226,7 +228,7 @@ class FatoorahController extends Controller
             \Log::error('COD Checkout Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => false,
-                'message' => 'Failed to place order. Please try again.'
+                'message' => 'Failed to place order. Please try again.' . $e->getMessage()
             ], 500);
         }
     }
