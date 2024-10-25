@@ -65,12 +65,6 @@
                 </div>
                 <button class="checkout-button">Proceed to Checkout</button>
             </div>
-            <div class="coupon-box">
-                <h3>Coupon Code</h3>
-                <hr>
-                <input type="text" placeholder="Email address" style="margin-bottom: 20px; border-color: #ddd;"><br>
-                <button style="background-color: #2DA5F3; border: none; color: white; height: 48px; width: 160px;">Apply Coupon</button>
-            </div>
         </div>
     </div>
     </div>
