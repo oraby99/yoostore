@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Services\FatoorahServices;
 use App\Models\Address;
 use App\Models\Cart;
+use App\Models\Notification;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use Illuminate\Http\Request;
@@ -13,9 +14,11 @@ use Illuminate\Http\Request;
 class FatoorahController extends Controller
 {
     private $fatoorahServices;
-    public function __construct(FatoorahServices $fatoorahServices)
+    private $notification;
+    public function __construct(FatoorahServices $fatoorahServices , Notification $notification)
     {
          $this->fatoorahServices = $fatoorahServices;
+         $this->notification = $notification;
     }
     public function checkout(Request $request)
     {
@@ -82,7 +85,7 @@ class FatoorahController extends Controller
                 'payment_status' => 'Paid',
                 'address_id'     => $defaultAddress->id
             ]);
-    
+            $result =  $this->notification->send('Received',$user->id,$user->device_token,$order->id);
             $cartItems = Cart::where('user_id', $user->id)->get();
             foreach ($cartItems as $item) {
                 OrderProduct::create([

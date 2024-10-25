@@ -85,8 +85,6 @@ class ChatResource extends Resource
     public static function getPages(): array
     {
         return [
-            // Point the index page to CustomChatView
-            //'index' => Pages\ListChats::route('/'),
             'index' => Pages\CustomChatView::route('/'),
             'create' => Pages\CreateChat::route('/create'),
             'edit' => Pages\EditChat::route('/{record}/edit'),

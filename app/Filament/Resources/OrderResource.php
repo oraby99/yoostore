@@ -29,12 +29,12 @@ class OrderResource extends Resource
             ->schema([
                 Forms\Components\Select::make('user_id')
                     ->relationship('user', 'name')
-                    ->required(),
+                    ->required()->disabled(),
                 Forms\Components\TextInput::make('invoice_id')
-                    ->required(),
+                    ->required()->disabled(),
                 Forms\Components\TextInput::make('total_price')
                     ->numeric()
-                    ->required(),
+                    ->required()->disabled(),
                 Forms\Components\Select::make('payment_status')
                     ->options([
                         'Pending'   => 'Pending',
@@ -50,37 +50,44 @@ class OrderResource extends Resource
                     ])
                     ->required()
                     ->afterStateUpdated(function (callable $set, $state, $get) {
-                        $orderId = $get('id'); // Get the order ID
-                        $originalStatus = $get('status'); // Get the original status
-
-                        // Check if the status is changed
-                       // if ($state !== $originalStatus) {
-                            // Store the status change in the OrderStatusChange model
+                        $orderId = $get('id');
+                        $originalStatus = $get('status');
                             OrderStatusChange::create([
                                 'order_id' => $orderId,
                                 'status'   => $state,
                             ]);
-                       // }
                     }),
             ]);
     }
     public static function table(Table $table): Table
     {
         return $table
-        ->columns([
-            Tables\Columns\TextColumn::make('user.name')->label('User Name'),
-            Tables\Columns\TextColumn::make('invoice_id')->label('Invoice ID'),
-            Tables\Columns\TextColumn::make('total_price')->label('Total Price'),
-            Tables\Columns\TextColumn::make('payment_status')->label('payment_status'),
-            Tables\Columns\TextColumn::make('status')->label('Order Status'),
-            Tables\Columns\TextColumn::make('address.street')->label('Address'),
-            Tables\Columns\TextColumn::make('created_at')->label('Order Date')->dateTime(),
-        ])
-            ->filters([
-                //
-            ])
+            ->columns([
+                Tables\Columns\TextColumn::make('user.name')->label('User Name'),
+                Tables\Columns\TextColumn::make('invoice_id')->label('Invoice ID'),
+                Tables\Columns\TextColumn::make('total_price')->label('Total Price'),
+                Tables\Columns\TextColumn::make('payment_status')->label('Payment Status'),
+                Tables\Columns\TextColumn::make('status')->label('Order Status'),
+                Tables\Columns\TextColumn::make('address.street')->label('Address'),
+                Tables\Columns\TextColumn::make('created_at')->label('Order Date')->dateTime(),
+                Tables\Columns\TextColumn::make('products')->label('Product Details')
+                    ->formatStateUsing(function ($record) {
+                        return $record->orderProducts->map(function ($orderProduct) {
+                            $product = $orderProduct->product;
+                            $productDetail = $orderProduct->productDetail;
+                            return $product->name . ' - Qty: ' . $orderProduct->quantity . ', Size: ' . $orderProduct->size . 
+                                '<br>Price: ' . ($productDetail->price ?? $productDetail->typeprice) . 
+                                '<br>Stock: ' . ($productDetail->stock ?? $productDetail->typestock) . 
+                                '<br>Name/Color: ' . ($productDetail->color ?? $productDetail->typename) ;
+                        })->implode('<hr>');
+                    })->html(),
+            ])->defaultSort('created_at', 'desc') 
             ->actions([
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('downloadPdf')
+                    ->label('Download Invoice')
+                    ->url(fn ($record) => route('orders.pdf', $record))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

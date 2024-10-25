@@ -10,6 +10,7 @@ use App\Models\OrderCancellation;
 use App\Models\OrderProduct;
 use App\Models\OrderStatusChange;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -179,5 +180,12 @@ class OrderController extends Controller
             'data' => new OrderResource($order),
         ], 200);
     }
-    
+    public function generatePdf(Order $order)
+    {
+        $order->load(['user', 'address', 'products', 'products.productDetails']); // Load necessary relationships
+
+        $pdf = Pdf::loadView('orders.invoice', compact('order'));
+
+        return $pdf->download('invoice_' . $order->invoice_id . '.pdf');
+    }
 }

@@ -2,6 +2,7 @@
 
 //use Illuminate\Support\Facades\Auth;
 
+use App\Http\Controllers\Api\Orders\OrderController;
 use App\Http\Controllers\Api\Payment\FatoorahController;
 use App\Http\Controllers\web\AuthController;
 use App\Http\Controllers\web\CartController;
@@ -50,6 +51,7 @@ Route::get('/payment-failure', function () {
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 
+Route::get('/orders/{order}/pdf', [OrderController::class, 'generatePdf'])->name('orders.pdf');
 
 Route::get('/index', [HomeController::class, 'index'])->name('index');
 Route::get('/product', [ProductController::class, 'index'])->name('product');
