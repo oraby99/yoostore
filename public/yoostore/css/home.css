@@ -197,7 +197,7 @@
 
 .banner2{
     height: 288px;
-    width: 100%;
+    width: 312px;
     background-color: #F3DE6D;
 }
 
@@ -206,6 +206,8 @@
 }
 
 .banner2 button {
+    position: relative;
+    top: -15px;
     background-color: #FA8232;
     color: white;
     padding: 10px 20px;

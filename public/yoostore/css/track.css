@@ -137,8 +137,6 @@
       background-image: url(../assets/whatsapp.png);
       background-size: cover;
   }
-  
-
 
 
 
@@ -197,6 +195,6 @@ button
     font-size: 18px;
     font-weight: 500;
     border: none;
-    width: 190px;
+    width: 210px;
     height: 56px;
 }

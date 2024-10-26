@@ -297,7 +297,6 @@ button:hover {
 .custom-select select {
     width: 100%;
     padding: 10px 40px 10px 15px; /* Adjust padding for icon space */
-    border: 1px solid #ddd;
     border-radius: 5px;
     background: none;
     appearance: none; /* Remove default arrow */
@@ -312,7 +311,6 @@ button:hover {
     transform: translateY(-50%);
     width: 20px;
     height: 20px;
-    background: url('icon.png') no-repeat center center; /* Replace 'icon.png' with your icon */
     pointer-events: none; /* Make the icon non-interactive */
     background-size: contain;
 }

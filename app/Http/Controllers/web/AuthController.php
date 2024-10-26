@@ -7,8 +7,15 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    public function index()
+    public function signupView()
     {        
-        return view('yoostore.auth');
+        return view('yoostore.signup');
     }
+
+    public function loginView()
+    {        
+        return view('yoostore.login');
+    }
+
+
 }

@@ -1,0 +1,55 @@
+.sidebar {
+    background-color: #f7f7f7;
+    height: 60vh;
+    box-shadow: 0 4px 6px rgba(0.1, 0.1, 0.1, 0.3);
+}
+.sidebar a {
+    display: block;
+    color: #5F6C72;
+    padding: 20px 0;
+    padding-left: 10px;
+    text-decoration: none;
+}
+.sidebar a i {
+    margin-right: 10px;
+    color: #5F6C72;
+}
+.sidebar a:hover {
+    color: #ffffff;
+    background-color: #ff6600;
+    
+}
+.link{
+    padding: 100px;
+}
+.sidebar a.active {
+    color: #ff6600;
+    font-weight: bold;
+}
+.container-fluid {
+    padding: 30px;
+}
+.card-header {
+    background-color: #ff6600;
+    color: white;
+}
+.form-control {
+    border-radius: 0;
+}
+.btn-custom {
+    background-color: #ff6600;
+    color: white;
+    border: none;
+    border-radius: 0;
+}
+.btn-custom:hover {
+    background-color: #ff8533;
+}
+.account-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #dfd5d5;
+    margin: 20px auto;
+    display: block;
+}

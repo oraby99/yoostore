@@ -1,5 +1,7 @@
 
-
+@php
+$categories = App\Models\Category::with('subcategories')->get();
+@endphp
 
 <nav class="navbarr">
         <!-- First Row -->
@@ -39,9 +41,9 @@
             </div>
             <div class="shopping-icons">
                 <a href="{{ route('cart') }}"><i class="fa-solid fa-cart-shopping"></i></a>
-                <a href="#"><i class="fa-regular fa-heart"></i></a>
+                <a href=""><i class="fa-regular fa-heart"></i></a>
                 <a href="{{ route('signup') }}"><i class="fa-regular fa-user"></i></a>
-                <a href=""><i class="fa-solid fa-right-from-bracket"></i></a>
+                <livewire:auth.logout>
             </div>
         </div>
 
@@ -50,13 +52,16 @@
             <div class="options">
                 <div class="categories">
                     <select>
-                        <option value="electronics">All categories</option>
-                        <option value="fashion">Fashion</option>
-                        <option value="home">Home</option>
+                    @foreach($categories as $category)
+                    @foreach($category->subcategories as $subcategory)
+                    <option value="electronics">{{ $subcategory->name }}</option>
+                    @endforeach
+                    @endforeach
+                        
                     </select>
                 </div>
-                <a href="#"><i class="fa-solid fa-location-dot"></i> Track Order</a>
-                <a href="#" id="a1">Summer Sale</a>
+                <a href="{{ route('track') }}"><i class="fa-solid fa-location-dot"></i> Track Order</a>
+                <a href="" id="a1">Summer Sale</a>
                 <a href="#">New Arrival</a>
                 <a href="#" id="a2">Best Sellers</a>
             </div>
