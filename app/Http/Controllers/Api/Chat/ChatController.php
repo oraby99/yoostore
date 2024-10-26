@@ -9,6 +9,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Resources\ChatResource;
 use App\Http\Resources\ProductResource;
+use App\Models\Notification;
 
 class ChatController extends Controller
 {
@@ -106,5 +107,15 @@ class ChatController extends Controller
             'chats' => ChatResource::collection($chats),
         ];
         return ApiResponse::send(true, 'Chats retrieved successfully', $response);
+    }
+    public function notification()
+    {
+        $user = auth()->user();
+        $data = Notification::where('user_id',$user->id);
+        return response()->json([
+            'data'   => $data,
+            'status' => 200,
+            'message'=> 'success'
+        ]);
     }
 }

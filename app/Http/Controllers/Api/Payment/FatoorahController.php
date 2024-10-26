@@ -232,7 +232,6 @@ class FatoorahController extends Controller
             ], 500);
         }
     }
-    
     public function errorurl(Request $request)
     {    
         $paymentId = $request->query('paymentId');
