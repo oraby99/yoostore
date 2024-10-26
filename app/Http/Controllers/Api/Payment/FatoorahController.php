@@ -197,20 +197,27 @@ class FatoorahController extends Controller
                 'payment_status_id' => 1,
                 'address_id'     => $defaultAddress->id
             ]);
-            //$result =  $this->notification->send('Received',$user->id,$user->device_token,$order->id);
-            $data = [
-                "registration_ids" => $user->device_token,
-                "notification" => [
-                    "title" => 'Teams Link',
-                    "body" => 'You have a new message from ' . $user->name,
-                ],
-            ];
-            $response = self::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
-            if (!empty($response['error'])) {
-                return response()->json(['message' => 'Error: ' . $response['error']], 500);
-            }
-            return response()->json(['message' => 'Notifications sent successfully', 'response' => $response['response']]);
+            $deviceToken = $user->device_token;
+        \Log::info('Device Token: ' . $deviceToken); // Log the device token
+
+        if (!$deviceToken) {
+            return response()->json(['message' => 'No device token found.'], 400);
+        }
+
+        $data = [
+            "registration_ids" => [$deviceToken], // Use an array for multiple tokens
+            "notification" => [
+                "title" => 'Teams Link',
+                "body" => 'You have a new message from ' . $user->name,
+            ],
+        ];
+
+        $response = self::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
         
+        if (!empty($response['error'])) {
+            \Log::error('FCM Error: ' . json_encode($response['error'])); // Log the FCM error
+            return response()->json(['message' => 'Error: ' . $response['error']], 500);
+        }
             $cartItems = Cart::where('user_id', $user->id)->get();
             if ($cartItems->isEmpty()) {
                 \DB::rollBack();
