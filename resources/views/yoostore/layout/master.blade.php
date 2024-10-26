@@ -6,7 +6,15 @@
     <link  rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
     <link rel="stylesheet" href="{{asset('yoostore/css/product.css') }}" />
     
-    
+    <link rel="stylesheet" href="faq.css">
+    <script
+      defer
+      src="https://unpkg.com/alpinejs@3.2.3/dist/cdn.min.js"
+    ></script>
+    <link
+      href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
     <!-- header link -->
     <link rel="stylesheet" href="{{asset('yoostore/css/all.css') }}" />
     <link rel="stylesheet" href="{{asset('yoostore/css/fontawesome.min.css') }}" />
