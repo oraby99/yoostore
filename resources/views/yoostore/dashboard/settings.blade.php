@@ -6,17 +6,17 @@
 
 
 <div class="container-fluid">
-    <div class="row">
+    <div class="row d-flex align-items-start">
         <!-- Sidebar -->
         <div class="col-md-3 sidebar">
             <a href="#" class="active link"><i class="fa-solid fa-layer-group"></i>Dashboard</a>
-            <a href="#" class="link"><i class="fa-solid fa-shop"></i>Order History</a>
-            <a href="#" class="link"><i class="fa-solid fa-location-dot"></i>Track Order</a>
-            <a href="#" class="link"><i class="fa-solid fa-cart-shopping"></i>Shopping Cart</a>
+            <a href="{{ route('orderHistory') }}" class="link"><i class="fa-solid fa-shop"></i>Order History</a>
+            <a href="{{ route('track') }}" class="link"><i class="fa-solid fa-location-dot"></i>Track Order</a>
+            <a href="{{ route('cart') }}" class="link"><i class="fa-solid fa-cart-shopping"></i>Shopping Cart</a>
             <a href="#" class="link"><i class="fa-regular fa-heart"></i>Wishlist</a>
             <a href="#" class="link"><i class="fa-solid fa-clock-rotate-left"></i>Browsing History</a>
             <a href="{{ route('settings') }}" class="link"><i class="fa-solid fa-gear"></i>Settings</a>
-            <a href="#" class="link"><i class="fa-solid fa-arrow-right-from-bracket"></i>Log out</a>
+            <livewire:dashboard.logout>
         </div>
 
         <!-- Content -->

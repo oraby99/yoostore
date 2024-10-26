@@ -105,6 +105,13 @@ class Addresses extends Component
         $this->defaultAddressId = $addressId; // Update the selected default address
         $this->loadAddresses(); // Reload addresses to reflect changes
     }
+
+    public function deleteAddress($id)
+    {
+        Address::where('id', $id)->delete();
+        $this->loadAddresses();
+        session()->flash('message', 'Address deleted successfully!');
+    }
     public function render()
     {
         return view('livewire.dashboard.settings.addresses');

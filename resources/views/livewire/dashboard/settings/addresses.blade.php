@@ -129,13 +129,14 @@
 
     
     <div class="col-xl-12">
-    <div class="card mb-4">
-        <div class="card-header">Addresses</div>
-        <div class="card-body">
-            <div class="row">
-                @foreach($addresses as $address)
+        <div class="card mb-4">
+            <div class="card-header">Addresses</div>
+            <div class="card-body">
+                <div class="row">
+                    @foreach($addresses as $address)
                     <div class="col-md-6 mb-3">
-                        <div class="card">
+                        <div class="card p-3">
+                            <i  wire:click="deleteAddress({{ $address->id }}) " class="fa fa-trash" style="  font-size: 20px; vertical-align: middle; color: red ; cursor: pointer"></i>
                             <div class="card-body">
                                 <h5 class="card-title">{{ $address->name }}</h5>
                                 <p class="card-text">
@@ -143,20 +144,21 @@
                                     {{ $address->city }}, {{ $address->country }}<br>
                                     Phone: {{ $address->phone }}
                                 </p>
-                                <input 
-                                    type="radio" 
-                                    wire:click="setDefault({{ $address->id }})" 
-                                    name="defaultAddress" 
-                                    value="{{ $address->id }}" 
+                                <input
+                                    type="radio"
+                                    wire:click="setDefault({{ $address->id }})"
+                                    name="defaultAddress"
+                                    value="{{ $address->id }}"
                                     @if($address->is_default) checked @endif
                                 > Choose as default
                             </div>
                         </div>
+                        
                     </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 </div>

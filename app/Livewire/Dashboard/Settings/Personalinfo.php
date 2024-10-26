@@ -3,6 +3,7 @@
 namespace App\Livewire\Dashboard\Settings;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class Personalinfo extends Component
@@ -14,7 +15,7 @@ class Personalinfo extends Component
     public function mount()
     {
         // Load the current user's information into the component properties
-        $user = auth()->user();
+        $user = Auth::user();
         $this->name = $user->name;
         $this->email = $user->email;
         $this->phone = $user->phone;
