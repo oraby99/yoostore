@@ -10,7 +10,9 @@ use App\Models\Cart;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\OrderProduct;
+use Google_Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class FatoorahController extends Controller
 {
@@ -21,6 +23,68 @@ class FatoorahController extends Controller
          $this->fatoorahServices = $fatoorahServices;
          $this->notification = $notification;
     }
+
+    public static function sendFCMNotification($data, $credentialsFile)
+    {
+        try {
+            $client = new Google_Client();
+            $credentialsFilePath = storage_path('app/' . $credentialsFile);
+    
+            // Check if the file exists instead of calling status() on a string
+            if (!file_exists($credentialsFilePath)) {
+                \Log::error('Failed to load Firebase credentials file.');
+                return ['error' => 'Failed to retrieve Firebase credentials'];
+            }
+    
+            $client->setAuthConfig($credentialsFilePath);
+            $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+            $token = $client->fetchAccessTokenWithAssertion();
+            
+            if (is_null($token) || !isset($token['access_token'])) {
+                \Log::error('Failed to retrieve access token.');
+                return ['error' => 'Failed to retrieve access token'];
+            }
+    
+            $access_token = $token['access_token'];
+            $headers = [
+                "Authorization: Bearer $access_token",
+                'Content-Type: application/json'
+            ];
+    
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/v1/projects/yoo-store-ed4ba/messages:send');
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    
+            $postData = [
+                "message" => [
+                    "notification" => [
+                        "title" => $data["notification"]["title"],
+                        "body"  => $data["notification"]["body"],
+                    ],
+                    "data" => $data["data"],
+                    "token" => $data["registration_ids"][0],
+                ]
+            ];
+            
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+            $response = curl_exec($ch);
+            
+            if ($response === false) {
+                return ['error' => curl_error($ch)];
+            }
+            
+            curl_close($ch);
+            return ['response' => json_decode($response, true)];
+            
+        } catch (\Exception $e) {
+            \Log::error('Exception: ' . $e->getMessage());
+            return ['error' => $e->getMessage()];
+        }
+    }
+    
     public function checkout(Request $request)
     {
         $user = auth()->user();
@@ -134,7 +198,20 @@ class FatoorahController extends Controller
                 'payment_status_id' => 1,
                 'address_id'     => $defaultAddress->id
             ]);
-            $result =  $this->notification->send('Received',$user->id,$user->device_token,$order->id);
+            //$result =  $this->notification->send('Received',$user->id,$user->device_token,$order->id);
+            $data = [
+                "registration_ids" => $user->device_token,
+                "notification" => [
+                    "title" => 'Teams Link',
+                    "body" => 'You have a new message from ' . $user->name,
+                ],
+            ];
+            $response = self::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
+            if (!empty($response['error'])) {
+                return response()->json(['message' => 'Error: ' . $response['error']], 500);
+            }
+            return response()->json(['message' => 'Notifications sent successfully', 'response' => $response['response']]);
+        
             $cartItems = Cart::where('user_id', $user->id)->get();
             if ($cartItems->isEmpty()) {
                 \DB::rollBack();
@@ -151,7 +228,6 @@ class FatoorahController extends Controller
                     'product_id' => $item->product_id,
                     'quantity'   => $item->quantity,
                     'size'       => $item->size,
-                    'result'     => $result
                 ]);
             }
     
