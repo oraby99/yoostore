@@ -52,7 +52,7 @@ class FatoorahController extends Controller
             ];
     
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/v1/projects/yoo-store-ed4ba/messages:send');
+            curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/v1/projects/teams-layered/messages:send');
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -64,7 +64,6 @@ class FatoorahController extends Controller
                         "title" => $data["notification"]["title"],
                         "body"  => $data["notification"]["body"],
                     ],
-                    "data" => $data["data"],
                     "token" => $data["registration_ids"][0],
                 ]
             ];
