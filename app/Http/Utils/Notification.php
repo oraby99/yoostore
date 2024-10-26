@@ -10,39 +10,35 @@ class Notification{
     public static function send($type, $id, $token, $order_id)
     {
         $user = User::find($id);
-        $message = $type == 'Received' ? 'Congratulations, your order request has been created' : 'Unfortunately, your request to publish the order has been cancelled. Please try again';
-        $fcm = $user->device_token;
-        $credentialsFilePath = storage_path('app/yoo-store-ed4ba-de6f28257b6d.json');
+        $message = $type == 'Received' . 'Congratulations, your Order request has been approved';
+        $fcm = $user->device_token;    
+        $credentialsFilePath = storage_path('yoo-store-ed4ba-de6f28257b6d.json');
         $client = new Google_Client();
         $client->setAuthConfig($credentialsFilePath);
-        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
-        $token = $client->fetchAccessTokenWithAssertion();
-        $access_token = $token['access_token'];
-    
+        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');        
+        $token = $client->getAccessToken();
+        $access_token = $token['access_token'] ?? null;    
         if (!$access_token) {
-            return response()->json(['status' => false, 'message' => 'Access token not found.'], 400);
+            return response()->json(['message' => 'Failed to get access token.'], 500);
         }
-    
         $headers = [
             "Authorization: Bearer $access_token",
             'Content-Type: application/json'
         ];
-    
         $data = [
             "message" => [
                 "token" => $fcm,
                 "notification" => [
                     "title" => 'Yoo Store',
-                    "body"  => $message,
+                    "body" => $message,
                 ],
                 "data" => [
-                    "order_id" => (string) $order_id,
-                    "type" => $type == 'Received' ? 'Received' : 'Cancelled',
+                    "order_id" => (string)$order_id,
+                    "type" => $type == 'Received',
                 ],
             ]
         ];
-    
-        $payload = json_encode($data);
+        $payload = json_encode($data);    
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/v1/projects/yoo-store-ed4ba/messages:send');
         curl_setopt($ch, CURLOPT_POST, true);
@@ -50,11 +46,9 @@ class Notification{
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-        curl_setopt($ch, CURLOPT_VERBOSE, true); // Enable verbose output 
         $response = curl_exec($ch);
         $err = curl_error($ch);
         curl_close($ch);
-    
         if ($err) {
             return response()->json([
                 'message' => 'Curl Error: ' . $err
@@ -72,7 +66,5 @@ class Notification{
                 'data' => $data
             ]);
         }
-    }
-    
-
+    } 
 }
