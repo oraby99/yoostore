@@ -17,8 +17,7 @@ class Notification{
         $client = new Google_Client();
         $client->setAuthConfig($credentialsFilePath);
         $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
-        $token = $client->getAccessToken();
-        $access_token = $token['device_token'] ?? null;
+        $access_token = $user->device_token ?? null;
         if (!$access_token) {
             return response()->json(['status' => false, 'message' => 'Device token not found.'], 400);
         }
@@ -70,5 +69,4 @@ class Notification{
             ]);
         }
     }
-    
 }
