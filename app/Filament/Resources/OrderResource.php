@@ -16,11 +16,11 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
-
+use App\Models\OrderStatus;
+use App\Models\PaymentStatus;
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Orders'; 
     public static function form(Form $form): Form
@@ -30,32 +30,24 @@ class OrderResource extends Resource
                 Forms\Components\Select::make('user_id')
                     ->relationship('user', 'name')
                     ->required()->disabled(),
-                Forms\Components\TextInput::make('invoice_id')
-                    ->required()->disabled(),
-                Forms\Components\TextInput::make('total_price')
-                    ->numeric()
-                    ->required()->disabled(),
-                Forms\Components\Select::make('payment_status')
-                    ->options([
-                        'Pending'   => 'Pending',
-                        'Paid'      => 'Paid',
-                        'Cancelled' => 'Cancelled',
-                    ])
+    
+                Forms\Components\TextInput::make('invoice_id')->required()->disabled(),
+                Forms\Components\TextInput::make('total_price')->numeric()->required()->disabled(),
+    
+                Forms\Components\Select::make('payment_status_id')
+                    ->label('Payment Status')
+                    ->relationship('paymentStatus', 'name')
                     ->required(),
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'Received'   => 'Received',
-                        'Cancelled'  => 'Cancelled',
-                        'Delivered'  => 'Delivered',
-                    ])
+    
+                Forms\Components\Select::make('order_status_id')
+                    ->label('Order Status')
+                    ->relationship('orderStatus', 'name')
                     ->required()
                     ->afterStateUpdated(function (callable $set, $state, $get) {
-                        $orderId = $get('id');
-                        $originalStatus = $get('status');
-                            OrderStatusChange::create([
-                                'order_id' => $orderId,
-                                'status'   => $state,
-                            ]);
+                        OrderStatusChange::create([
+                            'order_id' => $get('id'),
+                            'status' => $state,
+                        ]);
                     }),
             ]);
     }
@@ -66,8 +58,8 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')->label('User Name'),
                 Tables\Columns\TextColumn::make('invoice_id')->label('Invoice ID'),
                 Tables\Columns\TextColumn::make('total_price')->label('Total Price'),
-                Tables\Columns\TextColumn::make('payment_status')->label('Payment Status'),
-                Tables\Columns\TextColumn::make('status')->label('Order Status'),
+                Tables\Columns\TextColumn::make('paymentStatus.name')->label('Payment Status'),
+                Tables\Columns\TextColumn::make('orderStatus.name')->label('Order Status'),
                 Tables\Columns\TextColumn::make('address.street')->label('Address'),
                 Tables\Columns\TextColumn::make('created_at')->label('Order Date')->dateTime(),
                 Tables\Columns\TextColumn::make('products')->label('Product Details')

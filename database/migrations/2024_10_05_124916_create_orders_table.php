@@ -14,16 +14,16 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('address_id')->constrained()->onDelete('cascade')->nullable();
-            $table->string('invoice_id')->nullable(); // Nullable for COD orders
+            $table->foreignId('address_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('invoice_id')->nullable();
             $table->decimal('total_price', 10, 2);
-            $table->string('status')->default('Pending'); // Order status: Pending, Delivered, Cancelled, etc.
-            $table->string('payment_method')->default('gateway'); // Payment method: gateway or cod
-            $table->string('payment_status')->default('Pending'); // Payment status: Pending, Paid, Cancelled
+            $table->foreignId('order_status_id')->constrained()->onDelete('cascade'); // Refers to dynamic statuses
+            $table->string('payment_method')->default('gateway');
+            $table->foreignId('payment_status_id')->constrained()->onDelete('cascade'); // Refers to dynamic payment statuses
             $table->timestamps();
         });
     }
-    
+
     /**
      * Reverse the migrations.
      */
