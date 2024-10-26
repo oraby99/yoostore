@@ -5,7 +5,7 @@
             <div class="col-md-3 text-center">
                 <div class="account-img"></div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-8">
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label>Display Name</label>
