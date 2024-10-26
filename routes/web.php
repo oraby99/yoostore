@@ -71,3 +71,5 @@ Route::get('/track', [TrackController::class, 'index'])->name('track');
 Route::get('/orderDetails/{id}', [OrderdetailController::class, 'index'])->name('orderDetails');
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 Route::view('/orderHistory', 'yoostore.dashboard.orderHistory')->name('orderHistory');
+Route::view('/browsingHistory', 'yoostore.dashboard.browsingHistory')->name('browsingHistory');
+Route::view('/faq', 'yoostore.faq')->name('faq');

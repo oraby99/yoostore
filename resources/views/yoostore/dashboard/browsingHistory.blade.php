@@ -25,16 +25,7 @@
                 <!-- Account Settings -->
                 <div class="col-md-12">
                    
-                <livewire:dashboard.settings.personalinfo>
-                </div>
-
-            
-                    <livewire:dashboard.settings.addresses>
-                        
-                        <!-- Password -->
-                        
-                        <livewire:dashboard.settings.password>
-
+                
             </div>
         </div>
     </div>
