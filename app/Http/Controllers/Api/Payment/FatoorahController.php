@@ -78,13 +78,13 @@ class FatoorahController extends Controller
         if ($invoiceData->InvoiceStatus === "Paid") {
             $defaultAddress = Address::where('user_id', $user->id)->where('is_default', 1)->first();
             $order = Order::create([
-                'user_id'        => $user->id,
-                'total_price'    => $invoiceData->InvoiceValue,
-                'invoice_id'     => $invoiceData->InvoiceId,
-                'status'         => 'Received',
-                'payment_method' => 'gateway',
-                'payment_status' => 'Paid',
-                'address_id'     => $defaultAddress->id
+                'user_id'           => $user->id,
+                'total_price'       => $invoiceData->InvoiceValue,
+                'invoice_id'        => $invoiceData->InvoiceId,
+                'order_status_id'   => 1,
+                'payment_method'    => 'gateway',
+                'payment_status_id' => 1,
+                'address_id'        => $defaultAddress->id
             ]);
             $result =  $this->notification->send('Received',$user->id,$user->device_token,$order->id);
             $cartItems = Cart::where('user_id', $user->id)->get();
@@ -127,11 +127,11 @@ class FatoorahController extends Controller
         try {
             $totalPrice = $request->total ?? Cart::where('user_id', $user->id)->sum('total_price');
             $order = Order::create([
-                'user_id'        => $user->id,
-                'total_price'    => $totalPrice,
-                'status'         => 'Received',
+                'user_id'         => $user->id,
+                'total_price'     => $totalPrice,
+                'order_status_id' => 1,
                 'payment_method' => 'cod',
-                'payment_status' => 'Pending',
+                'payment_status_id' => 1,
                 'address_id'     => $defaultAddress->id
             ]);
             $result =  $this->notification->send('Received',$user->id,$user->device_token,$order->id);
@@ -214,9 +214,9 @@ class FatoorahController extends Controller
                     'user_id' => $order->user_id,
                     'address_id' => $order->address_id,
                     'total_price' => $order->total_price,
-                    'status' => $order->status,
+                    'status' => $order->orderStatus->name,
                     'payment_method' => $order->payment_method,
-                    'payment_status' => $order->payment_status,
+                    'payment_status' => $order->paymentStatus->name,
                     'created_at' => $order->created_at,
                     'updated_at' => $order->updated_at,
                     'products' => array_values($productsGrouped)
