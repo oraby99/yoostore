@@ -15,6 +15,7 @@ class SendNotification extends Page
     protected static ?string $slug = 'send-notification';
     protected static ?string $title = 'Send Notification';
     protected static string $view = 'filament.pages.send-notification';
+    protected static ?string $navigationGroup = 'Notification';
 
     public $user_id;
     public $message;

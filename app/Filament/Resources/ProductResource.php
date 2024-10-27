@@ -132,7 +132,7 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
+                TextColumn::make('name')->searchable(),
                 TextColumn::make('tag'),               
                 TextColumn::make('description'),
                 ImageColumn::make('image')
