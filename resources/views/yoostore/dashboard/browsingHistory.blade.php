@@ -1,6 +1,7 @@
 @extends('yoostore.layout.master')
 @section('css')
 <link rel="stylesheet" href="{{asset('yoostore/css/setting.css') }}" />
+<link rel="stylesheet" href="{{asset('yoostore/css/browsingHistory.css') }}" />
 @endsection
 @section('content')
 
@@ -22,10 +23,11 @@
         <!-- Content -->
         <div class="col-md-9">
             <div class="row">
-                <!-- Account Settings -->
+               
                 <div class="col-md-12">
                    
-                
+                <livewire:dashboard.browsing-history.browsing-history>
+
             </div>
         </div>
     </div>

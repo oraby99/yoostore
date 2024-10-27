@@ -1,0 +1,31 @@
+
+
+
+
+
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+.form-control:focus {
+    box-shadow: none;
+}
+
+.date-picker {
+    width: 150px;
+}
+
+.form-inline .form-control {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle;
+}
+
+.search-input {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}

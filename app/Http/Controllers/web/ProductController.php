@@ -13,9 +13,11 @@ class ProductController extends Controller
 
         $product = Product::where('id', $id)->first();
 
-        // dd($product);
+        $products = Product::where('category_id', $product->category_id)->where('id', '!=', $id)->get();
+        // dd($products);
         return view('yoostore.product' , [
-            'product' => $product
+            'product' => $product,
+            'products' => $products
         ]);
     }
 }
