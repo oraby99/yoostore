@@ -40,6 +40,8 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
+                \App\Filament\Pages\SendNotification::class, // Registering SendNotification page
+
             ])
             ->favicon('images/favicon.png')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')

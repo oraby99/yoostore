@@ -210,7 +210,7 @@ class FatoorahController extends Controller
             "registration_ids" => [$deviceToken],
             "notification" => [
                 "title" => 'Yoo Store',
-                "body" => 'You create a new order' . $user->name,
+                "body" => 'You create a new order by ' . $user->name,
             ],
         ];
         $response = self::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
