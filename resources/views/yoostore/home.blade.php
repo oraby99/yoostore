@@ -124,119 +124,23 @@
     <!-- First Card -->
     @foreach ($products as $product)
     <div class="col-3">
-      <div class="card custom-card">
+      <div class="card custom-card" style="height: 300px; position: relative; overflow: hidden;">
         <span class="badge bg-danger position-absolute top-0 start-0 m-2">HOT</span>
-        <img src="{{ asset(optional($product->images->first())->image_path) }}" alt="Product Image" />
-
-
-        <div class="card-body">
+        <div style="height: 66.67%; overflow: hidden;">
+          <img src="{{ asset('storage/' . optional($product->images->first())->image_path) }}" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+        <div class="card-body" style="height: 33.33%;">
           <div class="rating my-2">
             <span class="text-warning">★★★★★</span>
             <span>(738)</span>
           </div>
-          <h4 class="card-title">
-            <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black"> {{ $product->name }}</a>
+          <h4 class="card-title" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black">{{ $product->name }}</a>
           </h4>
         </div>
       </div>
     </div>
     @endforeach
-    @foreach ($products as $product)
-    <div class="col-3">
-      <div class="card custom-card">
-        <span class="badge bg-danger position-absolute top-0 start-0 m-2">HOT</span>
-        <img src="{{ asset(optional($product->images->first())->image_path) }}" alt="Product Image" />
-
-
-        <div class="card-body">
-          <div class="rating my-2">
-            <span class="text-warning">★★★★★</span>
-            <span>(738)</span>
-          </div>
-          <h4 class="card-title">
-            <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black"> {{ $product->name }}</a>
-          </h4>
-        </div>
-      </div>
-    </div>
-    @endforeach
-    @foreach ($products as $product)
-    <div class="col-3">
-      <div class="card custom-card">
-        <span class="badge bg-danger position-absolute top-0 start-0 m-2">HOT</span>
-        <img src="{{ asset(optional($product->images->first())->image_path) }}" alt="Product Image" />
-
-
-        <div class="card-body">
-          <div class="rating my-2">
-            <span class="text-warning">★★★★★</span>
-            <span>(738)</span>
-          </div>
-          <h4 class="card-title">
-            <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black"> {{ $product->name }}</a>
-          </h4>
-        </div>
-      </div>
-    </div>
-    @endforeach
-    @foreach ($products as $product)
-    <div class="col-3">
-      <div class="card custom-card">
-        <span class="badge bg-danger position-absolute top-0 start-0 m-2">HOT</span>
-        <img src="{{ asset(optional($product->images->first())->image_path) }}" alt="Product Image" />
-
-
-        <div class="card-body">
-          <div class="rating my-2">
-            <span class="text-warning">★★★★★</span>
-            <span>(738)</span>
-          </div>
-          <h4 class="card-title">
-            <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black"> {{ $product->name }}</a>
-          </h4>
-        </div>
-      </div>
-    </div>
-    @endforeach
-    @foreach ($products as $product)
-    <div class="col-3">
-      <div class="card custom-card">
-        <span class="badge bg-danger position-absolute top-0 start-0 m-2">HOT</span>
-        <img src="{{ asset(optional($product->images->first())->image_path) }}" alt="Product Image" />
-
-
-        <div class="card-body">
-          <div class="rating my-2">
-            <span class="text-warning">★★★★★</span>
-            <span>(738)</span>
-          </div>
-          <h4 class="card-title">
-            <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black"> {{ $product->name }}</a>
-          </h4>
-        </div>
-      </div>
-    </div>
-    @endforeach
-    @foreach ($products as $product)
-    <div class="col-3">
-      <div class="card custom-card">
-        <span class="badge bg-danger position-absolute top-0 start-0 m-2">HOT</span>
-        <img src="{{ asset(optional($product->images->first())->image_path) }}" alt="Product Image" />
-
-
-        <div class="card-body">
-          <div class="rating my-2">
-            <span class="text-warning">★★★★★</span>
-            <span>(738)</span>
-          </div>
-          <h4 class="card-title">
-            <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black"> {{ $product->name }}</a>
-          </h4>
-        </div>
-      </div>
-    </div>
-    @endforeach
-
   </div>
 </div>
 
@@ -244,7 +148,7 @@
 
 <div
   class="section5 container my4 w-75 mt-5 d-flex justify-content-between">
-  <div class="bg-danger w-25 mx-4">
+  <div class=" w-25 mx-4">
     <div class="banner2 p-5">
       <p class="text-danger text-center">COMPUTER & ACCESSORIES</p>
       <p class="text-center" style="font-size: 32px">32% Discount</p>
@@ -274,25 +178,22 @@
     </div>
 
 
-    
     <div class="my-3">
       <div class="w-100 row col-12">
         @foreach ($products as $product)
         <div class="col-4">
-          <div class="card custom-card">
-            <span
-              class="badge bg-danger position-absolute top-0 start-0 m-2">HOT</span>
-            <img
-              src="{{ asset('yoostore/images/headphone1.jpeg') }}"
-              class="card-img-top"
-              alt="Smartphone" />
-            <div class="card-body">
+          <div class="card custom-card" style="height: 300px; position: relative; overflow: hidden;">
+            <span class="badge bg-danger position-absolute top-0 start-0 m-2">HOT</span>
+            <div style="height: 66.67%; overflow: hidden;">
+              <img src="{{ asset('storage/' . optional($product->images->first())->image_path) }}" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div class="card-body" style="height: 33.33%;">
               <div class="rating my-2">
                 <span class="text-warning">★★★★★</span>
                 <span>(738)</span>
               </div>
-              <h4 class="card-title">
-                <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black"> {{ $product->name }}</a>
+              <h4 class="card-title" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black">{{ $product->name }}</a>
               </h4>
               <h4 class="pricee"></h4>
             </div>
@@ -301,7 +202,6 @@
         @endforeach
       </div>
     </div>
-
 
 
   </div>
@@ -358,25 +258,23 @@
       </div>
     </div>
 
-    
     <div class="my-3">
       <div class="w-100 row col-12">
         @foreach ($products as $product)
         <div class="col-4">
-          <div class="card custom-card">
-            <span
-              class="badge bg-danger position-absolute top-0 start-0 m-2">HOT</span>
-            <img
-              src="{{ asset('yoostore/images/headphone1.jpeg') }}"
-              class="card-img-top"
-              alt="Smartphone" />
-            <div class="card-body">
+          <div class="card custom-card" style="height: 300px; position: relative; overflow: hidden;">
+            <span class="badge bg-danger position-absolute top-0 start-0 m-2">HOT</span>
+            <div style="height: 66.67%; overflow: hidden;">
+            <img src="{{ asset('storage/' . optional($product->images->first())->image_path) }}" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
+
+            </div>
+            <div class="card-body" style="height: 33.33%;">
               <div class="rating my-2">
                 <span class="text-warning">★★★★★</span>
                 <span>(738)</span>
               </div>
-              <h4 class="card-title">
-                <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black"> {{ $product->name }}</a>
+              <h4 class="card-title" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black">{{ $product->name }}</a>
               </h4>
               <h4 class="pricee"></h4>
             </div>
@@ -385,6 +283,7 @@
         @endforeach
       </div>
     </div>
+
 
   </div>
 

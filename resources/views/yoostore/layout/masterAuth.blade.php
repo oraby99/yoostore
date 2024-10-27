@@ -17,6 +17,7 @@
 
 
     @yield('css')
+    @livewireStyles
     
 </head>
 <body>
@@ -26,6 +27,9 @@
 
 
 
+
+
+@livewireScripts
 
 
 

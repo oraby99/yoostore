@@ -8,8 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
-class AddToCart extends Component
+class AddToCart2 extends Component
 {
+
+
+
     public $productID;
     public $product;
     public $mainStock;
@@ -23,8 +26,8 @@ class AddToCart extends Component
         $this->product = Product::where('id', $this->productID)->first();
         if ($this->product->productDetails->isNotEmpty()) {
             $this->selectedVariationId = $this->product->productDetails->first()->id;
-            $this->selectedPrice = $this->product->productDetails->first()->typeprice;
-            $this->mainStock = $this->product->productDetails->first()->typestock; 
+            $this->selectedPrice = $this->product->productDetails->first()->price;
+            $this->mainStock = $this->product->productDetails->first()->stock; 
         }
 
         //refresh page to load selected price when selecting variatio
@@ -41,8 +44,8 @@ class AddToCart extends Component
         
         if ($variation) {
             $this->selectedVariationId = $typeId;
-            $this->selectedPrice = $variation->typeprice;
-            $this->mainStock = $variation->typestock; 
+            $this->selectedPrice = $variation->price;
+            $this->mainStock = $variation->stock; 
         }
 
     }
@@ -61,37 +64,23 @@ class AddToCart extends Component
 
     public function addToCart()
     {
+
+        // dd($this->selectedPrice);
         $userId = Auth::id();
-    
-        $cartItem = Cart::where([
+        Cart::create([
             'user_id' => $userId,
             'product_id' => $this->productID,
-            'product_detail_id' => $this->selectedVariationId
-        ])->first();
-    
-        if ($cartItem) {
-            $cartItem->quantity += $this->quantity;
-            $cartItem->save(); // Save the updated quantity
-        } else {
-            Cart::create([
-                'user_id' => $userId,
-                'product_id' => $this->productID,
-                'product_detail_id' => $this->selectedVariationId,
-                'quantity' => $this->quantity,
-                'size' => null,
-            ]);
-        }
-    
+            'product_detail_id' => $this->selectedVariationId,
+            'quantity' => $this->quantity,
+            'size' => null, 
+        ]);
+
         $this->quantity = 1; 
         session()->flash('success', 'Item added to cart successfully!');
     }
-    
 
     public function render()
     {
-        $this->product = Product::where('id', $this->productID)->first();
-        
-        return view('livewire.product.add-to-cart');
-    } 
+        return view('livewire.product.add-to-cart2');
+    }
 }
-

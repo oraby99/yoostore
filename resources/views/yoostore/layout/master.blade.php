@@ -7,10 +7,10 @@
     <link rel="stylesheet" href="{{asset('yoostore/css/product.css') }}" />
     
     <link rel="stylesheet" href="faq.css">
-    <script
+    <!-- <script
       defer
       src="https://unpkg.com/alpinejs@3.2.3/dist/cdn.min.js"
-    ></script>
+    ></script> -->
     <link
       href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
       rel="stylesheet"

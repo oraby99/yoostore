@@ -61,9 +61,9 @@ $categories = App\Models\Category::with('subcategories')->get();
                     </select>
                 </div>
                 <a href="{{ route('track') }}"><i class="fa-solid fa-location-dot"></i> Track Order</a>
-                <a href="" id="a1">Summer Sale</a>
-                <a href="#">New Arrival</a>
-                <a href="#" id="a2">Best Sellers</a>
+                <a href="{{ route('cart') }}" id="a1">Cart</a>
+                <a href="{{ route('settings') }}" id="a2">Dashboard</a>
+                <a href="{{ route('faq') }}" id="a2">Faq</a>
             </div>
             <div class="phone">
                 <div class="whatsapp"></div>

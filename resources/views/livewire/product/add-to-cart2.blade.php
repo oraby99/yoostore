@@ -3,11 +3,11 @@
         <!-- Product Image Section -->
         <div class="col-md-6 order-md-1 product-images">
             <div class="product-main-image text-center mb-3 d-flex justify-content-center">
-                <img id="mainImage" src="{{ asset('storage/' . optional($product->productDetails->first())->typeimage) }}" alt="Main Product Image" style="width: 100%; max-width: 400px; height: auto; object-fit: contain;" />
+                <img id="mainImage" src="{{ asset('storage/' . optional($product->productDetails->first())->image) }}" alt="Main Product Image" style="width: 100%; max-width: 400px; height: auto; object-fit: contain;" />
             </div>
             <div class="product-thumbnails d-flex justify-content-center">
                 @foreach ($product->productDetails as $image)
-                <img src="{{ asset('storage/' . $image->typeimage) }}" alt="Thumbnail" onclick="changeMainImage(this)" style="width: 80px; height: 80px; object-fit: cover; margin: 0 5px; cursor: pointer;" />
+                <img src="{{ asset('storage/' . $image->image) }}" alt="Thumbnail" onclick="changeMainImage(this)" style="width: 80px; height: 80px; object-fit: cover; margin: 0 5px; cursor: pointer;" />
                 @endforeach
             </div>
         </div>
@@ -54,7 +54,7 @@
                             <label for="memory">Edition:</label>
                             <select id="memory" class="custom-select" wire:change="selectVariation($event.target.value)">
                                 @foreach ($product->productDetails as $variation)
-                                <option value="{{ $variation->id }}">{{ $variation->typename }}</option>
+                                <option value="{{ $variation->id }}">{{ $variation->color }}</option>
                                 @endforeach
                             </select>
                         </div>
