@@ -57,7 +57,7 @@ class FatoorahController extends Controller
                         "title" => $data["notification"]["title"],
                         "body"  => $data["notification"]["body"],
                     ],
-                    "token" => $data["registration_ids"],
+                    "registration_ids" => $data["registration_ids"],
                 ]
             ];
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
