@@ -34,11 +34,11 @@ class SendNotification extends Page
                 ->required(),
         ];
     }
-
     public function sendNotification()
     {
         $tokens = [];
-        if ($this->user_id === 'all') {
+        if ($this->user_id === "all") {
+            dd($this->user_id);
             $tokens = User::whereNotNull('device_token')->pluck('device_token')->toArray();
             if (empty($tokens)) {
                 Notification::make()
@@ -48,9 +48,7 @@ class SendNotification extends Page
                 return;
             }
         } else {
-            // Send to a single selected user
             $user = User::find($this->user_id);
-    
             if (!$user || !$user->device_token) {
                 Notification::make()
                     ->title('User not found or device token missing.')
@@ -60,17 +58,16 @@ class SendNotification extends Page
             }
             $tokens[] = $user->device_token;
         }
-    
-        $data = [
-            "registration_ids" => $tokens,
-            "notification" => [
+        foreach ($tokens as $token) {
+            $data = [
+              "registration_ids" => [$token],
+              "notification" => [
                 "title" => 'Custom Notification',
-                "body"  => $this->message,
-            ],
-        ];
-    
-        $response = FatoorahController::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
-    
+                "body" => $this->message,
+              ],
+            ];
+            $response = FatoorahController::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
+          }
         if (!empty($response['error'])) {
             Notification::make()
                 ->title('Failed to send notification.')
@@ -83,5 +80,4 @@ class SendNotification extends Page
                 ->send();
         }
     }
-    
 }
