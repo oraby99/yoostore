@@ -37,19 +37,16 @@ class SendNotification extends Page
 
     public function sendNotification()
     {
+        $tokens = [];
         if ($this->user_id === 'all') {
-            // Send to all users
-            $users = User::whereNotNull('device_token')->pluck('device_token')->toArray();
-    
-            if (empty($users)) {
+            $tokens = User::whereNotNull('device_token')->pluck('device_token')->toArray();
+            if (empty($tokens)) {
                 Notification::make()
                     ->title('No users with device tokens found.')
                     ->danger()
                     ->send();
                 return;
             }
-    
-            $deviceTokens = $users;
         } else {
             // Send to a single selected user
             $user = User::find($this->user_id);
@@ -61,8 +58,7 @@ class SendNotification extends Page
                     ->send();
                 return;
             }
-            $tokens[] = $user['device_token'];
-            //$deviceTokens[] = $user->device_token;
+            $tokens[] = $user->device_token;
         }
     
         $data = [
@@ -87,4 +83,5 @@ class SendNotification extends Page
                 ->send();
         }
     }
+    
 }
