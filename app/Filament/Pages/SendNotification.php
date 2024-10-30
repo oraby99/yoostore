@@ -38,7 +38,6 @@ class SendNotification extends Page
     {
         $tokens = [];
         if ($this->user_id === "all") {
-            dd($this->user_id);
             $tokens = User::whereNotNull('device_token')->pluck('device_token')->toArray();
             if (empty($tokens)) {
                 Notification::make()
