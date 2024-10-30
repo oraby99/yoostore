@@ -30,15 +30,12 @@ class OrderResource extends Resource
                 Forms\Components\Select::make('user_id')
                     ->relationship('user', 'name')
                     ->required()->disabled(),
-    
                 Forms\Components\TextInput::make('invoice_id')->required()->disabled(),
                 Forms\Components\TextInput::make('total_price')->numeric()->required()->disabled(),
-    
                 Forms\Components\Select::make('payment_status_id')
                     ->label('Payment Status')
                     ->relationship('paymentStatus', 'name')
                     ->required(),
-    
                 Forms\Components\Select::make('order_status_id')
                     ->label('Order Status')
                     ->relationship('orderStatus', 'name')
@@ -64,14 +61,39 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->label('Order Date')->dateTime(),
                 Tables\Columns\TextColumn::make('products')->label('Product Details')
                     ->formatStateUsing(function ($record) {
-                        return $record->orderProducts->map(function ($orderProduct) {
+                        $productDetails = $record->orderProducts->map(function ($orderProduct) {
                             $product = $orderProduct->product;
                             $productDetail = $orderProduct->productDetail;
-                            return $product->name . ' - Qty: ' . $orderProduct->quantity . ', Size: ' . $orderProduct->size . 
-                                '<br>Price: ' . ($productDetail->price ?? $productDetail->typeprice) . 
-                                '<br>Stock: ' . ($productDetail->stock ?? $productDetail->typestock) . 
-                                '<br>Name/Color: ' . ($productDetail->color ?? $productDetail->typename) ;
-                        })->implode('<hr>');
+                            return [
+                                'name' => $product->name,
+                                'quantity' => $orderProduct->quantity,
+                                'size' => $orderProduct->size,
+                                'price' => $productDetail->price ?? $productDetail->typeprice,
+                                'stock' => $productDetail->stock ?? $productDetail->typestock,
+                                'color' => $productDetail->color ?? $productDetail->typename,
+                            ];
+                        });
+                        $html = '<table style="width:100%; border-collapse: collapse;">';
+                        $html .= '<thead><tr><th style="border: 1px solid #ddd; padding: 8px;">
+                        Product</th><th style="border: 1px solid #ddd; padding: 8px;">
+                        Qty</th><th style="border: 1px solid #ddd; padding: 8px;">Size</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Price</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Stock</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Color/Name</th></tr>
+                        </thead>';
+                        $html .= '<tbody>';
+                        foreach ($productDetails as $detail) {
+                            $html .= '<tr>';
+                            $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['name'] . '</td>';
+                            $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['quantity'] . '</td>';
+                            $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['size'] . '</td>';
+                            $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['price'] . '</td>';
+                            $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['stock'] . '</td>';
+                            $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['color'] . '</td>';
+                            $html .= '</tr>';
+                        }
+                        $html .= '</tbody></table>';
+                        return $html;
                     })->html(),
             ])->defaultSort('created_at', 'desc') 
             ->actions([
@@ -86,11 +108,10 @@ class OrderResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
-    }
+    }    
     public static function getRelations(): array
     {
         return [
-            //
         ];
     }
     public static function getPages(): array
