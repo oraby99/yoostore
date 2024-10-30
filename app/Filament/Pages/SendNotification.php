@@ -64,6 +64,7 @@ class SendNotification extends Page
 
             $deviceTokens = [$user->device_token];
         }
+
         $data = [
             "registration_ids" => $deviceTokens,
             "notification" => [
