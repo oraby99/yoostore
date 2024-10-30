@@ -61,12 +61,12 @@ class SendNotification extends Page
                     ->send();
                 return;
             }
-    
-            $deviceTokens = [$user->device_token];
+            $tokens[] = $user['device_token'];
+            //$deviceTokens[] = $user->device_token;
         }
     
         $data = [
-            "registration_ids" => $deviceTokens,
+            "registration_ids" => $tokens,
             "notification" => [
                 "title" => 'Custom Notification',
                 "body"  => $this->message,
