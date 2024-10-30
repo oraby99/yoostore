@@ -25,10 +25,10 @@ class SendNotification extends Page
         return [
             Select::make('user_id')
                 ->label('Select User')
-                ->options(User::pluck('name', 'id'))
+                ->options(User::pluck('name', 'id')->prepend('All Users', 'all'))
                 ->searchable()
-                ->placeholder('Select a user to notify'),
-                
+                ->placeholder('Select a user or all users to notify'),
+
             Textarea::make('message')
                 ->label('Message')
                 ->required(),
@@ -37,31 +37,53 @@ class SendNotification extends Page
 
     public function sendNotification()
     {
-        $user = User::find($this->user_id);
-        if ($user && $user->device_token) {
-            $data = [
-                "registration_ids" => [$user->device_token],
-                "notification" => [
-                    "title" => 'Custom Notification',
-                    "body"  => $this->message,
-                ],
-            ];
-            $response = FatoorahController::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
-            if (!empty($response['error'])) {
+        if ($this->user_id === 'all') {
+            // Send to all users
+            $users = User::whereNotNull('device_token')->get();
+            $deviceTokens = $users->pluck('device_token')->toArray();
+
+            if (empty($deviceTokens)) {
                 Notification::make()
-                    ->title('Failed to send notification.')
+                    ->title('No users with device tokens found.')
                     ->danger()
                     ->send();
-            } else {
-                Notification::make()
-                    ->title('Notification sent successfully.')
-                    ->success()
-                    ->send();
+                return;
             }
+
+        } else {
+            // Send to a single selected user
+            $user = User::find($this->user_id);
+
+            if (!$user || !$user->device_token) {
+                Notification::make()
+                    ->title('User not found or device token missing.')
+                    ->danger()
+                    ->send();
+                return;
+            }
+
+            $deviceTokens = [$user->device_token];
+        }
+
+        $data = [
+            "registration_ids" => $deviceTokens,
+            "notification" => [
+                "title" => 'Custom Notification',
+                "body"  => $this->message,
+            ],
+        ];
+
+        $response = FatoorahController::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
+
+        if (!empty($response['error'])) {
+            Notification::make()
+                ->title('Failed to send notification.')
+                ->danger()
+                ->send();
         } else {
             Notification::make()
-                ->title('User not found or device token missing.')
-                ->danger()
+                ->title('Notification sent successfully.')
+                ->success()
                 ->send();
         }
     }
