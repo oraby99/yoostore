@@ -39,21 +39,21 @@ class SendNotification extends Page
     {
         if ($this->user_id === 'all') {
             // Send to all users
-            $users = User::whereNotNull('device_token')->get();
-            $deviceTokens = $users->pluck('device_token')->toArray();
-
-            if (empty($deviceTokens)) {
+            $users = User::whereNotNull('device_token')->pluck('device_token')->toArray();
+    
+            if (empty($users)) {
                 Notification::make()
                     ->title('No users with device tokens found.')
                     ->danger()
                     ->send();
                 return;
             }
-
+    
+            $deviceTokens = $users;
         } else {
             // Send to a single selected user
             $user = User::find($this->user_id);
-
+    
             if (!$user || !$user->device_token) {
                 Notification::make()
                     ->title('User not found or device token missing.')
@@ -61,10 +61,10 @@ class SendNotification extends Page
                     ->send();
                 return;
             }
-
+    
             $deviceTokens = [$user->device_token];
         }
-
+    
         $data = [
             "registration_ids" => $deviceTokens,
             "notification" => [
@@ -72,9 +72,9 @@ class SendNotification extends Page
                 "body"  => $this->message,
             ],
         ];
-
+    
         $response = FatoorahController::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
-
+    
         if (!empty($response['error'])) {
             Notification::make()
                 ->title('Failed to send notification.')
