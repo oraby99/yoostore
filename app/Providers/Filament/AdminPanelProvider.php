@@ -52,7 +52,7 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 TranslationManagerPlugin::make(),
                 SpatieLaravelTranslatablePlugin::make()
-                ->defaultLocales(['en', 'es']),
+                ->defaultLocales(['en', 'ar']),
                 FilamentGeneralSettingsPlugin::make()
                 ->canAccess(fn() => auth()->guard('admin')->check() && auth()->guard('admin')->user()->id === 1)
                 ->setSort(3)

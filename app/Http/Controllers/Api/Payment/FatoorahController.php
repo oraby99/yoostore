@@ -34,8 +34,7 @@ class FatoorahController extends Controller
             }
             $client->setAuthConfig($credentialsFilePath);
             $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
-            $token = $client->fetchAccessTokenWithAssertion();
-            
+            $token = $client->fetchAccessTokenWithAssertion();           
             if (is_null($token) || !isset($token['access_token'])) {
                 \Log::error('Failed to retrieve access token.');
                 return ['error' => 'Failed to retrieve access token'];
@@ -71,6 +70,15 @@ class FatoorahController extends Controller
             \Log::error('Exception: ' . $e->getMessage());
             return ['error' => $e->getMessage()];
         }
+    }
+    private function createNotification($userId, $orderId, $message, $type = 'Order')
+    {
+        Notification::create([
+            'user_id'  => $userId,
+            'order_id' => $orderId,
+            'message'  => $message,
+            'type'     => $type,
+        ]);
     }
     public function checkout(Request $request)
     {
@@ -147,9 +155,14 @@ class FatoorahController extends Controller
                 "notification" => [
                     "title" => 'Yoo Store',
                     "body" => 'You create a new order' . $user->name,
-                ],
+                ],"data" => [
+                    "invoice_id"  => (string)$order->invoice_id,
+                    "order_id"    => (string)$order->id,
+                    "type"        => "Received",
+                ]
             ];
             $response = self::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
+            $this->createNotification($user->id, $order->id, 'New order created successfully.');
             if (!empty($response['error'])) {
                 \Log::error('FCM Error: ' . json_encode($response['error']));
                 return response()->json(['message' => 'Error: ' . $response['error']], 500);
@@ -164,10 +177,7 @@ class FatoorahController extends Controller
                     'size'       => $item->size,
                 ]);
             }
-    
             Cart::where('user_id', $user->id)->delete();
-    
-            // Redirect to the success page with both invoiceId and paymentId as query parameters
             return redirect()->route('payment.success', [
                 'invoiceId' => $invoiceData->InvoiceId,
                 'paymentId' => $request->paymentId
@@ -182,14 +192,12 @@ class FatoorahController extends Controller
         $defaultAddress = Address::where('user_id', $user->id)
                                  ->where('is_default', 1)
                                  ->first();
-    
         if (!$defaultAddress) {
             return response()->json([
                 'status'  => false,
                 'message' => 'Default address not found.'
             ], 400);
         }
-    
         \DB::beginTransaction();
         try {
             $totalPrice = $request->total ?? Cart::where('user_id', $user->id)->sum('total_price');
@@ -210,10 +218,14 @@ class FatoorahController extends Controller
             "registration_ids" => [$deviceToken],
             "notification" => [
                 "title" => 'Yoo Store',
-                "body" => 'You create a new order by ' . $user->name,
-            ],
+                "body" => 'You create a new order' . $user->name,
+            ],"data" => [
+                "order_id"    => (string)$order->id,
+                "type"        => "Received",
+            ]
         ];
         $response = self::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
+        $this->createNotification($user->id, $order->id, 'New order created successfully.');
         if (!empty($response['error'])) {
             \Log::error('FCM Error: ' . json_encode($response['error']));
             return response()->json(['message' => 'Error: ' . $response['error']], 500);
@@ -226,7 +238,6 @@ class FatoorahController extends Controller
                     'message' => 'No items found in cart.'
                 ], 400);
             }
-    
             foreach ($cartItems as $item) {
                 OrderProduct::create([
                     'order_id'   => $order->id,
@@ -236,16 +247,10 @@ class FatoorahController extends Controller
                     'size'       => $item->size,
                 ]);
             }
-    
-            // Delete cart items after creating the order
             Cart::where('user_id', $user->id)->delete();
-    
-            // Fetch the order products and details for the created order
             $orderProducts = OrderProduct::with(['product', 'productDetail'])
                 ->where('order_id', $order->id)
                 ->get();
-    
-            // Organize the order product data similar to the getUserOrders structure
             $productsGrouped = [];
             foreach ($orderProducts as $orderProduct) {
                 if ($orderProduct->product && $orderProduct->productDetail) {
@@ -284,10 +289,7 @@ class FatoorahController extends Controller
                     ];
                 }
             }
-    
             \DB::commit();
-    
-            // Return response with order and product details
             return response()->json([
                 'status'   => true,
                 'message'  => 'Order placed successfully under Cash on Delivery',
@@ -304,7 +306,6 @@ class FatoorahController extends Controller
                     'products' => array_values($productsGrouped)
                 ]
             ], 200);
-    
         } catch (\Exception $e) {
             \DB::rollBack();
             \Log::error('COD Checkout Error: ' . $e->getMessage());

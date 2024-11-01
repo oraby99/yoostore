@@ -111,7 +111,7 @@ class ChatController extends Controller
     public function notification()
     {
         $user = auth()->user();
-        $data = Notification::where('user_id',$user->id);
+        $data = Notification::where('user_id',$user->id)->get();
         return response()->json([
             'data'   => $data,
             'status' => 200,
