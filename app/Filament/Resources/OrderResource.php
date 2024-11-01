@@ -4,7 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
+use App\Http\Controllers\Api\Payment\FatoorahController;
 use App\Models\Address;
+use App\Models\Notification;
 use App\Models\Order;
 use App\Models\OrderStatusChange;
 use Filament\Forms;
@@ -27,26 +29,67 @@ class OrderResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
+                Select::make('user_id')
                     ->relationship('user', 'name')
                     ->required()->disabled(),
                 Forms\Components\TextInput::make('invoice_id')->required()->disabled(),
                 Forms\Components\TextInput::make('total_price')->numeric()->required()->disabled(),
-                Forms\Components\Select::make('payment_status_id')
+                Select::make('payment_status_id')
                     ->label('Payment Status')
                     ->relationship('paymentStatus', 'name')
-                    ->required(),
-                Forms\Components\Select::make('order_status_id')
+                    ->required()
+                    ->afterStateUpdated(function ($state, $get) {
+                        $orderId = $get('id');
+                        OrderStatusChange::create([
+                            'order_id' => $orderId,
+                            'status' => 'Payment ' . $state,
+                        ]);
+                        $this->notifyUser($orderId, $state, 'Payment');
+                    }),
+                Select::make('order_status_id')
                     ->label('Order Status')
                     ->relationship('orderStatus', 'name')
                     ->required()
-                    ->afterStateUpdated(function (callable $set, $state, $get) {
+                    ->afterStateUpdated(function ($state, $get) {
+                        $orderId = $get('id');
                         OrderStatusChange::create([
-                            'order_id' => $get('id'),
+                            'order_id' => $orderId,
                             'status' => $state,
                         ]);
+                        $this->notifyUser($orderId, $state, 'Order');
                     }),
             ]);
+    }
+    protected function notifyUser($orderId, $status, $type)
+    {
+        $order = Order::find($orderId);
+        $user = $order->user;
+        if ($user && $user->device_token) {
+            $title = $type . ' Status Updated';
+            $message = "Your $type #" . $order->id . " status is now: " . $status;
+            $data = [
+                "registration_ids" => [$user->device_token],
+                "notification" => [
+                    "title" => $title,
+                    "body" => $message,
+                ],
+                "data" => [
+                    "order_id" => (string)$order->id,
+                    "type"     => $type,
+                    "status"   => $status,
+                ]
+            ];
+            $response = FatoorahController::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
+            Notification::create([
+                'user_id'  => $user->id,
+                'order_id' => $order->id,
+                'message'  => $message,
+                'type'     => $type,
+            ]);
+            if (isset($response['error']) && !empty($response['error'])) {
+                \Log::error('FCM Error: ' . json_encode($response['error']));
+            }
+        }
     }
     public static function table(Table $table): Table
     {
