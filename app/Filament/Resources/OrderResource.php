@@ -26,7 +26,6 @@ class OrderResource extends Resource
     protected static ?string $model = Order::class;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Orders';
-
     public static function form(Form $form): Form
     {
         return $form
@@ -62,14 +61,20 @@ class OrderResource extends Resource
                     }),
             ]);
     }
-
-    protected static function notifyUser($orderId, $status, $type)
+    protected static function notifyUser($orderId, $statusId, $type)
     {
         $order = Order::find($orderId);
         $user = $order->user;
-        if ($user && $user->device_token) {
-            $title = $type . ' Status Updated';
-            $message = "Your $type #" . $order->id . " status is now: " . $status;
+    
+        // Determine the status name based on the type of status being updated
+        $statusName = ($type === 'Payment')
+            ? PaymentStatus::find($statusId)?->name
+            : OrderStatus::find($statusId)?->name;
+    
+        if ($user && $user->device_token && $statusName) {
+            $title = "$type Status Updated";
+            $message = "Your $type #" . $order->id . " status is now: " . $statusName;
+            
             $data = [
                 "registration_ids" => [$user->device_token],
                 "notification" => [
@@ -79,22 +84,24 @@ class OrderResource extends Resource
                 "data" => [
                     "order_id" => (string)$order->id,
                     "type"     => $type,
-                    "status"   => $status,
+                    "status"   => $statusName,
                 ]
             ];
+    
             $response = FatoorahController::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
+    
             Notification::create([
                 'user_id'  => $user->id,
                 'order_id' => $order->id,
                 'message'  => $message,
                 'type'     => $type,
             ]);
+    
             if (isset($response['error']) && !empty($response['error'])) {
                 \Log::error('FCM Error: ' . json_encode($response['error']));
             }
         }
     }
-
     public static function table(Table $table): Table
     {
         return $table
@@ -156,13 +163,11 @@ class OrderResource extends Resource
                 ]),
             ]);
     }
-
     public static function getRelations(): array
     {
         return [
         ];
     }
-
     public static function getPages(): array
     {
         return [
