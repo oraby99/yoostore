@@ -20,11 +20,13 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use App\Models\OrderStatus;
 use App\Models\PaymentStatus;
+
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Orders'; 
+    protected static ?string $navigationGroup = 'Orders';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -44,7 +46,7 @@ class OrderResource extends Resource
                             'order_id' => $orderId,
                             'status' => 'Payment ' . $state,
                         ]);
-                        $this->notifyUser($orderId, $state, 'Payment');
+                        self::notifyUser($orderId, $state, 'Payment');
                     }),
                 Select::make('order_status_id')
                     ->label('Order Status')
@@ -56,11 +58,12 @@ class OrderResource extends Resource
                             'order_id' => $orderId,
                             'status' => $state,
                         ]);
-                        $this->notifyUser($orderId, $state, 'Order');
+                        self::notifyUser($orderId, $state, 'Order');
                     }),
             ]);
     }
-    protected function notifyUser($orderId, $status, $type)
+
+    protected static function notifyUser($orderId, $status, $type)
     {
         $order = Order::find($orderId);
         $user = $order->user;
@@ -91,6 +94,7 @@ class OrderResource extends Resource
             }
         }
     }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -151,12 +155,14 @@ class OrderResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
-    }    
+    }
+
     public static function getRelations(): array
     {
         return [
         ];
     }
+
     public static function getPages(): array
     {
         return [
