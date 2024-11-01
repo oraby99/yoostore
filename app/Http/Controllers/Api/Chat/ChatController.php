@@ -111,11 +111,26 @@ class ChatController extends Controller
     public function notification()
     {
         $user = auth()->user();
-        $data = Notification::where('user_id',$user->id)->get();
+        $notifications = Notification::where('user_id', $user->id)
+            ->with('order:id,invoice_id')
+            ->get();
+            $data = $notifications->map(function ($notification) {
+            return [
+                'id'          => $notification->id,
+                'user_id'     => $notification->user_id,
+                'order_id'    => $notification->order_id,
+                'invoice_id'  => $notification->order->invoice_id ?? null,
+                'message'     => $notification->message,
+                'type'        => $notification->type,
+                'created_at'  => $notification->created_at,
+                'updated_at'  => $notification->updated_at,
+            ];
+        });
         return response()->json([
-            'data'   => $data,
-            'status' => 200,
-            'message'=> 'success'
+            'data'    => $data,
+            'status'  => 200,
+            'message' => 'success'
         ]);
     }
+    
 }

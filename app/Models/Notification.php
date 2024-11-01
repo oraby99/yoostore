@@ -11,4 +11,8 @@ class Notification extends Model
     protected $fillable = [
         'user_id', 'order_id', 'message', 'type',
     ];
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id');
+    }
 }

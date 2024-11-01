@@ -154,7 +154,7 @@ class FatoorahController extends Controller
                 "registration_ids" => [$deviceToken],
                 "notification" => [
                     "title" => 'Yoo Store',
-                    "body" => 'You create a new order' . $user->name,
+                    "body" => $user->name . ' create a new order'
                 ],"data" => [
                     "invoice_id"  => (string)$order->invoice_id,
                     "order_id"    => (string)$order->id,
@@ -162,7 +162,7 @@ class FatoorahController extends Controller
                 ]
             ];
             $response = self::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
-            $this->createNotification($user->id, $order->id, 'New order created successfully.');
+            $this->createNotification($user->id, $order->id, 'New order created successfully.','Received');
             if (!empty($response['error'])) {
                 \Log::error('FCM Error: ' . json_encode($response['error']));
                 return response()->json(['message' => 'Error: ' . $response['error']], 500);
@@ -218,14 +218,14 @@ class FatoorahController extends Controller
             "registration_ids" => [$deviceToken],
             "notification" => [
                 "title" => 'Yoo Store',
-                "body" => 'You create a new order' . $user->name,
+                "body" => $user->name . ' create a new order'
             ],"data" => [
                 "order_id"    => (string)$order->id,
                 "type"        => "Received",
             ]
         ];
         $response = self::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
-        $this->createNotification($user->id, $order->id, 'New order created successfully.');
+        $this->createNotification($user->id, $order->id, 'New order created successfully.','Received');
         if (!empty($response['error'])) {
             \Log::error('FCM Error: ' . json_encode($response['error']));
             return response()->json(['message' => 'Error: ' . $response['error']], 500);

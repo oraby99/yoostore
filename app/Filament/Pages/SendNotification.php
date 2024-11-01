@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Http\Controllers\Api\Payment\FatoorahController;
+use App\Models\Notification as ModelsNotification;
 use App\Models\User;
 use Filament\Pages\Page;
 use Filament\Forms\Components\Select;
@@ -33,6 +34,15 @@ class SendNotification extends Page
                 ->label('Message')
                 ->required(),
         ];
+    }
+    public function createNotification($userId, $orderId = null, $message, $type = 'Order')
+    {
+        ModelsNotification::create([
+            'user_id'  => $userId,
+            'order_id' => $orderId,
+            'message'  => $message,
+            'type'     => $type,
+        ]);
     }
     public function sendNotification()
     {
@@ -66,6 +76,8 @@ class SendNotification extends Page
               ],
             ];
             $response = FatoorahController::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
+            $this->createNotification($user->id, null, 'Notification sent successfully.', 'Custom');
+
           }
         if (!empty($response['error'])) {
             Notification::make()
