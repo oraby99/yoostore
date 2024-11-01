@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Payment\FatoorahController;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Models\Cart;
+use App\Models\Notification;
 use App\Models\Order;
 use App\Models\OrderCancellation;
 use App\Models\OrderProduct;
@@ -15,6 +16,15 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
+    public function createNotification($userId, $orderId = null, $message, $type = 'Order')
+    {
+        Notification::create([
+            'user_id'  => $userId,
+            'order_id' => $orderId,
+            'message'  => $message,
+            'type'     => $type,
+        ]);
+    }
     public function cancelOrder(Request $request, $orderId)
     {
         $order = Order::find($orderId);
@@ -76,7 +86,6 @@ class OrderController extends Controller
             'message' => 'Order cancelled successfully',
         ], 200);
     }
-    
     public function trackOrder($orderId)
     {
         // Find the order by ID
