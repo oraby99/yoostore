@@ -146,10 +146,10 @@ class FatoorahController extends Controller
                 'address_id'        => $defaultAddress->id
             ]);
             $deviceToken = $user->device_token;
-            \Log::info('Device Token: ' . $deviceToken);
-            if (!$deviceToken) {
-                return response()->json(['message' => 'No device token found.'], 400);
-            }
+            // \Log::info('Device Token: ' . $deviceToken);
+            // if (!$deviceToken) {
+            //     return response()->json(['message' => 'No device token found.'], 400);
+            // }
             $data = [
                 "registration_ids" => [$deviceToken],
                 "notification" => [
@@ -210,10 +210,10 @@ class FatoorahController extends Controller
                 'address_id'     => $defaultAddress->id
             ]);
         $deviceToken = $user->device_token;
-        \Log::info('Device Token: ' . $deviceToken);
-        if (!$deviceToken) {
-            return response()->json(['message' => 'No device token found.'], 400);
-        }
+        // \Log::info('Device Token: ' . $deviceToken);
+        // if (!$deviceToken) {
+        //     return response()->json(['message' => 'No device token found.'], 400);
+        // }
         $data = [
             "registration_ids" => [$deviceToken],
             "notification" => [
