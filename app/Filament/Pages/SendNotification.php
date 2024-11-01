@@ -47,9 +47,11 @@ class SendNotification extends Page
     public function sendNotification()
     {
         $tokens = [];
+        $users = [];
+    
         if ($this->user_id === "all") {
-            $tokens = User::whereNotNull('device_token')->pluck('device_token')->toArray();
-            if (empty($tokens)) {
+            $users = User::whereNotNull('device_token')->get(['id', 'device_token']);
+            if ($users->isEmpty()) {
                 Notification::make()
                     ->title('No users with device tokens found.')
                     ->danger()
@@ -65,21 +67,25 @@ class SendNotification extends Page
                     ->send();
                 return;
             }
-            $tokens[] = $user->device_token;
+            $users = collect([$user]);
         }
-        foreach ($tokens as $token) {
+    
+        foreach ($users as $user) {
             $data = [
-              "registration_ids" => [$token],
-              "notification" => [
-                "title" => 'Custom Notification',
-                "body" => $this->message,
-              ],
+                "registration_ids" => [$user->device_token],
+                "notification" => [
+                    "title" => 'Custom Notification',
+                    "body" => $this->message,
+                ],
             ];
             $response = FatoorahController::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
-            $this->createNotification($user->id, null, 'Notification sent successfully.', 'Custom');
-
-          }
-        if (!empty($response['error'])) {
+    
+            // Log notification in the database for each user
+            $this->createNotification($user->id, null, $this->message, 'Custom');
+        }
+    
+        // Handle FCM response
+        if (isset($response['error']) && !empty($response['error'])) {
             Notification::make()
                 ->title('Failed to send notification.')
                 ->danger()
@@ -91,4 +97,5 @@ class SendNotification extends Page
                 ->send();
         }
     }
+    
 }

@@ -198,56 +198,63 @@ class FatoorahController extends Controller
                 'message' => 'Default address not found.'
             ], 400);
         }
+    
+        $cartItems = Cart::where('user_id', $user->id)->get();
+        if ($cartItems->isEmpty()) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'No items found in cart.'
+            ], 400);
+        }
+    
         \DB::beginTransaction();
         try {
-            $totalPrice = $request->total ?? Cart::where('user_id', $user->id)->sum('total_price');
+            $totalPrice = $request->total ?? $cartItems->sum('total_price');
             $order = Order::create([
-                'user_id'         => $user->id,
-                'total_price'     => $totalPrice,
-                'order_status_id' => 1,
-                'payment_method' => 'cod',
+                'user_id'           => $user->id,
+                'total_price'       => $totalPrice,
+                'order_status_id'   => 1,
+                'payment_method'    => 'cod',
                 'payment_status_id' => 1,
-                'address_id'     => $defaultAddress->id
+                'address_id'        => $defaultAddress->id
             ]);
-        $deviceToken = $user->device_token;
-        // \Log::info('Device Token: ' . $deviceToken);
-        // if (!$deviceToken) {
-        //     return response()->json(['message' => 'No device token found.'], 400);
-        // }
-        $data = [
-            "registration_ids" => [$deviceToken],
-            "notification" => [
-                "title" => 'Yoo Store',
-                "body" => $user->name . ' create a new order'
-            ],"data" => [
-                "order_id"    => (string)$order->id,
-                "type"        => "Received",
-            ]
-        ];
-        $response = self::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
-        $this->createNotification($user->id, $order->id, 'New order created successfully.','Received');
-        if (!empty($response['error'])) {
-            \Log::error('FCM Error: ' . json_encode($response['error']));
-            return response()->json(['message' => 'Error: ' . $response['error']], 500);
-        }
-            $cartItems = Cart::where('user_id', $user->id)->get();
-            if ($cartItems->isEmpty()) {
-                \DB::rollBack();
-                return response()->json([
-                    'status'  => false,
-                    'message' => 'No items found in cart.'
-                ], 400);
-            }
+    
             foreach ($cartItems as $item) {
                 OrderProduct::create([
-                    'order_id'   => $order->id,
-                    'product_detail_id' => $item->product_detail_id,
-                    'product_id' => $item->product_id,
-                    'quantity'   => $item->quantity,
-                    'size'       => $item->size,
+                    'order_id'         => $order->id,
+                    'product_detail_id'=> $item->product_detail_id,
+                    'product_id'       => $item->product_id,
+                    'quantity'         => $item->quantity,
+                    'size'             => $item->size,
                 ]);
             }
+    
             Cart::where('user_id', $user->id)->delete();
+    
+            // Send FCM Notification
+            $deviceToken = $user->device_token;
+            $data = [
+                "registration_ids" => [$deviceToken],
+                "notification" => [
+                    "title" => 'Yoo Store',
+                    "body"  => $user->name . ' created a new order'
+                ],
+                "data" => [
+                    "order_id" => (string)$order->id,
+                    "type"     => "Received",
+                ]
+            ];
+            $response = self::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
+    
+            // Log notification in database
+            $this->createNotification($user->id, $order->id, 'New order created successfully.', 'Received');
+    
+            if (!empty($response['error'])) {
+                \Log::error('FCM Error: ' . json_encode($response['error']));
+                return response()->json(['message' => 'Error: ' . $response['error']], 500);
+            }
+    
+            // Prepare order response
             $orderProducts = OrderProduct::with(['product', 'productDetail'])
                 ->where('order_id', $order->id)
                 ->get();
@@ -256,62 +263,62 @@ class FatoorahController extends Controller
                 if ($orderProduct->product && $orderProduct->productDetail) {
                     $uniqueProductKey = $orderProduct->product_id . '-' . $orderProduct->product_detail_id;
                     $productsGrouped[$uniqueProductKey] = [
-                        'id' => $orderProduct->product_id,
-                        'name' => $orderProduct->product->name,
-                        'description' => $orderProduct->product->description,
+                        'id'           => $orderProduct->product_id,
+                        'name'         => $orderProduct->product->name,
+                        'description'  => $orderProduct->product->description,
                         'longdescription' => $orderProduct->product->longdescription,
-                        'tag' => $orderProduct->product->tag,
-                        'discount' => $orderProduct->product->discount,
-                        'attributes' => $orderProduct->product->attributes,
+                        'tag'          => $orderProduct->product->tag,
+                        'discount'     => $orderProduct->product->discount,
+                        'attributes'   => $orderProduct->product->attributes,
                         'deliverytime' => $orderProduct->product->deliverytime,
-                        'category_id' => $orderProduct->product->category_id,
+                        'category_id'  => $orderProduct->product->category_id,
                         'sub_category_id' => $orderProduct->product->sub_category_id,
-                        'created_at' => $orderProduct->product->created_at,
-                        'updated_at' => $orderProduct->product->updated_at,
-                        'size' => $orderProduct->size,
-                        'quantity' => $orderProduct->quantity,
-                        'product_details' => 
-                            [
-                                'id' => $orderProduct->productDetail->id,
-                                'price' => $orderProduct->productDetail->price,
-                                'image' => $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
-                                'color' => $orderProduct->productDetail->color,
-                                'size' => $orderProduct->productDetail->size,
-                                'stock' => $orderProduct->productDetail->stock,
-                                'typeprice' => $orderProduct->productDetail->typeprice,
-                                'typeimage' => $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
-                                'typename' => $orderProduct->productDetail->typename,
-                                'typestock' => $orderProduct->productDetail->typestock,
-                                'created_at' => $orderProduct->productDetail->created_at,
-                                'updated_at' => $orderProduct->productDetail->updated_at,
-                            
+                        'created_at'   => $orderProduct->product->created_at,
+                        'updated_at'   => $orderProduct->product->updated_at,
+                        'size'         => $orderProduct->size,
+                        'quantity'     => $orderProduct->quantity,
+                        'product_details' => [
+                            'id'        => $orderProduct->productDetail->id,
+                            'price'     => $orderProduct->productDetail->price,
+                            'image'     => $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
+                            'color'     => $orderProduct->productDetail->color,
+                            'size'      => $orderProduct->productDetail->size,
+                            'stock'     => $orderProduct->productDetail->stock,
+                            'typeprice' => $orderProduct->productDetail->typeprice,
+                            'typeimage' => $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
+                            'typename'  => $orderProduct->productDetail->typename,
+                            'typestock' => $orderProduct->productDetail->typestock,
+                            'created_at'=> $orderProduct->productDetail->created_at,
+                            'updated_at'=> $orderProduct->productDetail->updated_at,
                         ]
                     ];
                 }
             }
+    
             \DB::commit();
             return response()->json([
-                'status'   => true,
-                'message'  => 'Order placed successfully under Cash on Delivery',
-                'order'    => [
-                    'id' => $order->id,
-                    'user_id' => $order->user_id,
-                    'address_id' => $order->address_id,
-                    'total_price' => $order->total_price,
-                    'status' => $order->orderStatus->name,
-                    'payment_method' => $order->payment_method,
-                    'payment_status' => $order->paymentStatus->name,
-                    'created_at' => $order->created_at,
-                    'updated_at' => $order->updated_at,
-                    'products' => array_values($productsGrouped)
+                'status'  => true,
+                'message' => 'Order placed successfully under Cash on Delivery',
+                'order'   => [
+                    'id'              => $order->id,
+                    'user_id'         => $order->user_id,
+                    'address_id'      => $order->address_id,
+                    'total_price'     => $order->total_price,
+                    'status'          => $order->orderStatus->name,
+                    'payment_method'  => $order->payment_method,
+                    'payment_status'  => $order->paymentStatus->name,
+                    'created_at'      => $order->created_at,
+                    'updated_at'      => $order->updated_at,
+                    'products'        => array_values($productsGrouped)
                 ]
             ], 200);
+    
         } catch (\Exception $e) {
             \DB::rollBack();
             \Log::error('COD Checkout Error: ' . $e->getMessage());
             return response()->json([
                 'status'  => false,
-                'message' => 'Failed to place order. Please try again.' . $e->getMessage()
+                'message' => 'Failed to place order. Please try again. ' . $e->getMessage()
             ], 500);
         }
     }
