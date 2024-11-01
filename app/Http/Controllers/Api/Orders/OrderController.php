@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Orders;
 
+use App\Http\Controllers\Api\Payment\FatoorahController;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Models\Cart;
@@ -35,10 +36,11 @@ class OrderController extends Controller
                 'message' => 'Delivered orders cannot be cancelled',
             ], 400);
         }
+    
         $request->validate([
             'reason'  => 'required|string',
             'comment' => 'nullable|string',
-        ]);
+        ]);    
         OrderCancellation::create([
             'order_id' => $order->id,
             'reason'   => $request->reason,
@@ -48,14 +50,33 @@ class OrderController extends Controller
             'order_id' => $order->id,
             'status'   => 'Cancelled',
         ]);
-
         $order->update(['status' => 'Cancelled']);
-    
+        $user = $order->user;
+        if ($user && $user->device_token) {
+            $data = [
+                "registration_ids" => [$user->device_token],
+                "notification" => [
+                    "title" => 'Order Cancelled',
+                    "body" => 'Your order #' . $order->id . ' has been cancelled.',
+                ],
+                "data" => [
+                    "order_id" => (string)$order->id,
+                    "type"     => "Cancelled",
+                ]
+            ];
+            $response = FatoorahController::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
+            $this->createNotification($user->id, $order->id, 'Your order has been cancelled.', 'Cancelled');
+            if (isset($response['error']) && !empty($response['error'])) {
+                \Log::error('FCM Error: ' . json_encode($response['error']));
+                return response()->json(['message' => 'Error: ' . $response['error']], 500);
+            }
+        }
         return response()->json([
             'status'  => true,
             'message' => 'Order cancelled successfully',
         ], 200);
     }
+    
     public function trackOrder($orderId)
     {
         // Find the order by ID
