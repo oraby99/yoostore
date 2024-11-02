@@ -161,11 +161,9 @@ class OrderController extends Controller
                                 'image' => $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
                                 'color' => $orderProduct->productDetail->color,
                                 'size' => $orderProduct->productDetail->size,
-                                // 'stock' => $orderProduct->productDetail->stock,
                                 'typeprice' => $orderProduct->productDetail->typeprice,
                                 'typeimage' => $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
                                 'typename' => $orderProduct->productDetail->typename,
-                                // 'typestock' => $orderProduct->productDetail->typestock,
                                 'created_at' => $orderProduct->productDetail->created_at,
                                 'updated_at' => $orderProduct->productDetail->updated_at,
                             ]

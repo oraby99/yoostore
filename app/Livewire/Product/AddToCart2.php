@@ -27,7 +27,6 @@ class AddToCart2 extends Component
         if ($this->product->productDetails->isNotEmpty()) {
             $this->selectedVariationId = $this->product->productDetails->first()->id;
             $this->selectedPrice = $this->product->productDetails->first()->price;
-            //$this->mainStock = $this->product->productDetails->first()->stock; 
         }
 
         //refresh page to load selected price when selecting variatio
@@ -45,7 +44,6 @@ class AddToCart2 extends Component
         if ($variation) {
             $this->selectedVariationId = $typeId;
             $this->selectedPrice = $variation->price;
-            //$this->mainStock = $variation->stock; 
         }
 
     }

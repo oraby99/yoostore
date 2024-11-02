@@ -21,11 +21,9 @@ class OrderProductResource extends JsonResource
                 'image' => $this->productDetail->image ? url('storage/' . $this->productDetail->image) : null,
                 'color' => $this->productDetail->color,
                 'size' => $this->productDetail->size,
-                // 'stock' => $this->productDetail->stock,
                 'typeprice' => $this->productDetail->typeprice,
                 'typeimage' => $this->productDetail->typeimage ? url('storage/' . $this->productDetail->typeimage) : null,
                 'typename' => $this->productDetail->typename,
-                // 'typestock' => $this->productDetail->typestock,
                 'created_at' => $this->productDetail->created_at,
                 'updated_at' => $this->productDetail->updated_at,
             ]

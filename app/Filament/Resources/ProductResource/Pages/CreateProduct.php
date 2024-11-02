@@ -31,7 +31,6 @@ class CreateProduct extends CreateRecord
             ProductDetail::create([
                 'product_id' => $product->id,
                 'price'      => $item['price'],
-                // 'stock'      => $item['stock'] ?? 0,
                 'color'      => $item['color'] ?? null,
                 'size'       => $item['size'] ?? null,
                 'image'      => $item['image'] ?? null,
@@ -45,7 +44,6 @@ class CreateProduct extends CreateRecord
                 'product_id' => $product->id,
                 'typename'   => $item['typename'] ?? null,
                 'typeprice'  => $item['typeprice'],
-                // 'typestock'  => $item['typestock'] ?? 0,
                 'typeimage'  => $item['typeimage'] ?? null,
             ]);
         }

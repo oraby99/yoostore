@@ -114,38 +114,42 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('address.street')->label('Address'),
                 Tables\Columns\TextColumn::make('created_at')->label('Order Date')->dateTime(),
                 Tables\Columns\TextColumn::make('products')->label('Product Details')
-                    ->formatStateUsing(function ($record) {
-                        $productDetails = $record->orderProducts->map(function ($orderProduct) {
-                            $product = $orderProduct->product;
-                            $productDetail = $orderProduct->productDetail;
-                            return [
-                                'name' => $product->name,
-                                'quantity' => $orderProduct->quantity,
-                                'size' => $orderProduct->size,
-                                'price' => $productDetail->price ?? $productDetail->typeprice,
-                                'color' => $productDetail->color ?? $productDetail->typename,
-                            ];
-                        });
-                        $html = '<table style="width:100%; border-collapse: collapse;">';
-                        $html .= '<thead><tr><th style="border: 1px solid #ddd; padding: 8px;">
-                        Product</th><th style="border: 1px solid #ddd; padding: 8px;">
-                        Qty</th><th style="border: 1px solid #ddd; padding: 8px;">Size</th>
-                        <th style="border: 1px solid #ddd; padding: 8px;">Price</th>
-                        <th style="border: 1px solid #ddd; padding: 8px;">Color/Name</th></tr>
-                        </thead>';
-                        $html .= '<tbody>';
-                        foreach ($productDetails as $detail) {
-                            $html .= '<tr>';
-                            $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['name'] . '</td>';
-                            $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['quantity'] . '</td>';
-                            $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['size'] . '</td>';
-                            $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['price'] . '</td>';
-                            $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['color'] . '</td>';
-                            $html .= '</tr>';
-                        }
-                        $html .= '</tbody></table>';
-                        return $html;
-                    })->html(),
+                ->formatStateUsing(function ($record) {
+                    $productDetails = $record->orderProducts->map(function ($orderProduct) {
+                        $product = $orderProduct->product;
+                        $productDetail = $orderProduct->productDetail;
+            
+                        return [
+                            'name' => $product->name,
+                            'quantity' => $orderProduct->quantity,
+                            'size' => $orderProduct->size,
+                            'price' => $productDetail ? ($productDetail->price ?? $productDetail->typeprice) : 'N/A',
+                            'color' => $productDetail ? ($productDetail->color ?? $productDetail->typename) : 'N/A',
+                        ];
+                    });
+            
+                    $html = '<table style="width:100%; border-collapse: collapse;">';
+                    $html .= '<thead><tr><th style="border: 1px solid #ddd; padding: 8px;">Product</th>
+                              <th style="border: 1px solid #ddd; padding: 8px;">Qty</th>
+                              <th style="border: 1px solid #ddd; padding: 8px;">Size</th>
+                              <th style="border: 1px solid #ddd; padding: 8px;">Price</th>
+                              <th style="border: 1px solid #ddd; padding: 8px;">Color/Name</th></tr></thead>';
+                    $html .= '<tbody>';
+            
+                    foreach ($productDetails as $detail) {
+                        $html .= '<tr>';
+                        $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['name'] . '</td>';
+                        $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['quantity'] . '</td>';
+                        $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['size'] . '</td>';
+                        $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['price'] . '</td>';
+                        $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['color'] . '</td>';
+                        $html .= '</tr>';
+                    }
+            
+                    $html .= '</tbody></table>';
+                    return $html;
+                })->html(),
+            
             ])->defaultSort('created_at', 'desc') 
             ->actions([
                 Tables\Actions\DeleteAction::make(),

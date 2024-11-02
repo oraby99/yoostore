@@ -15,7 +15,6 @@ class ProductDetailResource extends JsonResource
             'image' => $this->image ? url('storage/' . $this->image) : null,
             'color' => $this->color,
             'size' => $this->size,
-            // 'stock' => $this->stock,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
