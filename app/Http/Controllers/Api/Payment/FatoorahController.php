@@ -10,6 +10,7 @@ use App\Models\Cart;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\OrderProduct;
+use App\Models\ProductDetail;
 use Google_Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
