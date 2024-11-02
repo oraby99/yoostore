@@ -111,27 +111,31 @@ class ChatController extends Controller
     public function notification()
     {
         $user = auth()->user();
-    
-        // Paginate notifications with 10 items per page (adjust as needed)
         $notifications = Notification::where('user_id', $user->id)
             ->with('order:id,invoice_id')
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
-    
-        // Map notifications to the desired structure
         $data = $notifications->getCollection()->map(function ($notification) {
+            $createdDate = $notification->created_at;
+            if ($createdDate->isToday()) {
+                $formattedDate = 'Today';
+            } elseif ($createdDate->isYesterday()) {
+                $formattedDate = 'Yesterday';
+            } else {
+                $formattedDate = $createdDate->format('j M');
+            }
             return [
                 'id'          => $notification->id,
+                'title'       => $notification->title,
                 'user_id'     => $notification->user_id,
                 'order_id'    => $notification->order_id,
                 'invoice_id'  => $notification->order->invoice_id ?? null,
                 'message'     => $notification->message,
                 'type'        => $notification->type,
-                'created_at'  => $notification->created_at,
+                'created_at'  => $formattedDate,
                 'updated_at'  => $notification->updated_at,
             ];
         });
-    
-        // Return response with pagination meta data
         return response()->json([
             'data'    => $data,
             'status'  => 200,
@@ -146,4 +150,5 @@ class ChatController extends Controller
             ],
         ]);
     }
+    
 }

@@ -177,9 +177,9 @@ class OrderController extends Controller
                 'address_id' => $order->address_id,
                 'invoice_id' => $order->invoice_id,
                 'total_price' => $order->total_price,
-                'status' => $order->status,
+                'status' => $order->orderStatus->name,
                 'payment_method' => $order->payment_method,
-                'payment_status' => $order->payment_status,
+                'payment_status' => $order->paymentStatus->name,
                 'created_at' => $order->created_at,
                 'updated_at' => $order->updated_at,
                 'products' => array_values($productsGrouped)
@@ -215,5 +215,43 @@ class OrderController extends Controller
         $pdf = Pdf::loadView('orders.invoice', compact('order'));
 
         return $pdf->download('invoice_' . $order->invoice_id . '.pdf');
+    }
+    public function getOrderById($orderId)
+    {
+        $order = Order::with(['orderProducts.product', 'orderProducts.productDetail', 'orderStatus', 'paymentStatus', 'user', 'address'])
+                    ->find($orderId);
+        if (!$order) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Order not found',
+            ], 404);
+        }
+        $orderData = [
+            'order_id'       => $order->id,
+            'user_id'        => $order->user_id,
+            'invoice_id'     => $order->invoice_id,
+            'status'         => $order->orderStatus->name,
+            'payment_status' => $order->paymentStatus->name,
+            'payment_method' => $order->payment_method,
+            'total_price'    => $order->total_price,
+            'created_at'     => $order->created_at,
+            'updated_at'     => $order->updated_at,
+            'products'       => $order->orderProducts->map(function ($orderProduct) {
+                return [
+                    'id'          => $orderProduct->product->id,
+                    'name'        => $orderProduct->product->name,
+                    'description' => $orderProduct->product->description,
+                    'size'        => $orderProduct->size,
+                    'quantity'    => $orderProduct->quantity,
+                    'price'       => $orderProduct->productDetail->price,
+                    'image'       => $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
+                    'color'       => $orderProduct->productDetail->color,
+                ];
+            })->toArray(),
+        ];
+        return response()->json([
+            'status' => true,
+            'data'   => $orderData,
+        ], 200);
     }
 }

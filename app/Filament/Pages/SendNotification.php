@@ -8,6 +8,7 @@ use App\Models\User;
 use Filament\Pages\Page;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 
 class SendNotification extends Page
@@ -17,10 +18,8 @@ class SendNotification extends Page
     protected static ?string $title = 'Send Notification';
     protected static string $view = 'filament.pages.send-notification';
     protected static ?string $navigationGroup = 'Notification';
-
     public $user_id;
     public $message;
-
     protected function getFormSchema(): array
     {
         return [
@@ -29,17 +28,22 @@ class SendNotification extends Page
                 ->options(User::pluck('name', 'id')->prepend('All Users', 'all'))
                 ->searchable()
                 ->placeholder('Select a user or all users to notify'),
-
+    
+            TextInput::make('title')
+                ->label('Notification Title')
+                ->required(),
+    
             Textarea::make('message')
                 ->label('Message')
                 ->required(),
         ];
     }
-    public function createNotification($userId, $orderId = null, $message, $type = 'Order')
+    public function createNotification($userId, $orderId = null, $title, $message, $type = 'Order')
     {
-        ModelsNotification::create([
+        Notification::create([
             'user_id'  => $userId,
             'order_id' => $orderId,
+            'title'    => $title,
             'message'  => $message,
             'type'     => $type,
         ]);
@@ -48,7 +52,7 @@ class SendNotification extends Page
     {
         $tokens = [];
         $users = [];
-    
+        
         if ($this->user_id === "all") {
             $users = User::whereNotNull('device_token')->get(['id', 'device_token']);
             if ($users->isEmpty()) {
@@ -74,14 +78,14 @@ class SendNotification extends Page
             $data = [
                 "registration_ids" => [$user->device_token],
                 "notification" => [
-                    "title" => 'Custom Notification',
+                    "title" => $this->title,
                     "body" => $this->message,
                 ],
             ];
             $response = FatoorahController::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
     
             // Log notification in the database for each user
-            $this->createNotification($user->id, null, $this->message, 'Custom');
+            $this->createNotification($user->id, null, $this->title, $this->message, 'Custom');
         }
     
         // Handle FCM response
@@ -97,5 +101,4 @@ class SendNotification extends Page
                 ->send();
         }
     }
-    
 }

@@ -71,6 +71,7 @@ use Illuminate\Support\Facades\Route;
     Route::get('/order/track/{orderId}',     [OrderController::class, 'trackOrder']);
     Route::get('/orders',                    [OrderController::class, 'getUserOrders']);
     Route::get('/order/invoice/{invoiceId}', [OrderController::class, 'getOrderByInvoiceId']);
+    Route::get('/order/{orderId}',           [OrderController::class, 'getOrderById']);
     //========================================================================================================
     Route::get('/chats',                     [ChatController::class, 'index']);
     Route::post('/chats',                    [ChatController::class, 'store']);

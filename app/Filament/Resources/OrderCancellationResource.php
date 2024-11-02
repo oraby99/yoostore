@@ -66,7 +66,7 @@ class OrderCancellationResource extends Resource
         return [
             'index' => Pages\ListOrderCancellations::route('/'),
             'create' => Pages\CreateOrderCancellation::route('/create'),
-            'edit' => Pages\EditOrderCancellation::route('/{record}/edit'),
+            //'edit' => Pages\EditOrderCancellation::route('/{record}/edit'),
         ];
     }
 }
