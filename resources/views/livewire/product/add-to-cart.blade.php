@@ -28,13 +28,12 @@
             </h5>
             <div class="row info">
                 <div class="col-6">
-                    @if ($mainStock > 0)
-                    <p><span>Availability</span>:There is {{$mainStock}} item</p>
-                    </p>
-                    @elseif ($mainStock == 0)
+                    @if ($product->in_stock == 0)
                     <p><span>Availability</span>:Out of stock</p>
-                    </p>
+                    @else
+                    <p><span>Availability</span>:In Stock</s></p>
                     @endif
+                 
                     <p><span>Category</span>: {{$product->category->name}}: {{$product->subCategory->name}}</p>
                 </div>
             </div>
@@ -74,34 +73,37 @@
 
 
             <!-- Quantity, Add to Cart, and Buy Now in 1:2:1 layout -->
-            <div class="button-group mb-3">
-                <div class="quantity-control d-flex">
-                    <div class="input-group quantity-box">
-                        <button class="btn btn-outline-secondary" wire:click="decrementQuantity">-</button>
+             @if ($product->in_stock == 1)
+             <div class="button-group mb-3">
+                 <div class="quantity-control d-flex">
+                     <div class="input-group quantity-box">
+                         <button class="btn btn-outline-secondary" wire:click="decrementQuantity">-</button>
+ 
+                         <input
+                             type="text"
+                             class="form-control text-center"
+                             wire:model="quantity"
+                             readonly />
+ 
+                         <button class="btn btn-outline-secondary" wire:click="incrementQuantity">+</button>
+                     </div>
+                 </div>
+ 
+                 <button
+                     class="btn btn-warning add-to-cart"
+                     wire:click="addToCart"
+                     style="color: aliceblue; font-weight: 600">
+                     ADD TO CART <i class="fa-solid fa-cart-shopping"></i>
+                 </button>
+ 
+                 <button
+                     class="btn btn-light buy-now"
+                     style="color: #fa8232; font-weight: 600">
+                     BUY NOW
+                 </button>
+             </div>
+             @endif
 
-                        <input
-                            type="text"
-                            class="form-control text-center"
-                            wire:model="quantity"
-                            readonly />
-
-                        <button class="btn btn-outline-secondary" wire:click="incrementQuantity">+</button>
-                    </div>
-                </div>
-
-                <button
-                    class="btn btn-warning add-to-cart"
-                    wire:click="addToCart"
-                    style="color: aliceblue; font-weight: 600">
-                    ADD TO CART <i class="fa-solid fa-cart-shopping"></i>
-                </button>
-
-                <button
-                    class="btn btn-light buy-now"
-                    style="color: #fa8232; font-weight: 600">
-                    BUY NOW
-                </button>
-            </div>
 
 
 
@@ -145,6 +147,10 @@
             </div>
         </div>
     </div>
+
+                         
+
+          
 </div>
 
 
@@ -160,21 +166,27 @@
         mainImage.src = thumbnail.src;
 
         function copyUrlToClipboard(button) {
-        const url = window.location.href;
-        
-        navigator.clipboard.writeText(url)
-            .then(() => {
-                button.querySelector('i').classList.add('copied');
-                
-                alert("URL copied to clipboard!");
+            const url = window.location.href;
 
-                setTimeout(() => {
-                    button.querySelector('i').classList.remove('copied');
-                }, 2000);
-            })
-            .catch(err => {
-                console.error("Failed to copy URL: ", err);
-            });
+            navigator.clipboard.writeText(url)
+                .then(() => {
+                    button.querySelector('i').classList.add('copied');
+
+                    alert("URL copied to clipboard!");
+
+                    setTimeout(() => {
+                        button.querySelector('i').classList.remove('copied');
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error("Failed to copy URL: ", err);
+                });
+        }
     }
-    }
+
+    document.querySelectorAll('input[name="star-rating"]').forEach((input) => {
+        input.addEventListener('change', function() {
+            console.log(`Selected Rating: ${this.value}`);
+        });
+    });
 </script>

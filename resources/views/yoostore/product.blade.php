@@ -27,9 +27,9 @@
                 <a class="nav-link" data-toggle="tab" href="#additional-info">Additional Information</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#specification">Specification</a>
+                <a class="nav-link d-none" data-toggle="tab" href="#specification">Specification</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item d-none">
                 <a class="nav-link" data-toggle="tab" href="#review">Review</a>
             </li>
         </ul>
@@ -39,21 +39,21 @@
                 <div id="description" class="tab-pane fade show active">
                     <h5>Description</h5>
                     <p>
-                        The most powerful MacBook Pro ever is here. With the blazing-fast M1 Pro or M1 Max chip — the first Apple silicon designed for pros — you get groundbreaking performance and amazing battery life. Add to that a stunning Liquid Retina XDR display, the best camera and audio ever in a Mac notebook, and all the ports you need. The first notebook of its kind, this MacBook Pro is a beast. M1 Pro takes the exceptional performance of the M1 architecture to a whole new level for pro users.
+                        {{ $product->description }}
                     </p>
                 </div>
 
                 <div id="additional-info" class="tab-pane fade">
                     <h5>Additional Information</h5>
-                    <p>Content for additional information goes here.</p>
+                    <p>{{ $product->longdescription }}.</p>
                 </div>
 
-                <div id="specification" class="tab-pane fade">
+                <div id="specification" class="tab-pane fade d-none">
                     <h5>Specification</h5>
                     <p>Content for specification goes here.</p>
                 </div>
 
-                <div id="review" class="tab-pane fade">
+                <div id="review" class="tab-pane fade d-none">
                     <h5>Review</h5>
                     <p>Content for review goes here.</p>
                 </div>
@@ -62,11 +62,11 @@
             <div class="feature-section w-25">
                 <h5>Feature</h5>
                 <ul>
-                    <li>
+                    <li class="d-none">
                         <i class="fa-solid fa-shield-alt "></i> Free 1 Year Warranty
                     </li>
-                    <li>
-                        <i class="fa-solid fa-truck"></i> Free Shipping & Fasted Delivery
+                    <li class="d-none">
+                        <i class="fa-solid fa-truck"></i> Fasted Delivery
                     </li>
                     <li>
                         <i class="fa-solid fa-money-check-alt"></i> 100% Money-back guarantee
@@ -82,8 +82,7 @@
 
             <div class="shipping-info w-25">
                 <h5>Shipping Information</h5>
-                <p class="text-muted"><strong>Courier:</strong> 2-4 days, free shipping</p>
-                <p class="text-muted"><strong>International Shipping:</strong> up to two weeks, 15 KWD</p>
+                <p class="text-muted"><strong>Courier:</strong> {{ $product->deliverytime}} days</p>
             </div>
         </div>
     </div>

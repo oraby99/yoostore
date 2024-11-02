@@ -13,7 +13,7 @@
 <div class="container-fluid  ">
     <div class="row d-flex align-items-start">
         <!-- Sidebar -->
-        <div class="col-md-9 sidebar">
+        <div class="col-md-3 sidebar" style="height: auto;">
             <a href="#" class="active link"><i class="fa-solid fa-layer-group"></i>Dashboard</a>
             <a href="{{ route('orderHistory') }}" class="link"><i class="fa-solid fa-shop"></i>Order History</a>
             <a href="{{ route('track') }}" class="link"><i class="fa-solid fa-location-dot"></i>Track Order</a>
@@ -26,7 +26,7 @@
 
 
         <!-- Content -->
-        <div class="col-md-3 ">
+        <div class="col-md-8 ">
             <div class="row">
                 <!-- Account Settings -->
                 <div class="col-md-12">

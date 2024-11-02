@@ -65,7 +65,7 @@ $categories = App\Models\Category::with('subcategories')->get();
                 <a href="{{ route('settings') }}" id="a2">Dashboard</a>
                 <a href="{{ route('faq') }}" id="a2">Faq</a>
             </div>
-            <div class="phone">
+            <div class="phone d-none">
                 <div class="whatsapp"></div>
                 +2342834942
             </div>

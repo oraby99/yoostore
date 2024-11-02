@@ -16,17 +16,18 @@ class Home extends Component
 
     public function mount()
     {
-        $this->products = Product::orderBy('id', 'desc')->with(['productDetails', 'images'])->get();
+        $this->products = Product::where('is_published', 1)->with(['productDetails', 'images'])->get();
     }
 
     public function searchProducts()
     {
         $this->products = Product::where('name', 'like', '%' . $this->search . '%')
+        ->where('is_published', 1)
             ->orderBy('id', 'desc')
             ->with(['productDetails', 'images'])
             ->get();
         if($this->products->isEmpty()) {
-        $this->products = Product::orderBy('id', 'desc')->with(['productDetails', 'images'])->get();
+        $this->products = Product::where('is_published', 1)->orderBy('id', 'desc')->with(['productDetails', 'images'])->get();
             
             session()->flash('error', 'No product found');
         }
