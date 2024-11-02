@@ -11,7 +11,7 @@ class Product extends Model
 {
     use HasFactory, HasTranslations;
     protected $guarded = [];
-    protected $fillable = ['name', 'description', 'tag', 'longdescription', 'discount', 'attributes', 'deliverytime', 'category_id', 'sub_category_id'];
+    protected $fillable = ['name', 'description', 'tag', 'longdescription', 'discount', 'attributes', 'deliverytime', 'category_id', 'sub_category_id', 'is_published', 'in_stock'];
     public $translatable = ['name', 'description', 'tag', 'longdescription',];
     public function typeDetails()
     {
@@ -47,7 +47,10 @@ class Product extends Model
         return $this->hasMany(ProductDetail::class);
     }
     protected $casts = [
+        'is_published' => 'boolean',
+        'in_stock' => 'boolean',
         'attributes' => 'array',
     ];
+    
 }
 

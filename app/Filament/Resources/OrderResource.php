@@ -123,7 +123,7 @@ class OrderResource extends Resource
                                 'quantity' => $orderProduct->quantity,
                                 'size' => $orderProduct->size,
                                 'price' => $productDetail->price ?? $productDetail->typeprice,
-                                'stock' => $productDetail->stock ?? $productDetail->typestock,
+                                // 'stock' => $productDetail->stock ?? $productDetail->typestock,
                                 'color' => $productDetail->color ?? $productDetail->typename,
                             ];
                         });
@@ -132,7 +132,7 @@ class OrderResource extends Resource
                         Product</th><th style="border: 1px solid #ddd; padding: 8px;">
                         Qty</th><th style="border: 1px solid #ddd; padding: 8px;">Size</th>
                         <th style="border: 1px solid #ddd; padding: 8px;">Price</th>
-                        <th style="border: 1px solid #ddd; padding: 8px;">Stock</th>
+                        // <th style="border: 1px solid #ddd; padding: 8px;">Stock</th>
                         <th style="border: 1px solid #ddd; padding: 8px;">Color/Name</th></tr>
                         </thead>';
                         $html .= '<tbody>';
@@ -142,7 +142,7 @@ class OrderResource extends Resource
                             $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['quantity'] . '</td>';
                             $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['size'] . '</td>';
                             $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['price'] . '</td>';
-                            $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['stock'] . '</td>';
+                            // $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['stock'] . '</td>';
                             $html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . $detail['color'] . '</td>';
                             $html .= '</tr>';
                         }

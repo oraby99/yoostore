@@ -36,7 +36,7 @@ class EditProduct extends EditRecord
             $data['product_details'] = $product->productDetails->map(function ($detail) {
                 return [
                     'price' => $detail->price,
-                    'stock' => $detail->stock,
+                    // 'stock' => $detail->stock,
                     'color' => $detail->color,
                     'size' => $detail->size,
                     'image' => $detail->image ? [$detail->image] : [],  // Ensure array for images
@@ -49,7 +49,7 @@ class EditProduct extends EditRecord
                 return [
                     'typename' => $detail->typename,
                     'typeprice' => $detail->typeprice,
-                    'typestock' => $detail->typestock,
+                    // 'typestock' => $detail->typestock,
                     'typeimage' => $detail->typeimage ? [$detail->typeimage] : [],  // Ensure array for images
                 ];
             })->toArray();

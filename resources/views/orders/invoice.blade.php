@@ -119,7 +119,7 @@
                     <th>Size</th>
                     <th>Price</th>
                     <th>Color</th>
-                    <th>Stock</th>
+                    {{--  <th>Stock</th>  --}}
                 </tr>
             </thead>
             <tbody>
@@ -130,7 +130,7 @@
                         <td>{{ $orderProduct->size }}</td>
                         <td>${{ $orderProduct->productDetail->price ?? $orderProduct->productDetail->typeprice }}</td>
                         <td>{{ $orderProduct->productDetail->color ?? 'N/A' }}</td>
-                        <td>{{ $orderProduct->productDetail->stock ?? $orderProduct->productDetail->typestock }}</td>
+                        {{--  <td>{{ $orderProduct->productDetail->stock ?? $orderProduct->productDetail->typestock }}</td>  --}}
                     </tr>
                 @endforeach
             </tbody>

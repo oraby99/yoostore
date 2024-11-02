@@ -16,11 +16,14 @@ use Filament\Forms\Form;
 use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\BooleanColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 class ProductResource extends Resource
 {
     use Translatable;
@@ -64,7 +67,19 @@ class ProductResource extends Resource
                     ->imageEditor()
                     ->directory('product-images') 
                     ->required(),
-                    
+                Toggle::make('is_published')
+                    ->label('Status')
+                    ->onIcon('heroicon-s-check')
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->helperText('Toggle between Published and Draft'),
+    
+                Toggle::make('in_stock')
+                    ->label('Stock Availability')
+                    ->onIcon('heroicon-s-check')
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->helperText('Toggle between In Stock and Out of Stock'),
                 Toggle::make('is_product_details')
                     ->label('Use Product Details')
                     ->default(true)
@@ -76,7 +91,6 @@ class ProductResource extends Resource
                             $set('product_details', []);
                         }
                     }),
-    
                 Forms\Components\Repeater::make('product_details')
                     ->label('Product Details')
                     ->visible(fn (callable $get) => $get('is_product_details'))
@@ -100,9 +114,9 @@ class ProductResource extends Resource
                         TextInput::make('price')
                             ->label('Price')
                             ->numeric()->required(),
-                        TextInput::make('stock')
-                            ->label('Stock')
-                            ->numeric()->required(),
+                        // TextInput::make('stock')
+                        //     ->label('Stock')
+                        //     ->numeric()->required(),
                     ])
                     ->defaultItems(1),
     
@@ -121,9 +135,9 @@ class ProductResource extends Resource
                         TextInput::make('typeprice')
                             ->label('Type Price')
                             ->numeric()->required(),
-                        TextInput::make('typestock')
-                            ->label('Type Stock')
-                            ->numeric()->required(),
+                        // TextInput::make('typestock')
+                        //     ->label('Type Stock')
+                        //     ->numeric()->required(),
                     ])
                     ->defaultItems(1),
             ]);
@@ -142,10 +156,25 @@ class ProductResource extends Resource
                     }),
                 TextColumn::make('category.name')->label('Category Name'),
                 TextColumn::make('subCategory.name')->label('Sub Category Name'),
+                ToggleColumn::make('is_published'),
+                ToggleColumn::make('in_stock')
 
+
+            //     BooleanColumn::make('is_published')
+            //     ->label('Published')
+            //     ->getStateUsing(fn ($record) => $record->is_published === true ? 'Published' : 'Draft')
+            //     ->trueColor('success')
+            //     ->falseColor('danger'),
+            
+            // BooleanColumn::make('in_stock')
+            //     ->label('In Stock')
+            //     ->getStateUsing(fn ($record) => $record->in_stock === true ? 'In Stock' : 'Out of Stock')
+            //     ->trueColor('success')
+            //     ->falseColor('danger'),
+            
             ])
             ->filters([
-                //
+                
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
