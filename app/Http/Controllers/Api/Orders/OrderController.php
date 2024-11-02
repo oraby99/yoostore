@@ -180,22 +180,23 @@ class OrderController extends Controller
                     'updated_at'     => $orderProduct->product->updated_at,
                     'size'           => $orderProduct->size,
                     'quantity'       => $orderProduct->quantity,
-                    'product_details'=> [
-                        'id'         => optional($orderProduct->productDetail)->id,
-                        'price'      => optional($orderProduct->productDetail)->price,
-                        'image'      => $orderProduct->productDetail && $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
-                        'color'      => optional($orderProduct->productDetail)->color,
-                        'size'       => optional($orderProduct->productDetail)->size,
-                        'typeprice'  => optional($orderProduct->productDetail)->typeprice,
-                        'typeimage'  => $orderProduct->productDetail && $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
-                        'typename'   => optional($orderProduct->productDetail)->typename,
-                        'created_at' => optional($orderProduct->productDetail)->created_at,
-                        'updated_at' => optional($orderProduct->productDetail)->updated_at,
-                    ]
+                    'product_details'=> $orderProduct->productDetail ? [
+                        'id'         => $orderProduct->productDetail->id,
+                        'price'      => $orderProduct->productDetail->price,
+                        'image'      => $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
+                        'color'      => $orderProduct->productDetail->color,
+                        'size'       => $orderProduct->productDetail->size,
+                        'typeprice'  => $orderProduct->productDetail->typeprice,
+                        'typeimage'  => $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
+                        'typename'   => $orderProduct->productDetail->typename,
+                        'created_at' => $orderProduct->productDetail->created_at,
+                        'updated_at' => $orderProduct->productDetail->updated_at,
+                    ] : null, // If productDetail is null, return null for product_details
                 ];
             })->toArray(),
         ];
     }
+    
     public function getOrderById($orderId)
     {
         $order = Order::with(['orderProducts.product', 'orderProducts.productDetail', 'orderStatus', 'paymentStatus', 'user', 'address'])
