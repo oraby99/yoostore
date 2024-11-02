@@ -213,25 +213,35 @@ class FatoorahController extends Controller
             $order = Order::create([
                 'user_id'           => $user->id,
                 'total_price'       => $totalPrice,
-                'order_status_id'   => 1,
+                'order_status_id'   => 1, // Assuming "1" represents a default order status (e.g., "Pending")
                 'payment_method'    => 'cod',
-                'payment_status_id' => 1,
+                'payment_status_id' => 1, // Assuming "1" represents an initial payment status (e.g., "Unpaid")
                 'address_id'        => $defaultAddress->id
             ]);
     
             foreach ($cartItems as $item) {
-                OrderProduct::create([
-                    'order_id'         => $order->id,
-                    'product_detail_id'=> $item->product_detail_id,
-                    'product_id'       => $item->product_id,
-                    'quantity'         => $item->quantity,
-                    'size'             => $item->size,
-                ]);
+                // Validate if product_detail_id exists in product_details table
+                if ($item->product_detail_id && ProductDetail::find($item->product_detail_id)) {
+                    OrderProduct::create([
+                        'order_id'         => $order->id,
+                        'product_detail_id'=> $item->product_detail_id,
+                        'product_id'       => $item->product_id,
+                        'quantity'         => $item->quantity,
+                        'size'             => $item->size,
+                    ]);
+                } else {
+                    \DB::rollBack();
+                    return response()->json([
+                        'status' => false,
+                        'message' => "Product detail with ID {$item->product_detail_id} not found."
+                    ], 400);
+                }
             }
     
+            // Clear the user's cart after successful order creation
             Cart::where('user_id', $user->id)->delete();
     
-            // Send FCM Notification
+            // Prepare and send FCM notification
             $deviceToken = $user->device_token;
             $data = [
                 "registration_ids" => [$deviceToken],
@@ -254,7 +264,7 @@ class FatoorahController extends Controller
                 return response()->json(['message' => 'Error: ' . $response['error']], 500);
             }
     
-            // Prepare order response
+            // Prepare order response data
             $orderProducts = OrderProduct::with(['product', 'productDetail'])
                 ->where('order_id', $order->id)
                 ->get();
