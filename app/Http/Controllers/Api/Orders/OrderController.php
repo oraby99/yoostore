@@ -236,18 +236,18 @@ class OrderController extends Controller
             'total_price'    => $order->total_price,
             'created_at'     => $order->created_at,
             'updated_at'     => $order->updated_at,
-            'products'       => $order->orderProducts->map(function ($orderProduct) {
-                return [
-                    'id'          => $orderProduct->product->id,
-                    'name'        => $orderProduct->product->name,
-                    'description' => $orderProduct->product->description,
-                    'size'        => $orderProduct->size,
-                    'quantity'    => $orderProduct->quantity,
-                    'price'       => $orderProduct->productDetail->price,
-                    'image'       => $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
-                    'color'       => $orderProduct->productDetail->color,
-                ];
-            })->toArray(),
+           'products' => $order->orderProducts->map(function ($orderProduct) {
+            return [
+                'id'          => $orderProduct->product->id,
+                'name'        => $orderProduct->product->name,
+                'description' => $orderProduct->product->description,
+                'size'        => $orderProduct->size,
+                'quantity'    => $orderProduct->quantity,
+                'price'       => optional($orderProduct->productDetail)->price,
+                'image'       => $orderProduct->productDetail && $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
+                'color'       => optional($orderProduct->productDetail)->color,
+            ];
+        })->toArray(),
         ];
         return response()->json([
             'status' => true,
