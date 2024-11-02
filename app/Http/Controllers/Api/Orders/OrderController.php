@@ -124,72 +124,7 @@ class OrderController extends Controller
             ],
         ], 200);
     }
-    public function getUserOrders()
-    {
-        $user = auth()->user();
-        $orders = Order::where('user_id', $user->id)->get();
-        $orderIds = $orders->pluck('id')->toArray();
-        $orderProducts = OrderProduct::with(['product', 'productDetail'])
-            ->whereIn('order_id', $orderIds)
-            ->get();
-        $organizedOrders = [];
-        foreach ($orders as $order) {
-            $orderProductsForCurrentOrder = $orderProducts->where('order_id', $order->id);
-            $productsGrouped = [];
-            foreach ($orderProductsForCurrentOrder as $orderProduct) {
-                if ($orderProduct->product && $orderProduct->productDetail) {
-                    $uniqueProductKey = $orderProduct->product_id . '-' . $orderProduct->product_detail_id;
-                    $productsGrouped[$uniqueProductKey] = [
-                        'id' => $orderProduct->product_id,
-                        'name' => $orderProduct->product->name,
-                        'description' => $orderProduct->product->description,
-                        'longdescription' => $orderProduct->product->longdescription,
-                        'tag' => $orderProduct->product->tag,
-                        'discount' => $orderProduct->product->discount,
-                        'attributes' => $orderProduct->product->attributes,
-                        'deliverytime' => $orderProduct->product->deliverytime,
-                        'category_id' => $orderProduct->product->category_id,
-                        'sub_category_id' => $orderProduct->product->sub_category_id,
-                        'created_at' => $orderProduct->product->created_at,
-                        'updated_at' => $orderProduct->product->updated_at,
-                        'size' => $orderProduct->size,
-                        'quantity' => $orderProduct->quantity,
-                        'product_details' => 
-                            [
-                                'id' => $orderProduct->productDetail->id,
-                                'price' => $orderProduct->productDetail->price,
-                                'image' => $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
-                                'color' => $orderProduct->productDetail->color,
-                                'size' => $orderProduct->productDetail->size,
-                                'typeprice' => $orderProduct->productDetail->typeprice,
-                                'typeimage' => $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
-                                'typename' => $orderProduct->productDetail->typename,
-                                'created_at' => $orderProduct->productDetail->created_at,
-                                'updated_at' => $orderProduct->productDetail->updated_at,
-                            ]
-                        
-                    ];
-                }
-            }
-            $organizedOrders[] = [
-                'id' => $order->id,
-                'user_id' => $order->user_id,
-                'address_id' => $order->address_id,
-                'invoice_id' => $order->invoice_id,
-                'total_price' => $order->total_price,
-                'status' => $order->orderStatus->name,
-                'payment_method' => $order->payment_method,
-                'payment_status' => $order->paymentStatus->name,
-                'created_at' => $order->created_at,
-                'updated_at' => $order->updated_at,
-                'products' => array_values($productsGrouped)
-            ];
-        }
-        return response()->json([
-            'status' => true,
-            'orders' => $organizedOrders,
-        ], 200);
-    }
+
     public function getOrderByInvoiceId($invoiceId)
     {
         $order = Order::with(['orderProducts.product', 'orderProducts.productDetail'])
@@ -216,6 +151,51 @@ class OrderController extends Controller
 
         return $pdf->download('invoice_' . $order->invoice_id . '.pdf');
     }
+    protected function formatOrder($order)
+    {
+        return [
+            'id'             => $order->id,
+            'user_id'        => $order->user_id,
+            'address_id'     => $order->address_id,
+            'invoice_id'     => $order->invoice_id,
+            'total_price'    => $order->total_price,
+            'status'         => $order->orderStatus->name,
+            'payment_method' => $order->payment_method,
+            'payment_status' => $order->paymentStatus->name,
+            'created_at'     => $order->created_at,
+            'updated_at'     => $order->updated_at,
+            'products'       => $order->orderProducts->map(function ($orderProduct) {
+                return [
+                    'id'             => $orderProduct->product->id,
+                    'name'           => $orderProduct->product->name,
+                    'description'    => $orderProduct->product->description,
+                    'longdescription'=> $orderProduct->product->longdescription,
+                    'tag'            => $orderProduct->product->tag,
+                    'discount'       => $orderProduct->product->discount,
+                    'attributes'     => $orderProduct->product->attributes,
+                    'deliverytime'   => $orderProduct->product->deliverytime,
+                    'category_id'    => $orderProduct->product->category_id,
+                    'sub_category_id'=> $orderProduct->product->sub_category_id,
+                    'created_at'     => $orderProduct->product->created_at,
+                    'updated_at'     => $orderProduct->product->updated_at,
+                    'size'           => $orderProduct->size,
+                    'quantity'       => $orderProduct->quantity,
+                    'product_details'=> [
+                        'id'         => optional($orderProduct->productDetail)->id,
+                        'price'      => optional($orderProduct->productDetail)->price,
+                        'image'      => $orderProduct->productDetail && $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
+                        'color'      => optional($orderProduct->productDetail)->color,
+                        'size'       => optional($orderProduct->productDetail)->size,
+                        'typeprice'  => optional($orderProduct->productDetail)->typeprice,
+                        'typeimage'  => $orderProduct->productDetail && $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
+                        'typename'   => optional($orderProduct->productDetail)->typename,
+                        'created_at' => optional($orderProduct->productDetail)->created_at,
+                        'updated_at' => optional($orderProduct->productDetail)->updated_at,
+                    ]
+                ];
+            })->toArray(),
+        ];
+    }
     public function getOrderById($orderId)
     {
         $order = Order::with(['orderProducts.product', 'orderProducts.productDetail', 'orderStatus', 'paymentStatus', 'user', 'address'])
@@ -226,35 +206,27 @@ class OrderController extends Controller
                 'message' => 'Order not found',
             ], 404);
         }
-        $orderData = [
-            'id'             => $order->id,
-            'user_id'        => $order->user_id,
-            'invoice_id'     => $order->invoice_id,
-            'status'         => $order->orderStatus->name,
-            'payment_status' => $order->paymentStatus->name,
-            'payment_method' => $order->payment_method,
-            'total_price'    => $order->total_price,
-            'created_at'     => $order->created_at,
-            'updated_at'     => $order->updated_at,
-           'products' => $order->orderProducts->map(function ($orderProduct) {
-            return [
-                'id'          => $orderProduct->product->id,
-                'name'        => $orderProduct->product->name,
-                'description' => $orderProduct->product->description,
-                'size'        => $orderProduct->size,
-                'quantity'    => $orderProduct->quantity,
-                'price'       => optional($orderProduct->productDetail)->price,
-                'image'       => $orderProduct->productDetail && $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
-                'color'       => optional($orderProduct->productDetail)->color,
-                'typeprice'   => optional($orderProduct->productDetail)->typeprice,
-                'typeimage'   => $orderProduct->productDetail && $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
-                'typename'    => optional($orderProduct->productDetail)->typename,  
-            ];
-        })->toArray(),
-        ];
+        $orderData = $this->formatOrder($order);
+    
         return response()->json([
             'status' => true,
             'data'   => $orderData,
+        ], 200);
+    }
+    public function getUserOrders()
+    {
+        $user = auth()->user();
+        $orders = Order::with(['orderProducts.product', 'orderProducts.productDetail', 'orderStatus', 'paymentStatus', 'user', 'address'])
+                       ->where('user_id', $user->id)
+                       ->get();
+        
+        $organizedOrders = $orders->map(function ($order) {
+            return $this->formatOrder($order);
+        })->toArray();
+    
+        return response()->json([
+            'status' => true,
+            'orders' => $organizedOrders,
         ], 200);
     }
 }
