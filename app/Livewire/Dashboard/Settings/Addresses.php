@@ -52,7 +52,7 @@ class Addresses extends Component
             'is_default' => 0,
         ]);
         $this->reset(['homeName', 'homePhone', 'homeStreet', 'homeLandmark', 'homeArea', 'homeCity', 'homeFlat', 'homeCountry']);
-        session()->flash('message', 'Home address saved successfully!');
+        session()->flash('success1', 'Home address saved successfully!');
     }
     
     
@@ -85,7 +85,7 @@ class Addresses extends Component
 
         $this->reset(['officeName', 'officePhone', 'officeStreet', 'officeLandmark', 'officeArea', 'officeCity', 'officeFlat', 'officeCountry']);
 
-        session()->flash('message', 'Office address saved successfully!');
+        session()->flash('success2', 'Office address saved successfully!');
     }
 
 

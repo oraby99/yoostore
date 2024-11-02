@@ -73,4 +73,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::view('/browsingHistory', 'yoostore.dashboard.browsingHistory')->name('browsingHistory');
     Route::view('/faq', 'yoostore.faq')->name('faq');
     Route::view('/wishlist', 'yoostore.wishlist')->name('wishlist');
+Route::post('/order/cancel/{id}', [OrderdetailController::class, 'cancelOrder'])->name('order.cancel');
+
 });
