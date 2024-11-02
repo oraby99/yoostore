@@ -20,7 +20,7 @@ class SendNotification extends Page
 
     public $user_id;
     public $message;
-    public $title; // Add this line
+    public $notificationTitle; // Renamed property
 
     protected function getFormSchema(): array
     {
@@ -31,7 +31,7 @@ class SendNotification extends Page
                 ->searchable()
                 ->placeholder('Select a user or all users to notify'),
     
-            TextInput::make('title')
+            TextInput::make('notificationTitle') // Updated field name
                 ->label('Notification Title')
                 ->required(),
     
@@ -82,14 +82,14 @@ class SendNotification extends Page
             $data = [
                 "registration_ids" => [$user->device_token],
                 "notification" => [
-                    "title" => $this->title,
+                    "title" => $this->notificationTitle, // Updated usage
                     "body" => $this->message,
                 ],
             ];
             $response = FatoorahController::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
     
             // Log notification in the database for each user
-            $this->createNotification($user->id, null, $this->title, $this->message, 'Custom');
+            $this->createNotification($user->id, null, $this->notificationTitle, $this->message, 'Custom');
         }
     
         // Handle FCM response
