@@ -11,29 +11,27 @@ use Livewire\Component;
 
 class Home extends Component
 {
-    
+    public $products;
+    public $search = ''; 
 
-  
-    public function addToHistory($id)
+    public function mount()
     {
-        // add to table product_histories recored have fields product_id and user_id and if exist don,t add it
-        $userId = Auth::id();
-
-        if ($userId) {
-       
-            $history = ProductHistory::where([
-                'user_id' => $userId,
-                'product_id' => $id
-            ])->first();
-            if (!$history) {
-                ProductHistory::create([
-                    'user_id' => $userId,
-                    'product_id' => $id,
-                ]);
-            }
-        }
-        
+        $this->products = Product::orderBy('id', 'desc')->with(['productDetails', 'images'])->get();
     }
+
+    public function searchProducts()
+    {
+        $this->products = Product::where('name', 'like', '%' . $this->search . '%')
+            ->orderBy('id', 'desc')
+            ->with(['productDetails', 'images'])
+            ->get();
+        if($this->products->isEmpty()) {
+        $this->products = Product::orderBy('id', 'desc')->with(['productDetails', 'images'])->get();
+            
+            session()->flash('error', 'No product found');
+        }
+    }
+   
     public function render()
     {
         $products =Product::orderby('id','desc')->with(['productDetails' , 'images'])->get();

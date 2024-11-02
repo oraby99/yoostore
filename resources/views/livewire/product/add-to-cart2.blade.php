@@ -107,14 +107,14 @@
 
             <div class="row mb-3 align-items-center">
                 <div class="col-md-4">
-                    <button class="btn btn-link btn-sm me-2">
+                    <button class="btn btn-link btn-sm me-2"  wire:click="addToWishlist({{ $product->id }})>
                         <i class="fa-solid fa-heart"></i> Add to Wishlist
                     </button>
                 </div>
 
                 <div class="col-md-7 text-end">
                     <span class="me-2" style="font-size: 0.9rem">Share product:</span>
-                    <button class="btn btn-link btn-sm me-1">
+                    <button class="btn btn-link btn-sm me-1"  onclick="copyUrlToClipboard()" wire:click="copied()">
                         <i class="fa-regular fa-copy"></i>
                     </button>
                     <button class="btn btn-link btn-sm me-1">
@@ -128,6 +128,13 @@
                     </button>
                 </div>
             </div>
+
+
+            @if(session()->has('success'))
+            <div class="alert alert-success mt-3">
+                {{ session('success') }}
+            </div>
+            @endif
 
             <div class="paymentIMages">
                 <p>100% Guarantee Safe Checkout</p>
@@ -153,5 +160,23 @@
     function changeMainImage(thumbnail) {
         const mainImage = document.getElementById('mainImage');
         mainImage.src = thumbnail.src;
+    }
+
+    function copyUrlToClipboard(button) {
+        const url = window.location.href;
+        
+        navigator.clipboard.writeText(url)
+            .then(() => {
+                button.querySelector('i').classList.add('copied');
+                
+                alert("URL copied to clipboard!");
+
+                setTimeout(() => {
+                    button.querySelector('i').classList.remove('copied');
+                }, 2000);
+            })
+            .catch(err => {
+                console.error("Failed to copy URL: ", err);
+            });
     }
 </script>

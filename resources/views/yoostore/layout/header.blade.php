@@ -35,13 +35,13 @@ $categories = App\Models\Category::with('subcategories')->get();
         <!-- Second Row -->
         <div class="navbarr-row">
            <a href="{{ route('index') }}"><img src="{{ asset('yoostore/images/yoostoree.png') }}" alt="" width="200"></a>
-            <div class="search-bar">
+            <div class="search-bar d-none">
                 <input type="text" placeholder="Search for anything..." />
                 <i class="fa-solid fa-magnifying-glass"></i>
             </div>
             <div class="shopping-icons">
                 <a href="{{ route('cart') }}"><i class="fa-solid fa-cart-shopping"></i></a>
-                <a href=""><i class="fa-regular fa-heart"></i></a>
+                <a href="{{ route('wishlist') }}"><i class="fa-regular fa-heart"></i></a>
                 <a href="{{ route('signup') }}"><i class="fa-regular fa-user"></i></a>
                 <livewire:auth.logout>
             </div>

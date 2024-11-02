@@ -3,6 +3,7 @@
 namespace App\Livewire\Product;
 
 use App\Models\Cart;
+use App\Models\Favorite;
 use App\Models\Product;
 use App\Models\ProductHistory;
 use Illuminate\Http\Request;
@@ -108,6 +109,34 @@ class AddToCart extends Component
     }
     
 
+    public function addToWishlist(){
+        $userId = Auth::id();
+        if ($userId) {
+            $wishlist = Favorite::where([
+                'user_id' => $userId,
+                'product_id' => $this->productID
+            ])->first();
+            session()->flash('success', 'you already have this item in your wishlist');
+            if (!$wishlist) {
+                Favorite::create([
+                    'user_id' => $userId,
+                    'product_id' => $this->productID,
+                    'is_favorite' => 1,
+                ]);
+                session()->flash('success', 'Item added to wishlist successfully!');
+            }
+        }
+        else{
+            return redirect()->route('login');
+        }
+    }
+
+
+    public function copied()
+    {
+        session()->flash('success', 'URL copied to clipboard');
+
+    }
     public function render()
     {
         $this->product = Product::where('id', $this->productID)->first();

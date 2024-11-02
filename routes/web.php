@@ -72,4 +72,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::view('/orderHistory', 'yoostore.dashboard.orderHistory')->name('orderHistory');
     Route::view('/browsingHistory', 'yoostore.dashboard.browsingHistory')->name('browsingHistory');
     Route::view('/faq', 'yoostore.faq')->name('faq');
+    Route::view('/wishlist', 'yoostore.wishlist')->name('wishlist');
 });
