@@ -27,7 +27,7 @@
                 <a class="nav-link" data-toggle="tab" href="#additional-info">Additional Information</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link d-none" data-toggle="tab" href="#specification">Specification</a>
+                <a class="nav-link" data-toggle="tab" href="#specification">Specification</a>
             </li>
             <li class="nav-item d-none">
                 <a class="nav-link" data-toggle="tab" href="#review">Review</a>
@@ -48,9 +48,15 @@
                     <p>{{ $product->longdescription }}.</p>
                 </div>
 
-                <div id="specification" class="tab-pane fade d-none">
+                <div id="specification" class="tab-pane fade">
                     <h5>Specification</h5>
-                    <p>Content for specification goes here.</p>
+                    <div class="row">
+                    @foreach ($product->attributes as $key => $value)
+                    <div class="mb-3 col-md-4">
+                        <label>{{ ucfirst($key) }}: {{ $value }}</label>
+                    </div>
+                    @endforeach
+                </div>
                 </div>
 
                 <div id="review" class="tab-pane fade d-none">

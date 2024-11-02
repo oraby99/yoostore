@@ -97,7 +97,7 @@
                 </button>
 
                 <button
-                    class="btn btn-light buy-now"
+                    class="btn btn-light buy-now d-none"
                     style="color: #fa8232; font-weight: 600">
                     BUY NOW
                 </button>

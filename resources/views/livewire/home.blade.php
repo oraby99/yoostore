@@ -19,7 +19,11 @@
         @foreach ($products as $product)
         <div class="col-3">
             <div class="card custom-card" style="height: 300px; position: relative; overflow: hidden;">
-                <span class="badge bg-danger position-absolute top-0 start-0 m-2">HOT</span>
+            @if ($product->in_stock == 0)
+            <span class="badge bg-dark position-absolute top-0 start-0 m-2">Out of stock</span>
+            @else
+            <span class="badge bg-success position-absolute top-0 start-0 m-2">In stock</span>
+            @endif
                 <div style="height: 66.67%; overflow: hidden;">
                     <img src="{{ asset('storage/' . optional($product->images->first())->image_path) }}" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
                 </div>
