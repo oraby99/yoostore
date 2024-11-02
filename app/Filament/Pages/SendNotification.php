@@ -15,11 +15,13 @@ class SendNotification extends Page
 {
     protected static ?string $navigationLabel = 'Send Notification';
     protected static ?string $slug = 'send-notification';
-    protected static ?string $title = 'Send Notification';
     protected static string $view = 'filament.pages.send-notification';
     protected static ?string $navigationGroup = 'Notification';
+
     public $user_id;
     public $message;
+    public $title; // Add this line
+
     protected function getFormSchema(): array
     {
         return [
@@ -38,9 +40,10 @@ class SendNotification extends Page
                 ->required(),
         ];
     }
+
     public function createNotification($userId, $orderId = null, $title, $message, $type = 'Order')
     {
-        Notification::create([
+        ModelsNotification::create([
             'user_id'  => $userId,
             'order_id' => $orderId,
             'title'    => $title,
@@ -48,6 +51,7 @@ class SendNotification extends Page
             'type'     => $type,
         ]);
     }
+
     public function sendNotification()
     {
         $tokens = [];
