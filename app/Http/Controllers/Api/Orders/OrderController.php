@@ -227,7 +227,7 @@ class OrderController extends Controller
             ], 404);
         }
         $orderData = [
-            'order_id'       => $order->id,
+            'id'             => $order->id,
             'user_id'        => $order->user_id,
             'invoice_id'     => $order->invoice_id,
             'status'         => $order->orderStatus->name,
