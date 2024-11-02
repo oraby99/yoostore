@@ -3,7 +3,9 @@
 namespace App\Livewire\Product;
 
 use App\Models\Cart;
+use App\Models\Favorite;
 use App\Models\Product;
+use App\Models\ProductHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -29,6 +31,21 @@ class AddToCart2 extends Component
             $this->selectedPrice = $this->product->productDetails->first()->price;
         }
 
+
+        $userId = Auth::id();
+        if ($userId) {
+            $history = ProductHistory::where([
+                'user_id' => $userId,
+                'product_id' => $this->productID
+            ])->first();
+            if (!$history) {
+                ProductHistory::create([
+                    'user_id' => $userId,
+                    'product_id' => $this->productID,
+                ]);
+            }
+            
+        }
         //refresh page to load selected price when selecting variatio
     }
 
@@ -65,18 +82,52 @@ class AddToCart2 extends Component
 
         // dd($this->selectedPrice);
         $userId = Auth::id();
-        Cart::create([
-            'user_id' => $userId,
-            'product_id' => $this->productID,
-            'product_detail_id' => $this->selectedVariationId,
-            'quantity' => $this->quantity,
-            'size' => null, 
-        ]);
+
+        if (!$userId) {
+            return redirect()->route('login');
+        }else{
+            
+            Cart::create([
+                'user_id' => $userId,
+                'product_id' => $this->productID,
+                'product_detail_id' => $this->selectedVariationId,
+                'quantity' => $this->quantity,
+                'size' => null, 
+            ]);
+        }
 
         $this->quantity = 1; 
         session()->flash('success', 'Item added to cart successfully!');
     }
 
+
+    public function addToWishlist(){
+        $userId = Auth::id();
+        if ($userId) {
+            $wishlist = Favorite::where([
+                'user_id' => $userId,
+                'product_id' => $this->productID
+            ])->first();
+            session()->flash('success', 'you already have this item in your wishlist');
+            if (!$wishlist) {
+                Favorite::create([
+                    'user_id' => $userId,
+                    'product_id' => $this->productID,
+                    'is_favorite' => 1,
+                ]);
+                session()->flash('success', 'Item added to wishlist successfully!');
+            }
+        }
+        else{
+            return redirect()->route('login');
+        }
+    }
+
+    public function copied()
+    {
+        session()->flash('success', 'URL copied to clipboard');
+
+    }
     public function render()
     {
         return view('livewire.product.add-to-cart2');
