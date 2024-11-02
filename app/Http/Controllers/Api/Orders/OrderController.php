@@ -247,7 +247,7 @@ class OrderController extends Controller
                 'image'       => $orderProduct->productDetail && $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
                 'color'       => optional($orderProduct->productDetail)->color,
                 'typeprice'   => optional($orderProduct->productDetail)->typeprice,
-                'typeimage'   => $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
+                'typeimage'   => $orderProduct->productDetail && $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
                 'typename'    => optional($orderProduct->productDetail)->typename,  
             ];
         })->toArray(),
