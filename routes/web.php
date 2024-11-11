@@ -57,6 +57,7 @@ Route::get('/index', [HomeController::class, 'index'])->name('index');
 Route::get('/product/{id}', [ProductController::class, 'index'])->name('product');
 Route::get('/signup', [AuthController::class, 'signupView'])->name('signup');
 Route::get('/login', [AuthController::class, 'loginView'])->name('login');
+Route::get('/verifyemail', [AuthController::class, 'verifyemail'])->name('verifyemail');
 
 
 

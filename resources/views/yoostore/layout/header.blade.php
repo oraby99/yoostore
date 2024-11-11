@@ -14,22 +14,7 @@ $categories = App\Models\Category::with('subcategories')->get();
                     <a href="#"><i class="fa-brands fa-youtube"></i></a>
                     <a href="#"><i class="fa-brands fa-instagram"></i></a>
                 </div>
-                
-                <div class="navbarr-select">
-                    <select>
-                        <option value="en">English</option>
-                        <option value="es">Spanish</option>
-                        <option value="fr">French</option>
-                    </select>
-                </div>
-                <div class="navbarr-select">
-                    <select>
-                        <option value="en">Egpty</option>
-                        <option value="es">kwd</option>
-                        <option value="fr">French</option>
-                    </select>
-                </div>
-            </div>
+                        </div>
         </div>
 
         <!-- Second Row -->
@@ -64,10 +49,6 @@ $categories = App\Models\Category::with('subcategories')->get();
                 <a href="{{ route('cart') }}" id="a1">Cart</a>
                 <a href="{{ route('settings') }}" id="a2">Dashboard</a>
                 <a href="{{ route('faq') }}" id="a2">Faq</a>
-            </div>
-            <div class="phone d-none">
-                <div class="whatsapp"></div>
-                +2342834942
             </div>
         </div>
         </div>

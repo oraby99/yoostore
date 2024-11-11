@@ -17,5 +17,10 @@ class AuthController extends Controller
         return view('yoostore.login');
     }
 
+    public function verifyemail()
+    {        
+        return view('yoostore.verifyemail');
+    }
+
 
 }

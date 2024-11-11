@@ -15,12 +15,38 @@
         <!-- Product Info Section -->
         <div class="col-md-6 order-md-2 product-info">
             <div class="rating mb-3">
+            @if ($rating > 0 && $rating = 1)
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                @elseif ($rating > 0 && $rating = 2)
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                @elseif ($rating > 0 && $rating = 3)
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                @elseif ($rating > 0 && $rating = 4)
                 <i class="fas fa-star"></i>
                 <i class="fas fa-star"></i>
                 <i class="fas fa-star"></i>
                 <i class="fas fa-star"></i>
                 <i class="far fa-star"></i>
-                <span>(21,671 User Feedback)</span>
+                @elseif ($rating > 0 && $rating = 5)
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                @endif
+                <span>( {{ $rating }} Feedback)</span>
             </div>
 
             <h5 style="margin-bottom: 25px">
@@ -138,13 +164,15 @@
             @endif
             <div class="paymentIMages">
                 <p>100% Guarantee Safe Checkout</p>
-                <div>
+                <div class="d-flex">
                     <span><img src="{{ asset('yoostore/images/amrican express.png') }}" alt="" /></span>
                     <span><img src="{{ asset('yoostore/images/master card.png') }}" alt="" /></span>
                     <span><img src="{{ asset('yoostore/images/paypall.png') }}" alt="" /></span>
                     <span><img src="{{ asset('yoostore/images/visa.png') }}" alt="" /></span>
                 </div>
             </div>
+            <livewire:rating.rating>
+
         </div>
     </div>
 

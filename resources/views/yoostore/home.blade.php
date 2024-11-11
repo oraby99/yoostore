@@ -170,8 +170,12 @@
               </div>
               <div class="card-body" style="height: 33.33%;">
                 <div class="rating my-2">
-                  <span class="text-warning">★★★★★</span>
-                  <span>(738)</span>
+                  @php
+                  $averageRating = $product->rates()->avg('rate');
+                  @endphp
+                  <span class="text-warning">
+                    {{ str_repeat('★', floor($averageRating)) . str_repeat('☆', 5 - floor($averageRating)) }}</span>
+                  <span>({{ $averageRating }})</span>
                 </div>
                 <h4 class="card-title" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                   <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black">{{ $product->name }}</a>
@@ -255,8 +259,12 @@
               </div>
               <div class="card-body" style="height: 33.33%;">
                 <div class="rating my-2">
-                  <span class="text-warning">★★★★★</span>
-                  <span>(738)</span>
+                  @php
+                  $averageRating = $product->rates()->avg('rate');
+                  @endphp
+                  <span class="text-warning">
+                    {{ str_repeat('★', floor($averageRating)) . str_repeat('☆', 5 - floor($averageRating)) }}</span>
+                  <span>({{ $averageRating }})</span>
                 </div>
                 <h4 class="card-title" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                   <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black">{{ $product->name }}</a>
@@ -300,11 +308,11 @@
 
   <!-- section 9 -->
 
-  <div style="height: 324px; background: linear-gradient(to bottom, #fa8232, #ffffff); padding: 50px 100px; margin-bottom: 100px;" class="d-flex align-items-center flex-column mb-5" >
+  <div style="height: 324px; background: linear-gradient(to bottom, #fa8232, #ffffff); padding: 50px 100px; margin-bottom: 100px;" class="d-flex align-items-center flex-column mb-5">
 
     <h1 style="font-size: 40px; " class="text-white text-center">Subscribe to our newsletter</h1>
     <p style="font-size: 18px; " class="text-white text-center pb-3">Join Our Newsletter for latest Offers</p>
-    <div class="row w-75 pt-5" style="position: relative; left: 250px" >
+    <div class="row w-75 pt-5" style="position: relative; left: 250px">
       <input type="text" class="col-md-8" placeholder="Enter your email address" style="height: 80px; font-size: 18px; width: 70%; box-shadow: 0px 0px 10px #ccc ;">
       <button class="col-md-2" style="height: 60px; font-size: 18px; background-color: #fa8232; color: white; position: relative; right: 250px;">Subscribe <i class="fa-solid fa-arrow-right-long "></i></button>
     </div>

@@ -86,6 +86,8 @@
                 </ul>
             </div>
 
+
+
             <div class="shipping-info w-25">
                 <h5>Shipping Information</h5>
                 <p class="text-muted"><strong>Courier:</strong> {{ $product->deliverytime}} days</p>
