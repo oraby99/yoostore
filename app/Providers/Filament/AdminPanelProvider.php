@@ -50,6 +50,7 @@ class AdminPanelProvider extends PanelProvider
                 //Widgets\FilamentInfoWidget::class,
             ])
             ->plugins([
+                \Hasnayeen\Themes\ThemesPlugin::make(),
                 TranslationManagerPlugin::make(),
                 SpatieLaravelTranslatablePlugin::make()
                 ->defaultLocales(['en', 'ar']),
@@ -59,9 +60,11 @@ class AdminPanelProvider extends PanelProvider
                 ->setIcon('heroicon-o-cog')
                 ->setNavigationGroup('Settings')
                 ->setTitle('General Settings')
+                
                 ->setNavigationLabel('General Settings'),
             ])
             ->middleware([
+                \Hasnayeen\Themes\Http\Middleware\SetTheme::class,
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
@@ -71,6 +74,10 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+            ])
+            ->tenantMiddleware([
+                
+                \Hasnayeen\Themes\Http\Middleware\SetTheme::class
             ])
             ->authMiddleware([
                 Authenticate::class,

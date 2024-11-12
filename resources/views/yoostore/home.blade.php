@@ -121,205 +121,236 @@
 
 <livewire:home>
 
-<!-- section 5 -->
+  <!-- section 5 -->
 
-<div
-  class="section5 container my4 w-75 mt-5 d-flex justify-content-between">
-  <div class=" w-25 mx-4">
-    <div class="banner2 p-5">
-      <p class="text-danger text-center">COMPUTER & ACCESSORIES</p>
-      <p class="text-center" style="font-size: 32px">32% Discount</p>
-      <p class="text-center">For all ellectronics products</p>
-      <span style="font-size: 13px">Offers ends in</span><span
-        style="background-color: white; font-size: 13px; font-weight: 600; p-1">ENDS OF CHRISTMAS</span>
-      <button>shop now <i class="fa-solid fa-arrow-right mx-3"></i></button>
-    </div>
-    <div>
-      <img src="{{ asset('yoostore/images/banner 2.jpeg') }}" alt="" />
-    </div>
-  </div>
-
-  <div class="products w-75 p-3">
-    <div class="d-flex justify-content-between">
-      <span style="font-size: 22px; font-weight: 600">Featuerd Products</span>
-      <div class="featuerd">
-        @foreach($categories as $category)
-        @foreach($category->subcategories as $subcategory)
-        <span class="featureitem">{{ $subcategory->name }}</span>
-        @endforeach
-        @endforeach
-
-
-        <span style="color: #fa8232">View All Products <i class="fa-solid fa-arrow-right-long"></i></span>
+  <div
+    class="section5 container my4 w-75 mt-5 d-flex justify-content-between">
+    <div class=" w-25 mx-4">
+      <div class="banner2 p-5">
+        <p class="text-danger text-center">COMPUTER & ACCESSORIES</p>
+        <p class="text-center" style="font-size: 32px">32% Discount</p>
+        <p class="text-center">For all ellectronics products</p>
+        <span style="font-size: 13px">Offers ends in</span><span
+          style="background-color: white; font-size: 13px; font-weight: 600; p-1">ENDS OF CHRISTMAS</span>
+        <button>shop now <i class="fa-solid fa-arrow-right mx-3"></i></button>
+      </div>
+      <div>
+        <img src="{{ asset('yoostore/images/banner 2.jpeg') }}" alt="" />
       </div>
     </div>
 
+    <div class="products w-75 p-3">
+      <div class="d-flex justify-content-between">
+        <span style="font-size: 22px; font-weight: 600">Featuerd Products</span>
+        <div class="featuerd">
+          @foreach($categories as $category)
+          @foreach($category->subcategories as $subcategory)
+          <span class="featureitem">{{ $subcategory->name }}</span>
+          @endforeach
+          @endforeach
 
-    <div class="my-3">
-      <div class="w-100 row col-12">
-        @foreach ($products as $product)
-        <div class="col-4">
-          <div class="card custom-card" style="height: 300px; position: relative; overflow: hidden;">
-            <span class="badge bg-danger position-absolute top-0 start-0 m-2">HOT</span>
-            <div style="height: 66.67%; overflow: hidden;">
-              <img src="{{ asset('storage/' . optional($product->images->first())->image_path) }}" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
-            </div>
-            <div class="card-body" style="height: 33.33%;">
-              <div class="rating my-2">
-                <span class="text-warning">★★★★★</span>
-                <span>(738)</span>
+
+          <span style="color: #fa8232">View All Products <i class="fa-solid fa-arrow-right-long"></i></span>
+        </div>
+      </div>
+
+
+      <div class="my-3">
+        <div class="w-100 row col-12">
+          @foreach ($products as $product)
+          <div class="col-4">
+            <div class="card custom-card" style="height: 300px; position: relative; overflow: hidden;">
+              @if ($product->in_stock == 0)
+              <span class="badge bg-dark position-absolute top-0 start-0 m-2">Out of stock</span>
+              @else
+              <span class="badge bg-success position-absolute top-0 start-0 m-2">In stock</span>
+              @endif
+              <div style="height: 66.67%; overflow: hidden;">
+                <img src="{{ asset('storage/' . optional($product->images->first())->image_path) }}" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
               </div>
-              <h4 class="card-title" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black">{{ $product->name }}</a>
-              </h4>
-              <h4 class="pricee"></h4>
+              <div class="card-body" style="height: 33.33%;">
+                <div class="rating my-2">
+                  @php
+                  $averageRating = $product->rates()->avg('rate');
+                  @endphp
+                  <span class="text-warning">
+                    {{ str_repeat('★', floor($averageRating)) . str_repeat('☆', 5 - floor($averageRating)) }}</span>
+                  <span>({{ $averageRating }})</span>
+                </div>
+                <h4 class="card-title" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black">{{ $product->name }}</a>
+                </h4>
+                <h4 class="pricee"></h4>
+              </div>
             </div>
           </div>
+          @endforeach
         </div>
-        @endforeach
       </div>
+
+
     </div>
-
-
   </div>
-</div>
 
-<!-- section 6 -->
-<div class="d-flex justify-content-center my-5">
-  <div class="section6 d-flex justify-content-around">
-    <div class="p-5">
-      <div
-        style="
+  <!-- section 6 -->
+  <div class="d-flex justify-content-center my-5">
+    <div class="section6 d-flex justify-content-around">
+      <div class="p-5">
+        <div
+          style="
               height: 35px;
               background-color: #efd33d;
               font-weight: 600;
               width: 170px;
             "
-        class="d-flex justify-content-center align-items-center">
-        <p>INTRODUCING NEW</p>
-      </div>
-      <p
-        style="
+          class="d-flex justify-content-center align-items-center">
+          <p>INTRODUCING NEW</p>
+        </div>
+        <p
+          style="
               font-size: 32px;
               width: 280px;
               font-weight: 600;
               color: white;
             ">
-        Xiaomi Mi 11 Ultra 12GB+256GB
-      </p>
-      <p style="width: 280px; font-weight: 600; color: #adb7bc">
-        *Data provided by internal laboratories. Industry measurment.
-      </p>
-      <button>Shop Now <i class="fa-solid fa-arrow-right mx-3"></i></button>
-    </div>
-    <div class="">
-      <img src="{{ asset('yoostore/images/xaomi.png') }}" alt="" />
-    </div>
-  </div>
-</div>
-
-<!-- section 7 -->
-
-<div
-  class="section5 container my4 w-75 mt-5 d-flex justify-content-between">
-  <div class="products w-75 p-3">
-    <div class="d-flex justify-content-between">
-      <span style="font-size: 22px; font-weight: 600">Featuerd Products</span>
-      <div class="featuerd">
-        @foreach($categories as $category)
-        @foreach($category->subcategories as $subcategory)
-        <span class="featureitem">{{ $subcategory->name }}</span>
-        @endforeach
-        @endforeach
-        <span style="color: #fa8232">View Products <i class="fa-solid fa-arrow-right-long"></i></span>
+          Xiaomi Mi 11 Ultra 12GB+256GB
+        </p>
+        <p style="width: 280px; font-weight: 600; color: #adb7bc">
+          *Data provided by internal laboratories. Industry measurment.
+        </p>
+        <button>Shop Now <i class="fa-solid fa-arrow-right mx-3"></i></button>
+      </div>
+      <div class="">
+        <img src="{{ asset('yoostore/images/xaomi.png') }}" alt="" />
       </div>
     </div>
+  </div>
 
-    <div class="my-3">
-      <div class="w-100 row col-12">
-        @foreach ($products as $product)
-        <div class="col-4">
-          <div class="card custom-card" style="height: 300px; position: relative; overflow: hidden;">
-            <span class="badge bg-danger position-absolute top-0 start-0 m-2">HOT</span>
-            <div style="height: 66.67%; overflow: hidden;">
-            <img src="{{ asset('storage/' . optional($product->images->first())->image_path) }}" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
+  <!-- section 7 -->
 
-            </div>
-            <div class="card-body" style="height: 33.33%;">
-              <div class="rating my-2">
-                <span class="text-warning">★★★★★</span>
-                <span>(738)</span>
+  <div
+    class="section5 container my4 w-75 mt-5 d-flex justify-content-between">
+    <div class="products w-75 p-3">
+      <div class="d-flex justify-content-between">
+        <span style="font-size: 22px; font-weight: 600">Featuerd Products</span>
+        <div class="featuerd">
+          @foreach($categories as $category)
+          @foreach($category->subcategories as $subcategory)
+          <span class="featureitem">{{ $subcategory->name }}</span>
+          @endforeach
+          @endforeach
+          <span style="color: #fa8232">View Products <i class="fa-solid fa-arrow-right-long"></i></span>
+        </div>
+      </div>
+
+      <div class="my-3">
+        <div class="w-100 row col-12">
+          @foreach ($products as $product)
+          <div class="col-4">
+            <div class="card custom-card" style="height: 300px; position: relative; overflow: hidden;">
+              @if ($product->in_stock == 0)
+              <span class="badge bg-dark position-absolute top-0 start-0 m-2">Out of stock</span>
+              @else
+              <span class="badge bg-success position-absolute top-0 start-0 m-2">In stock</span>
+              @endif
+              <div style="height: 66.67%; overflow: hidden;">
+                <img src="{{ asset('storage/' . optional($product->images->first())->image_path) }}" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
+
               </div>
-              <h4 class="card-title" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black">{{ $product->name }}</a>
-              </h4>
-              <h4 class="pricee"></h4>
+              <div class="card-body" style="height: 33.33%;">
+                <div class="rating my-2">
+                  @php
+                  $averageRating = $product->rates()->avg('rate');
+                  @endphp
+                  <span class="text-warning">
+                    {{ str_repeat('★', floor($averageRating)) . str_repeat('☆', 5 - floor($averageRating)) }}</span>
+                  <span>({{ $averageRating }})</span>
+                </div>
+                <h4 class="card-title" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black">{{ $product->name }}</a>
+                </h4>
+                <h4 class="pricee"></h4>
+              </div>
             </div>
           </div>
+          @endforeach
         </div>
-        @endforeach
+      </div>
+
+
+    </div>
+
+    <div class="w-25 mx-4">
+      <div class="banner2 p-5" style="background-color: #124261">
+        <p class="text-white text-center">COMPUTER & ACCESSORIES</p>
+        <p class="text-white text-center" style="font-size: 32px">
+          32% Discount
+        </p>
+        <p class="text-white text-center">For all ellectronics products</p>
+        <span style="font-size: 13px" class="text-white text-center">OFFERS ENDS IN OF CHRISTMAS</span>
+        <button>shop now <i class="fa-solid fa-arrow-right mx-3"></i></button>
+      </div>
+      <div>
+        <img src="images/banner 2.jpeg" alt="" />
       </div>
     </div>
-
-
   </div>
 
-  <div class="w-25 mx-4">
-    <div class="banner2 p-5" style="background-color: #124261">
-      <p class="text-white text-center">COMPUTER & ACCESSORIES</p>
-      <p class="text-white text-center" style="font-size: 32px">
-        32% Discount
-      </p>
-      <p class="text-white text-center">For all ellectronics products</p>
-      <span style="font-size: 13px" class="text-white text-center">OFFERS ENDS IN OF CHRISTMAS</span>
-      <button>shop now <i class="fa-solid fa-arrow-right mx-3"></i></button>
-    </div>
-    <div>
-      <img src="images/banner 2.jpeg" alt="" />
+  <!-- section 8 -->
+
+  <div class="my-5 d-flex justify-content-center">
+    <img src="images/special offer.jpeg" alt="" />
+  </div>
+
+  <div class="my-5 d-flex justify-content-center">
+    <img src="{{ asset('yoostore/images/bannerstatic.jpeg') }}" alt="" width="80%" />
+  </div>
+
+  <!-- section 9 -->
+
+  <div style="height: 324px; background: linear-gradient(to bottom, #fa8232, #ffffff); padding: 50px 100px; margin-bottom: 100px;" class="d-flex align-items-center flex-column mb-5">
+
+    <h1 style="font-size: 40px; " class="text-white text-center">Subscribe to our newsletter</h1>
+    <p style="font-size: 18px; " class="text-white text-center pb-3">Join Our Newsletter for latest Offers</p>
+    <div class="row w-75 pt-5" style="position: relative; left: 250px">
+      <input type="text" class="col-md-8" placeholder="Enter your email address" style="height: 80px; font-size: 18px; width: 70%; box-shadow: 0px 0px 10px #ccc ;">
+      <button class="col-md-2" style="height: 60px; font-size: 18px; background-color: #fa8232; color: white; position: relative; right: 250px;">Subscribe <i class="fa-solid fa-arrow-right-long "></i></button>
     </div>
   </div>
-</div>
-
-<!-- section 8 -->
-
-<div class="my-5 d-flex justify-content-center">
-  <img src="images/special offer.jpeg" alt="" />
-</div>
-
-<!-- section 9 -->
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-  let currentSlide = 0;
-  const slides = document.querySelectorAll(".slide");
-  const totalSlides = slides.length;
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  function showSlide(slideIndex) {
-    const slider = document.querySelector(".slider");
-    slider.style.transform = `translateX(${-slideIndex * 100}%)`;
-  }
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll(".slide");
+    const totalSlides = slides.length;
 
-  function nextSlide() {
-    currentSlide = (currentSlide + 1) % totalSlides;
-    showSlide(currentSlide);
-  }
+    function showSlide(slideIndex) {
+      const slider = document.querySelector(".slider");
+      slider.style.transform = `translateX(${-slideIndex * 100}%)`;
+    }
 
-  function prevSlide() {
-    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-    showSlide(currentSlide);
-  }
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      showSlide(currentSlide);
+    }
 
-  const featureItems = document.querySelectorAll(".feature-item");
+    function prevSlide() {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      showSlide(currentSlide);
+    }
 
-  featureItems.forEach((item) => {
-    item.addEventListener("click", () => {
-      featureItems.forEach((i) => i.classList.remove("active"));
-      item.classList.add("active");
+    const featureItems = document.querySelectorAll(".feature-item");
+
+    featureItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        featureItems.forEach((i) => i.classList.remove("active"));
+        item.classList.add("active");
+      });
     });
-  });
-</script>
+  </script>
 
-@endsection
+  @endsection

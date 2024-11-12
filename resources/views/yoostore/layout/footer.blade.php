@@ -16,22 +16,22 @@ $categories = App\Models\Category::with('subcategories')->get();
           <li class="title_2">info@yoostore.com</li>
         </ul>
       </div>
-  
+
       <!-- Second Column -->
       <div class="FOOTER-col">
         <h4 class="title">Top Category</h4>
         <ul>
-        @foreach($categories as $category)
-        @foreach($category->subcategories as $subcategory)
-        <li><a href="#">{{ $subcategory->name }}</a></li>
-        @endforeach
-        @endforeach
+          @foreach($categories as $category)
+          @foreach($category->subcategories as $subcategory)
+          <li><a href="#">{{ $subcategory->name }}</a></li>
+          @endforeach
+          @endforeach
           <li>
             <a href="#" style="color: yellow">Browse All Product <i class="fa-solid fa-arrow-right"></i></a>
           </li>
         </ul>
       </div>
-  
+
       <!-- Third Column -->
       <div class="FOOTER-col">
         <h4 class="title">Quick Links</h4>
@@ -44,38 +44,20 @@ $categories = App\Models\Category::with('subcategories')->get();
           <li><a href="">About Us</a></li>
         </ul>
       </div>
-  
+
       <!-- Fourth Column -->
       <div class="FOOTER-col cards">
         <h4 class="title">Download App</h4>
-        <ul>
-          <div class="card">
-            <a href="#">
-              <div>
-                <i
-                  style="font-size: 5px"
-                  class="fa-brands fa-google-play"></i>
-              </div>
-              <div class="details">
-                <p>Get it now</p>
-                <h4>Google Play</h4>
-              </div>
-            </a>
-          </div>
-          <div class="carddd">
-            <a href="#">
-              <div>
-                <i style="font-size: 35px" class="fa-brands fa-apple"></i>
-              </div>
-              <div class="details">
-                <p>Get it now</p>
-                <h4>App store</h4>
-              </div>
-            </a>
-          </div>
+        <ul class="d-flex gap-3">
+          <li>
+            <i class="fa-brands fa-apple" style="font-size: 26px; color: white;"> <a href=""></a> </i>
+          </li>
+          <li>
+            <i class="fa-brands fa-google-play " style="font-size: 26px; color: white;"> <a href=""></a> </i>
+          </li>
         </ul>
       </div>
-  
+
       <!-- Fifth Column -->
       <div class=" tags">
         <h4 class="title">Popular Tag</h4>
@@ -97,4 +79,3 @@ $categories = App\Models\Category::with('subcategories')->get();
     <div class="footer_end"> All Rights Reserved YooStore.com © 2024. </div>
   </footer>
 </div>
-

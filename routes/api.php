@@ -28,7 +28,6 @@ use Illuminate\Support\Facades\Route;
         Route::name('otp.')->prefix('otp')->group(function () {
 
             Route::post('verify', 'verifyOtp')->name('verify');
-
             Route::post('resend', 'resendOtp')->name('resend');
 
         });

@@ -14,8 +14,8 @@
             <a href="{{ route('orderHistory') }}" class="link"><i class="fa-solid fa-shop"></i>Order History</a>
             <a href="{{ route('track') }}" class="link"><i class="fa-solid fa-location-dot"></i>Track Order</a>
             <a href="{{ route('cart') }}" class="link"><i class="fa-solid fa-cart-shopping"></i>Shopping Cart</a>
-            <a href="#" class="link"><i class="fa-regular fa-heart"></i>Wishlist</a>
-            <a href="#" class="link"><i class="fa-solid fa-clock-rotate-left"></i>Browsing History</a>
+            <a href="{{ route('wishlist') }}" class="link"><i class="fa-regular fa-heart"></i>Wishlist</a>
+            <a href="{{ route('browsingHistory') }}" class="link"><i class="fa-solid fa-clock-rotate-left"></i>Browsing History</a>
             <a href="{{ route('settings') }}" class="link"><i class="fa-solid fa-gear"></i>Settings</a>
             <livewire:dashboard.logout>
         </div>

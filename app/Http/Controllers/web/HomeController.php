@@ -14,7 +14,7 @@ class HomeController extends Controller
 
     public function index()
     {
-        $products =Product::orderby('id','desc')->with(['productDetails' , 'images'])->get();
+        $products =Product::where('is_published', 1)->orderby('id','desc')->with(['productDetails' , 'images'])->get();
         $banner4 = Banner::where('name->en', 'Section Two')->first();
         $categories = Category::with('subcategories')->get();
 

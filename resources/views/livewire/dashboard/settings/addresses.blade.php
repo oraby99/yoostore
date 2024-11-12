@@ -1,8 +1,5 @@
-@if (session()->has('success'))
-<div class="alert alert-success mt-3">
-    {{ session('success') }}
-</div>
-@endif
+
+
 <div class="row">
     <div class="col-xl-6">
         <div class="card mb-4">
@@ -60,8 +57,14 @@
                 <button class="btn btn-custom" wire:click="saveHomeAddress">Save Changes</button>
             </div>
 
+            @if (session()->has('success1'))
+<div class="alert alert-success mt-3">
+    {{ session('success1') }}
+</div>
+@endif
         </div>
     </div>
+
 
     <div class="col-xl-6">
         <div class="card mb-4">
@@ -123,8 +126,15 @@
                 </div>
                 <button class="btn btn-custom" wire:click="saveOfficeAddress">Save Changes</button>
             </div>
+            @if (session()->has('success2'))
+<div class="alert alert-success mt-3">
+    {{ session('success2') }}
+</div>
+@endif
+    
         </div>
     </div>
+
 
 
     

@@ -57,6 +57,7 @@ Route::get('/index', [HomeController::class, 'index'])->name('index');
 Route::get('/product/{id}', [ProductController::class, 'index'])->name('product');
 Route::get('/signup', [AuthController::class, 'signupView'])->name('signup');
 Route::get('/login', [AuthController::class, 'loginView'])->name('login');
+Route::get('/verifyemail', [AuthController::class, 'verifyemail'])->name('verifyemail');
 
 
 
@@ -73,4 +74,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::view('/browsingHistory', 'yoostore.dashboard.browsingHistory')->name('browsingHistory');
     Route::view('/faq', 'yoostore.faq')->name('faq');
     Route::view('/wishlist', 'yoostore.wishlist')->name('wishlist');
+Route::post('/order/cancel/{id}', [OrderdetailController::class, 'cancelOrder'])->name('order.cancel');
+
 });
