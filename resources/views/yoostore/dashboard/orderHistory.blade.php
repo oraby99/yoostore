@@ -48,17 +48,17 @@
                                     @foreach ($orders as $order) 
                                     <tr>
                                         <td class="text-center">#{{ $order->id }}</td>
-                                        @if ($order->status == 'Pending')
-                                        <td class="order-status in-progress text-center">{{ $order->status }}</td>
-                                        @elseif($order->status == 'Received')
+                                        @if ($order->statusChanges()->latest()->first()->status == 'Pending')
+                                        <td class="order-status in-progress text-center">{{ $order->statusChanges()->latest()->first()->status}}</td>
+                                        @elseif($order->statusChanges()->latest()->first()->status == 'Received')
                                         <td class="order-status completed text-center">{{ $order->status }}</td>
-                                        @elseif($order->status == 'Cancelled')
+                                        @elseif($order->statusChanges()->latest()->first()->status == 'Cancelled')
                                         <td class="order-status canceled text-center">{{ $order->status }}</td>
                                         @else
                                         <td class="order-status completed text-center">{{ $order->status }}</td>
                                         @endif
                                         <td class="text-center">{{ $order->created_at -> format('d M, Y')}}</td>
-                                        <td class="text-center">{{ $order->total_price }} KWD ({{ $order->orderProducts->first()->quantity }} Products)</td>
+                                        <td class="text-center">{{ $order->total_price }} KWD </td>
                                         <td class="text-center"><a href="{{ route('orderDetails', $order->id) }}">View Details <i class="fa-solid fa-arrow-right"></i></a></td>
                                     </tr>
                                     @endforeach
