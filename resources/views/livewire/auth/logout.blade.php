@@ -1,1 +1,1 @@
-<a href="{{ route('login') }}" wire:click="logout"><i class="fa-solid fa-right-from-bracket"></i></a>
+<a wire:click="logout" style="cursor: pointer;"><i class="fa-solid fa-right-from-bracket"></i></a>
