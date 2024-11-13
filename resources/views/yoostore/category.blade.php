@@ -1,23 +1,12 @@
-<div class="container my-4 w-75 " style="height: auto;">
-    <div class="w-100 d-flex justify-content-center m-4">
-
-        <div class="search-bar">
-            <input type="text" placeholder="Search for anything..." wire:model="search" />
-            <i class="fa-solid fa-magnifying-glass" style="cursor: pointer;" hover="color: #fa8232;" wire:click="searchProducts"></i>
-        </div>
-    </div>
-    @if (session()->has('error'))
-    <div class="d-flex justify-content-center w-100">
-
-        <div class="alert alert-danger mt-3 w-25 d-flex justify-content-center">
-            {{ session('error') }}
-        </div>
-    </div>
-    @endif
-    <div class="row justify-content-center">
-        <!-- First Card -->
+@extends('yoostore.layout.master')
+@section('css')
+<link href="{{ asset('yoostore/css/home.css')}}" rel="stylesheet">
+@endsection
+@section('content')
+<div class="my-3">
+    <div class="w-100 row col-12" style="padding: 50px;">
         @foreach ($products as $product)
-        <div class="col-3">
+        <div class="col-2">
             <div class="card custom-card" style="height: 300px; position: relative; overflow: hidden;">
                 @if ($product->in_stock == 0)
                 <span class="badge bg-dark position-absolute top-0 start-0 m-2">Out of stock</span>
@@ -34,14 +23,17 @@
                         @endphp
                         <span class="text-warning">
                             {{ str_repeat('★', floor($averageRating)) . str_repeat('☆', 5 - floor($averageRating)) }}</span>
-                        <span>{{( $averageRating) }}</span>
+                        <span>{{ ( $averageRating ) }}</span>
                     </div>
                     <h4 class="card-title" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         <a href="{{ route('product', $product->id) }}" style="text-decoration: none; color: black">{{ $product->name }}</a>
                     </h4>
+                    <h4 class="pricee"></h4>
                 </div>
             </div>
         </div>
         @endforeach
     </div>
 </div>
+
+@endsection

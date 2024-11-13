@@ -8,8 +8,11 @@
 $user = Auth::user();
 $products = App\Models\Favorite::where('user_id', $user->id)->get();
 @endphp
-<div class="p-5">
 
+@if (count($products) == 0)
+    <h1 class="text-center mt-5 " style="font-size: 40px; height: 200px; color: #fa8232" >Your wishlist is Empty</h1>
+@else
+<div class="p-5">
     <div class="row">
         @foreach ($products as $product)
         <div class="col-md-3 mb-5">
@@ -36,5 +39,6 @@ $products = App\Models\Favorite::where('user_id', $user->id)->get();
         @endforeach
     </div>
 </div>
+@endif
 
 @endsection

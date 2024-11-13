@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Orders\OrderController;
 use App\Http\Controllers\Api\Payment\FatoorahController;
 use App\Http\Controllers\web\AuthController;
 use App\Http\Controllers\web\CartController;
+use App\Http\Controllers\web\CategoryController;
 use App\Http\Controllers\web\CheckoutController;
 use App\Http\Controllers\web\HomeController;
 use App\Http\Controllers\web\OrderdetailController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\web\SuccessController;
 use App\Http\Controllers\web\TrackController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 
 
 /*
@@ -55,6 +57,7 @@ Route::get('/orders/{order}/pdf', [OrderController::class, 'generatePdf'])->name
 
 Route::get('/index', [HomeController::class, 'index'])->name('index');
 Route::get('/product/{id}', [ProductController::class, 'index'])->name('product');
+Route::get('/category/{id}' , [CategoryController::class, 'index' ])->name('category');
 Route::get('/signup', [AuthController::class, 'signupView'])->name('signup');
 Route::get('/login', [AuthController::class, 'loginView'])->name('login');
 Route::get('/verifyemail', [AuthController::class, 'verifyemail'])->name('verifyemail');
