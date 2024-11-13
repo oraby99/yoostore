@@ -1,27 +1,29 @@
 @extends('yoostore.layout.master')
 @section('css')
-    <link rel="stylesheet" href="{{ asset('yoostore/css/orderHistory.css') }}" />
+<link rel="stylesheet" href="{{ asset('yoostore/css/orderHistory.css') }}" />
 @endsection
 
 @section('content')
-    @php
-        $user = Auth::user();
-        $orders = $user->orders;
-    @endphp
 
-    <div class="container-fluid">
-        <div class="row d-flex align-items-start">
-            <!-- Sidebar -->
-            <div class="col-md-3 sidebar" style="height: auto;">
-                <a href="#" class="active link"><i class="fa-solid fa-layer-group"></i>Dashboard</a>
-                <a href="{{ route('orderHistory') }}" class="link"><i class="fa-solid fa-shop"></i>Order History</a>
-                <a href="{{ route('track') }}" class="link"><i class="fa-solid fa-location-dot"></i>Track Order</a>
-                <a href="{{ route('cart') }}" class="link"><i class="fa-solid fa-cart-shopping"></i>Shopping Cart</a>
-                <a href="{{ route('wishlist') }}" class="link"><i class="fa-regular fa-heart"></i>Wishlist</a>
-                <a href="{{ route('browsingHistory') }}" class="link"><i class="fa-solid fa-clock-rotate-left"></i>Browsing History</a>
-                <a href="{{ route('settings') }}" class="link"><i class="fa-solid fa-gear"></i>Settings</a>
-                <livewire:dashboard.logout>
-            </div>
+@php
+$user = Auth::user();
+$orders = $user->orders()->paginate(10); 
+@endphp
+
+
+<div class="container-fluid">
+    <div class="row d-flex align-items-start">
+        <!-- Sidebar -->
+        <div class="col-md-3 sidebar" style="height: auto;">
+            <a href="#" class="active link"><i class="fa-solid fa-layer-group"></i>Dashboard</a>
+            <a href="{{ route('orderHistory') }}" class="link"><i class="fa-solid fa-shop"></i>Order History</a>
+            <a href="{{ route('track') }}" class="link"><i class="fa-solid fa-location-dot"></i>Track Order</a>
+            <a href="{{ route('cart') }}" class="link"><i class="fa-solid fa-cart-shopping"></i>Shopping Cart</a>
+            <a href="{{ route('wishlist') }}" class="link"><i class="fa-regular fa-heart"></i>Wishlist</a>
+            <a href="{{ route('browsingHistory') }}" class="link"><i class="fa-solid fa-clock-rotate-left"></i>Browsing History</a>
+            <a href="{{ route('settings') }}" class="link"><i class="fa-solid fa-gear"></i>Settings</a>
+            <livewire:dashboard.logout>
+        </div>
 
             <!-- Content -->
             <div class="col-md-8">
@@ -71,23 +73,15 @@
                                     </tbody>
                                 </table>
 
-                                <!-- Pagination -->
-                                <nav>
-                                    <ul class="pagination">
-                                        <li class="page-item"><a class="page-link" href="#"><i class="fa-solid fa-angles-left"></i></a></li>
-                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">4</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">5</a></li>
-                                        <li class="page-item"><a class="page-link" href="#"><i class="fa-solid fa-angles-right"></i></a></li>
-                                    </ul>
-                                </nav>
-                            </div>
+                            <!-- Pagination -->
+                            <nav>
+                                {{ $orders->links() }} 
+                            </nav>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 @endsection
