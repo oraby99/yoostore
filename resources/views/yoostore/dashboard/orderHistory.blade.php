@@ -51,7 +51,7 @@
                                                 @if ($latestStatusChange)
                                                     @if ($latestStatusChange->status == 'Pending')
                                                         <td class="order-status in-progress text-center">{{ $latestStatusChange->status }}</td>
-                                                    @elseif($latestStatusChange->status == 'Received')
+                                                    @elseif($latestStatusChange->status == 'Delivered')
                                                         <td class="order-status completed text-center">{{ $latestStatusChange->status }}</td>
                                                     @elseif($latestStatusChange->status == 'Cancelled')
                                                         <td class="order-status canceled text-center">{{ $latestStatusChange->status }}</td>
@@ -59,7 +59,7 @@
                                                         <td class="order-status completed text-center">{{ $latestStatusChange->status }}</td>
                                                     @endif
                                                 @else
-                                                    <td class="order-status text-center">No Status</td>
+                                                    <td class="order-status text-center">Received</td>
                                                 @endif
                                                 <td class="text-center">{{ $order->created_at->format('d M, Y') }}</td>
                                                 <td class="text-center">{{ $order->total_price }} KWD</td>
