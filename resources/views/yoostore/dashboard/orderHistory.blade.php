@@ -49,11 +49,11 @@
                                             <tr>
                                                 <td class="text-center">#{{ $order->id }}</td>
                                                 @if ($latestStatusChange)
-                                                    @if ($latestStatusChange->status == 'Pending')
+                                                    @if ($latestStatusChange->orderStatus->name == 'Pending')
                                                         <td class="order-status in-progress text-center">{{ $latestStatusChange->status }}</td>
-                                                    @elseif($latestStatusChange->status == 'Received')
+                                                    @elseif($latestStatusChange->orderStatus->name == 'Received')
                                                         <td class="order-status completed text-center">{{ $latestStatusChange->status }}</td>
-                                                    @elseif($latestStatusChange->status == 'Cancelled')
+                                                    @elseif($latestStatusChange->orderStatus->name == 'Cancelled')
                                                         <td class="order-status canceled text-center">{{ $latestStatusChange->status }}</td>
                                                     @else
                                                         <td class="order-status completed text-center">{{ $latestStatusChange->status }}</td>
