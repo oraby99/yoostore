@@ -7,7 +7,7 @@
 
 @php
 $user = Auth::user();
-$orders = $user->orders()->paginate(1); 
+$orders = $user->orders()->paginate(10); 
 @endphp
 
 
