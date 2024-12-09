@@ -81,19 +81,19 @@
     <div class="carousel-inner">
       <div class="carousel-item active">
         <img
-          src="{{ asset('yoostore/images/master card.png') }}"
+          src="{{ Storage::url($banner1->image) }}"
           class="d-block w-100"
           alt="Slide 1" />
       </div>
       <div class="carousel-item">
         <img
-          src="{{ asset('yoostore/images/master card.png') }}"
+           src="{{ Storage::url($banner2->image) }}"
           class="d-block w-100"
           alt="Slide 2" />
       </div>
       <div class="carousel-item">
         <img
-          src="{{ asset('yoostore/images/amrican express.png') }}"
+         src="{{ Storage::url($banner3->image) }}"
           class="d-block w-100"
           alt="Slide 3" />
       </div>
@@ -221,7 +221,7 @@
         <button>Shop Now <i class="fa-solid fa-arrow-right mx-3"></i></button>
       </div>
       <div class="">
-        <img src="{{ asset('yoostore/images/xaomi.png') }}" alt="" />
+        <img Xiaomi src="{{ Storage::url($banner4->image) }}" alt="" />
       </div>
     </div>
   </div>
@@ -303,7 +303,7 @@
   </div>
 
   <div class="my-5 d-flex justify-content-center">
-    <img src="{{ asset('yoostore/images/bannerstatic.jpeg') }}" alt="" width="80%" />
+    <img src="{{ Storage::url($banner1->image) }}" alt="" width="500" />
   </div>
 
   <!-- section 9 -->
