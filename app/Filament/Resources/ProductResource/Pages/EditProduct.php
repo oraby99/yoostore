@@ -26,11 +26,9 @@ class EditProduct extends EditRecord
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $product = $this->record->load('productDetails', 'images');
-    
         $data['attributes'] = $product->attributes ?? [];
-    
         $data['images'] = $product->images->pluck('image_path')->toArray();
-    
+        //dd($data['images']);
         if ($product->productDetails->isNotEmpty() && !$product->productDetails->first()->typename) {
             $data['is_product_details'] = true;
             $data['product_details'] = $product->productDetails->map(function ($detail) {
@@ -38,7 +36,7 @@ class EditProduct extends EditRecord
                     'price' => $detail->price,
                     'color' => $detail->color,
                     'size' => $detail->size,
-                    'image' => $detail->image ? [$detail->image] : [],  // Ensure array for images
+                    'image' => $detail->image ? [$detail->image] : [],
                 ];
             })->toArray();
             $data['type_details'] = [];
@@ -48,12 +46,11 @@ class EditProduct extends EditRecord
                 return [
                     'typename' => $detail->typename,
                     'typeprice' => $detail->typeprice,
-                    'typeimage' => $detail->typeimage ? [$detail->typeimage] : [],  // Ensure array for images
+                    'typeimage' => $detail->typeimage ? [$detail->typeimage] : [],
                 ];
             })->toArray();
             $data['product_details'] = [];
         }
-    
         return $data;
     }
     protected function mutateFormDataBeforeSave(array $data): array
@@ -61,7 +58,7 @@ class EditProduct extends EditRecord
         $this->productDetails = $data['product_details'] ?? [];
         $this->typeDetails = $data['type_details'] ?? [];
         $this->images = isset($data['images']) ? (is_array($data['images']) ? $data['images'] : [$data['images']]) : [];
-        unset($data['images']);  // Ensure images are handled separately
+        unset($data['images']);
         return $data;
     }
     protected function handleRecordUpdate($record, array $data): \Illuminate\Database\Eloquent\Model

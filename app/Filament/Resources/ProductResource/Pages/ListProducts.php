@@ -15,6 +15,19 @@ class ListProducts extends ListRecords
         return [
             Actions\CreateAction::make(),
             Actions\LocaleSwitcher::make(),
+            \EightyNine\ExcelImport\ExcelImportAction::make()
+            ->color("primary"),
+        ];
+    }
+    protected function getHeaderActions(): array
+    {
+        return [
+               \EightyNine\ExcelImport\ExcelImportAction::make()
+            ->slideOver()
+            ->color("primary")
+            ->use(\App\Imports\ProductImport::class),
+            Actions\CreateAction::make(),
+            Actions\LocaleSwitcher::make(),
         ];
     }
 }

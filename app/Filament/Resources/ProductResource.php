@@ -158,23 +158,8 @@ class ProductResource extends Resource
                 TextColumn::make('subCategory.name')->label('Sub Category Name'),
                 ToggleColumn::make('is_published'),
                 ToggleColumn::make('in_stock')
-
-
-            //     BooleanColumn::make('is_published')
-            //     ->label('Published')
-            //     ->getStateUsing(fn ($record) => $record->is_published === true ? 'Published' : 'Draft')
-            //     ->trueColor('success')
-            //     ->falseColor('danger'),
-            
-            // BooleanColumn::make('in_stock')
-            //     ->label('In Stock')
-            //     ->getStateUsing(fn ($record) => $record->in_stock === true ? 'In Stock' : 'Out of Stock')
-            //     ->trueColor('success')
-            //     ->falseColor('danger'),
-            
             ])
             ->filters([
-                
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -185,7 +170,7 @@ class ProductResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])->emptyStateActions([
                 Tables\Actions\CreateAction::make(),
