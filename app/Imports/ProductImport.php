@@ -44,6 +44,8 @@ class ProductImport implements ToCollection
             'size'       => $sizeDecoded,
             'typeprice'  => $row[15],
             'typename'   => $row[16],
+            'image'      => $row[18],
+            'typeimage'  => $row[19],
         ]);
     }
     private function saveProductImages($productId, $imagePaths)
