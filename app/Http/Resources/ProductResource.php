@@ -91,7 +91,8 @@ class ProductResource extends JsonResource
                 return [
                     'id' => $image->id,
                     'product_id' => $image->product_id,
-                    'image_path' => url('storage/' . $image->image_path),
+                    'image_path' => $image->image_path,
+                    // 'image_path' => url('storage/' . $image->image_path),
                 ];
             }),
         ];
