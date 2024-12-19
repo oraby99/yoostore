@@ -51,7 +51,7 @@ class CreateProduct extends CreateRecord
     private function saveImages(Product $product, array $images)
     {
         foreach ($images as $image) {
-            $product->images()->create(['image_path' => $image]);
+            $product->images()->create(['image_path' => 'https://amhere.net/storage/' . $image]);
         }
     }
     protected function getRedirectUrl(): string
