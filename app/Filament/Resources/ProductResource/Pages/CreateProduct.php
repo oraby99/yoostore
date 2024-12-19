@@ -33,7 +33,7 @@ class CreateProduct extends CreateRecord
                 'price'      => $item['price'],
                 'color'      => $item['color'] ?? null,
                 'size'       => $item['size'] ?? null,
-                'image'      => $item['image'] ?? null,
+                'image'      => 'https://amhere.net/storage/' . $item['image'] ?? null,
             ]);
         }
     }
@@ -44,7 +44,7 @@ class CreateProduct extends CreateRecord
                 'product_id' => $product->id,
                 'typename'   => $item['typename'] ?? null,
                 'typeprice'  => $item['typeprice'],
-                'typeimage'  => $item['typeimage'] ?? null,
+                'typeimage'  => 'https://amhere.net/storage/' . $item['typeimage'] ?? null,
             ]);
         }
     }
