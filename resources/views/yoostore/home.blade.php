@@ -166,7 +166,7 @@
             <span class="badge bg-success position-absolute top-0 start-0 m-2">In stock</span>
             @endif
             <div style="height: 66.67%; overflow: hidden;">
-              <img src="{{ asset('storage/' . optional($product->images->first())->image_path) }}" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="{{ optional($product->images->first())->image_path) }}" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div class="card-body" style="height: 33.33%;">
               <div class="rating my-2">
@@ -254,7 +254,7 @@
               <span class="badge bg-success position-absolute top-0 start-0 m-2">In stock</span>
               @endif
               <div style="height: 66.67%; overflow: hidden;">
-                <img src="{{ asset('storage/' . optional($product->images->first())->image_path) }}" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
+                <img src="{{ optional($product->images->first())->image_path) }}" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
 
               </div>
               <div class="card-body" style="height: 33.33%;">
