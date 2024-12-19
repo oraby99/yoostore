@@ -291,11 +291,11 @@ class FatoorahController extends Controller
                         'product_details' => [
                             'id'        => $orderProduct->productDetail->id,
                             'price'     => $orderProduct->productDetail->price,
-                            'image'     => $orderProduct->productDetail->image ? url('storage/' . $orderProduct->productDetail->image) : null,
+                            'image'     => $orderProduct->productDetail->image ,
                             'color'     => $orderProduct->productDetail->color,
                             'size'      => $orderProduct->productDetail->size,
                             'typeprice' => $orderProduct->productDetail->typeprice,
-                            'typeimage' => $orderProduct->productDetail->typeimage ? url('storage/' . $orderProduct->productDetail->typeimage) : null,
+                            'typeimage' => $orderProduct->productDetail->typeimage ,
                             'typename'  => $orderProduct->productDetail->typename,
                             'created_at'=> $orderProduct->productDetail->created_at,
                             'updated_at'=> $orderProduct->productDetail->updated_at,

@@ -18,10 +18,10 @@ class CategoryResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'image' => $this->image ? url('storage/' . $this->image) : null,
-            'banner' => $this->banner ? url('storage/' . $this->banner) : null,
+            'image' => $this->image ,
+            'banner' => $this->banner ,
             'tag' => $this->tag,
-            'bannerimage' => $this->bannerimage ? url('storage/' . $this->bannerimage) : null,
+            'bannerimage' => $this->bannerimage ,
             'subcategories' => SubCategoryResource::collection($this->whenLoaded('subcategories')),
         ];
     }

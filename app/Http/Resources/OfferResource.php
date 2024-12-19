@@ -16,10 +16,10 @@ class OfferResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'banner' => $this->banner ? url('storage/' . $this->banner) : null,
+            'banner' => $this->banner ,
             'bannertag' => $this->getTranslation('bannertag', 'en'),
             'tag' => $this->getTranslation('tag', 'en'),
-            'secondbanner' => $this->secondbanner ? url('storage/' . $this->secondbanner) : null,
+            'secondbanner' => $this->secondbanner ,
         ];
     }
 }

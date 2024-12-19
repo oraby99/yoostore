@@ -18,11 +18,11 @@ class OrderProductResource extends JsonResource
             'product_details' => [
                 'id' => $this->productDetail->id,
                 'price' => $this->productDetail->price,
-                'image' => $this->productDetail->image ? url('storage/' . $this->productDetail->image) : null,
+                'image' => $this->productDetail->image ,
                 'color' => $this->productDetail->color,
                 'size' => $this->productDetail->size,
                 'typeprice' => $this->productDetail->typeprice,
-                'typeimage' => $this->productDetail->typeimage ? url('storage/' . $this->productDetail->typeimage) : null,
+                'typeimage' => $this->productDetail->typeimage ,
                 'typename' => $this->productDetail->typename,
                 'created_at' => $this->productDetail->created_at,
                 'updated_at' => $this->productDetail->updated_at,

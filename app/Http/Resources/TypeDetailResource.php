@@ -18,7 +18,7 @@ class TypeDetailResource extends JsonResource
             'id' => $this->id,
             'product_id' => $this->product_id,
             'typeprice' => $this->typeprice,
-            'typeimage' => $this->typeimage ? url('storage/' . $this->typeimage) : null,
+            'typeimage' => $this->typeimage,
             'typename' => $this->typename,
             'typestock' => $this->typestock,
             'created_at' => $this->created_at,
