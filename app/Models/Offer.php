@@ -12,4 +12,13 @@ class Offer extends Model
     protected $guarded = [];
     protected $fillable = ['secondbanner', 'banner','tag','bannertag'];
     public $translatable = ['bannertag','tag'];
+    protected static function boot()
+    {
+        parent::boot();
+        static::saving(function ($category) {
+            $baseUrl = 'https://amhere.net/storage/';
+            $category->banner = $category->banner ? $baseUrl . ltrim($category->banner, '/') : null;
+            $category->secondbanner = $category->secondbanner ? $baseUrl . ltrim($category->secondbanner, '/') : null;
+        });
+    }
 }

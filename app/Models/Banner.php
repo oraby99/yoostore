@@ -16,5 +16,13 @@ class Banner extends Model
     {
         return $this->hasMany(Product::class, 'tag', 'tag');
     }
-
+    protected static function boot()
+    {
+        parent::boot();
+        static::saving(function ($category) {
+            $baseUrl = 'https://amhere.net/storage/';
+            $category->image = $category->image ? $baseUrl . ltrim($category->image, '/') : null;
+            $category->bannerimage = $category->bannerimage ? $baseUrl . ltrim($category->bannerimage, '/') : null;
+        });
+    }
 }
