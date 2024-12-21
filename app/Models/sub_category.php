@@ -21,4 +21,14 @@ class sub_category extends Model
     {
         return $this->hasMany(Product::class);
     }
+    protected static function boot()
+    {
+        parent::boot();
+        static::saving(function ($category) {
+            $baseUrl = 'https://amhere.net/storage/';
+            $category->image = $category->image ? $baseUrl . ltrim($category->image, '/') : null;
+            $category->banner = $category->banner ? $baseUrl . ltrim($category->banner, '/') : null;
+            $category->bannerimage = $category->bannerimage ? $baseUrl . ltrim($category->bannerimage, '/') : null;
+        });
+    }
 }
