@@ -36,7 +36,7 @@ class EditProduct extends EditRecord
                     'price' => $detail->price,
                     'color' => $detail->color,
                     'size' => $detail->size,
-                    'image' => $detail->image ? [$detail->image] : [],
+                    'image' => 'https://amhere.net/storage/' . $detail->image ? [$detail->image] : [],
                 ];
             })->toArray();
             $data['type_details'] = [];
@@ -46,7 +46,7 @@ class EditProduct extends EditRecord
                 return [
                     'typename' => $detail->typename,
                     'typeprice' => $detail->typeprice,
-                    'typeimage' => $detail->typeimage ? [$detail->typeimage] : [],
+                    'typeimage' => 'https://amhere.net/storage/' . $detail->typeimage ? [$detail->typeimage] : [],
                 ];
             })->toArray();
             $data['product_details'] = [];
@@ -99,7 +99,7 @@ class EditProduct extends EditRecord
                 'price'      => $item['price'],
                 'color'      => $item['color'] ?? null,
                 'size'       => $item['size'] ?? null,
-                'image'      => $item['image'] ?? null,
+                'image'      => 'https://amhere.net/storage/' . $item['image'] ?? null,
             ]);
         }
     }
@@ -112,7 +112,7 @@ class EditProduct extends EditRecord
                 'typename'   => $item['typename'] ?? null,
                 'typeprice'  => $item['typeprice'],
                 'typestock'  => $item['typestock'] ?? 0,
-                'typeimage'  => $item['typeimage'] ?? null,
+                'typeimage'  => 'https://amhere.net/storage/' . $item['typeimage'] ?? null,
             ]);
         }
     }
@@ -121,7 +121,7 @@ class EditProduct extends EditRecord
         $product->images()->delete();
         foreach ($images as $image) {
             if ($image) {
-                $product->images()->create(['image_path' => $image]);
+                $product->images()->create(['image_path' => 'https://amhere.net/storage/' . $image]);
             }
         }
     }
