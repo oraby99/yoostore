@@ -4,6 +4,7 @@
 
 use App\Http\Controllers\Api\Orders\OrderController;
 use App\Http\Controllers\Api\Payment\FatoorahController;
+use App\Http\Controllers\ImportController;
 use App\Http\Controllers\web\AuthController;
 use App\Http\Controllers\web\CartController;
 use App\Http\Controllers\web\CategoryController;
@@ -80,3 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::post('/order/cancel/{id}', [OrderdetailController::class, 'cancelOrder'])->name('order.cancel');
 
 });
+Route::get('/import-products', function () {
+    return view('cv');
+});
+Route::post('/import-products', [ImportController::class, 'import'])->name('import.products');
