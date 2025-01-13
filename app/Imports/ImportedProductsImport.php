@@ -4,8 +4,8 @@ namespace App\Imports;
 
 use App\Models\ImportedProduct;
 use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
 class ImportedProductsImport implements ToModel, WithHeadingRow, WithChunkReading
 {
@@ -21,11 +21,13 @@ class ImportedProductsImport implements ToModel, WithHeadingRow, WithChunkReadin
             'type' => $row['type'] ?? null,
             'sku' => $row['sku'] ?? null,
             'name' => $row['name'] ?? null,
+            'title_ar' => $row['title_ar'] ?? null, // Add this
             'published' => ($row['published'] ?? '0') == '1',
             'is_featured' => ($row['is_featured'] ?? '0') == '1',
             'visibility' => $row['visibility_in_catalog'] ?? null,
             'short_description' => $row['short_description'] ?? null,
             'description' => $row['description'] ?? null,
+            'description_ar' => $row['description_ar'] ?? null, // Add this
             'date_sale_price_starts' => $row['date_sale_price_starts'] ?? null,
             'date_sale_price_ends' => $row['date_sale_price_ends'] ?? null,
             'tax_status' => $row['tax_status'] ?? null,
@@ -43,6 +45,8 @@ class ImportedProductsImport implements ToModel, WithHeadingRow, WithChunkReadin
             'purchase_note' => $row['purchase_note'] ?? null,
             'sale_price' => $row['sale_price'] ?? null,
             'regular_price' => $row['regular_price'] ?? null,
+            'discount' => $row['discount'] ?? null, // Add this
+            'delivery_time' => $row['delivery_time'] ?? null, // Add this
             'categories' => $row['categories'] ?? null,
             'tags' => $row['tags'] ?? null,
             'shipping_class' => $row['shipping_class'] ?? null,

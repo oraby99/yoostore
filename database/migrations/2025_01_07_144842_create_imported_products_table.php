@@ -10,6 +10,7 @@ class CreateImportedProductsTable extends Migration
     public function up()
     {
         Schema::create('imported_products', function (Blueprint $table) {
+            
             $table->id();
             $table->string('product_id')->nullable();
             $table->string('type')->nullable();

@@ -9,21 +9,18 @@ class ImportedProduct extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'product_id',
         'type',
         'sku',
         'name',
+        'title_ar', 
         'published',
         'is_featured',
         'visibility',
         'short_description',
         'description',
+        'description_ar', 
         'date_sale_price_starts',
         'date_sale_price_ends',
         'tax_status',
@@ -41,6 +38,8 @@ class ImportedProduct extends Model
         'purchase_note',
         'sale_price',
         'regular_price',
+        'discount', 
+        'delivery_time', 
         'categories',
         'tags',
         'shipping_class',
@@ -104,4 +103,28 @@ class ImportedProduct extends Model
         'attribute_3_visible',
         'attribute_3_global',
     ];
+
+    public function categories()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    protected $casts = [
+        'images' => 'array',
+    ];
+
+    public function getImagesAttribute($value)
+    {
+        return $value ? array_map('trim', explode(',', $value)) : [];
+    }
+
+    public function setImagesAttribute($value)
+    {
+        if (is_array($value)) {
+            $urls = array_column($value, 'url');
+            $this->attributes['images'] = implode(',', $urls);
+        } else {
+            $this->attributes['images'] = $value;
+        }
+    }
 }
