@@ -109,10 +109,13 @@ class ImportedProduct extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
 
+    public function childproduct()
+    {
+        return $this->hasMany(ImportedProduct::class, 'parent', 'sku');
+    }
     protected $casts = [
         'images' => 'array',
     ];
-
     public function getImagesAttribute($value)
     {
         return $value ? array_map('trim', explode(',', $value)) : [];

@@ -14,7 +14,7 @@ class Banner extends Model
     public $translatable = ['name','tag','bannertag'];
     public function products()
     {
-        return $this->hasMany(Product::class, 'tag', 'tag');
+        return $this->hasMany(ImportedProduct::class, 'tags');
     }
     protected static function boot()
     {

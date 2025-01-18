@@ -12,6 +12,7 @@ use App\Http\Resources\ProfileResource;
 use App\Http\Resources\SubCategoryResource;
 use App\Models\Banner;
 use App\Models\Category;
+use App\Models\ImportedProduct;
 use App\Models\Offer;
 use App\Models\Product;
 use App\Models\ProductHistory;
@@ -28,15 +29,14 @@ class BannerProductController extends Controller
         $response = [];
         foreach ($banners as $index => $banner) {
             $bannerTag = $banner->getTranslation('tag', 'en');
+            $query = ImportedProduct::where('tags', $bannerTag)
+                ->whereNull('parent')
+                ->with('childproduct');
             if ($index < 3) {
-                $products = Product::where('tag->en', $bannerTag)
-                    ->with('productDetails')
-                    ->take(10)
-                    ->get();
-            } else {
-                $products = [];
+                $query->take(10);
             }
-            $banner->products = $products;
+            $parentProducts = $query->get();
+            $banner->products = ProductResource::collection($parentProducts);
             $response[] = new BannerResource($banner);
         }
         return ApiResponse::send(true, 'Banners with products retrieved successfully', $response);
@@ -46,10 +46,11 @@ class BannerProductController extends Controller
         $banner = Banner::skip(3)->first();
         if ($banner) {
             $bannerTag = $banner->getTranslation('tag', 'en');
+            $query = ImportedProduct::where('tags', $bannerTag)
+                ->whereNull('parent')
+                ->with('childproduct');
             $perPage = $request->query('per_page', 10);
-            $products = Product::where('tag->en', $bannerTag)
-                ->with('productDetails')
-                ->paginate($perPage);
+            $products = $query->paginate($perPage);
             $banner->products = $products;
             return ApiResponse::send(true, 'Products related to the fourth banner retrieved successfully', [
                 new BannerResource($banner)

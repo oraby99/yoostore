@@ -41,8 +41,8 @@ use Illuminate\Support\Facades\Route;
     Route::get('/offers',                    [BannerProductController::class, 'getOffers']);
     Route::get('/offers-by-tag',             [BannerProductController::class, 'getOffersByTag']);
     Route::get('/profile-by-tag',            [BannerProductController::class, 'getProfileByTag']);
-    Route::get('/product/{productId}/rates', [RateController::class, 'getRatesByProduct']);
     Route::post('/product/{productId}',      [BannerProductController::class, 'productById']);
+    Route::get('/product/{productId}/rates', [RateController::class, 'getRatesByProduct']);
     Route::middleware('auth:sanctum')->group(function () {
     Route::get('/product-history',           [ProductHistoryController::class, 'getUserHistory']);
     Route::get('/favorites',                 [FavoriteController::class, 'getFavorites']);
