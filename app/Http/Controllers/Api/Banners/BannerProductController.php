@@ -69,15 +69,15 @@ class BannerProductController extends Controller
         return SubCategoryResource::collection($subcategories);
     }
     public function products(Request $request)
-    {   
-        $searchKey = $request->query('search'); 
+    {
+        $searchKey = $request->query('search');
         $page = $request->query('page', 1);
         $perPage = $request->query('per_page', 10);
         $tag = $request->query('tag');
         $categoryId = $request->query('cat_id');
         $subCategoryId = $request->query('sub_id');
         $currency = $request->header('currency', 'KWD');
-        $query = Product::with('productDetails')->with('images');
+        $query = ImportedProduct::whereNull('parent')->with('childproduct');
         if ($searchKey) {
             $query->where(function ($q) use ($searchKey) {
                 $q->where('name->en', 'like', '%' . $searchKey . '%')
@@ -85,7 +85,7 @@ class BannerProductController extends Controller
             });
         }
         if ($tag) {
-            $query->where('tag->en', $tag);
+            $query->where('tags', $tag);
         }
         if ($categoryId) {
             $query->where('category_id', $categoryId);
@@ -95,7 +95,7 @@ class BannerProductController extends Controller
         }
         $products = $query->paginate($perPage, ['*'], 'page', $page);
         return ProductResource::collection($products)->additional(['currency' => $currency]);
-    }    
+    }  
     public function getOffers()
     {
         $offers = Offer::all();
