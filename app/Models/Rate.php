@@ -21,7 +21,7 @@ class Rate extends Model
     ];
     public function product()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(ImportedProduct::class);
     }
     public function user()
     {

@@ -2,12 +2,28 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Favorite;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class ChildProductResource extends JsonResource
 {
+
+    protected $userId;
+
+    public function __construct($resource, $userId = null)
+    {
+        parent::__construct($resource);
+        $this->userId = $userId;
+    }
     public function toArray($request)
     {
+        $isFav = 0;
+        if ($this->userId) {
+            $isFav = Favorite::where('product_id', $this->id)
+                             ->where('user_id', $this->userId)
+                             ->exists() ? 1 : 0;
+        }
         return [
             'id' => $this->id,
             'product_id' => $this->product_id,
@@ -17,6 +33,7 @@ class ChildProductResource extends JsonResource
             'title_ar' => $this->title_ar,
             'published' => $this->published,
             'is_featured' => $this->is_featured,
+            'is_fav' => $isFav,
             'visibility' => $this->visibility,
             'short_description' => $this->short_description,
             'description' => $this->description,
@@ -102,7 +119,19 @@ class ChildProductResource extends JsonResource
             'attribute_3_value' => $this->attribute_3_value,
             'attribute_3_visible' => $this->attribute_3_visible,
             'attribute_3_global' => $this->attribute_3_global,
-            // Include all other fields as needed...
+            'avg_rate' => $this->getAvgRateAttribute(),
+            'rates' => $this->whenLoaded('rates', function () {
+                return $this->rates->map(function ($rate) {
+                    return [
+                        'id' => $rate->id,
+                        'rate' => $rate->rate,
+                        'title' => $rate->title,
+                        'description' => $rate->description,
+                        'images' => $rate->images,
+                        'user_id' => $rate->user_id,
+                    ];
+                });
+            }),
         ];
     }
 }

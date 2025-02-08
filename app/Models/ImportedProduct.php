@@ -108,10 +108,21 @@ class ImportedProduct extends Model
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
-
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class, 'product_id');
+    }
     public function childproduct()
     {
         return $this->hasMany(ImportedProduct::class, 'parent', 'sku');
+    }
+    public function rates()
+    {
+        return $this->hasMany(Rate::class, 'product_id');
+    }
+    public function orders()
+    {
+        return $this->hasMany(OrderProduct::class);
     }
     protected $casts = [
         'images' => 'array',
@@ -120,7 +131,6 @@ class ImportedProduct extends Model
     {
         return $value ? array_map('trim', explode(',', $value)) : [];
     }
-
     public function setImagesAttribute($value)
     {
         if (is_array($value)) {
@@ -129,5 +139,13 @@ class ImportedProduct extends Model
         } else {
             $this->attributes['images'] = $value;
         }
+    }
+    public function getAvgRateAttribute()
+    {
+        if ($this->rates->isEmpty()) {
+            return 0; // Return 0 if there are no rates
+        }
+
+        return $this->rates->avg('rate');
     }
 }

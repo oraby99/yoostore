@@ -23,40 +23,118 @@ use Exception;
 use Illuminate\Http\Request;
 class BannerProductController extends Controller
 {
-    public function getBannersWithProducts()
+    public function getBannersWithProducts(Request $request)
     {
+        $userId = request()->header('user_id');
+        if (!$userId) {
+            return ApiResponse::send(false, 'User ID is required', [], 400);
+        }
         $banners = Banner::all();
         $response = [];
         foreach ($banners as $index => $banner) {
             $bannerTag = $banner->getTranslation('tag', 'en');
             $query = ImportedProduct::where('tags', $bannerTag)
                 ->whereNull('parent')
-                ->with('childproduct');
+                ->with(['childproduct.rates', 'rates']);
             if ($index < 3) {
                 $query->take(10);
             }
             $parentProducts = $query->get();
-            $banner->products = ProductResource::collection($parentProducts);
-            $response[] = new BannerResource($banner);
+            $products = $parentProducts->map(function ($product) use ($userId) {
+                return new ProductResource($product, $userId);
+            });
+            $banner->products = $products;
+            $response[] = new BannerResource($banner, $userId);
         }
         return ApiResponse::send(true, 'Banners with products retrieved successfully', $response);
     }
     public function getFourthBannerProducts(Request $request)
     {
+        $userId = request()->header('user_id');
+        if (!$userId) {
+            return ApiResponse::send(false, 'User ID is required', [], 400);
+        }
         $banner = Banner::skip(3)->first();
         if ($banner) {
             $bannerTag = $banner->getTranslation('tag', 'en');
             $query = ImportedProduct::where('tags', $bannerTag)
-                ->whereNull('parent')
-                ->with('childproduct');
+            ->whereNull('parent')
+            ->with(['childproduct.rates', 'rates']); 
             $perPage = $request->query('per_page', 10);
             $products = $query->paginate($perPage);
-            $banner->products = $products;
+            // $banner->products = ProductResource::collection($products)->additional(['user_id' => $userId]);
+            $banner->products  = $products->map(function ($product) use ($userId) {
+                return new ProductResource($product, $userId);
+            });
             return ApiResponse::send(true, 'Products related to the fourth banner retrieved successfully', [
-                new BannerResource($banner)
+                new BannerResource($banner, $userId)
             ]);
         }
+    
         return ApiResponse::send(false, 'Fourth banner not found', []);
+    }
+    public function products(Request $request)
+    {
+        $userId = request()->header('user_id');
+        if (!$userId) {
+            return ApiResponse::send(false, 'User ID is required', [], 400);
+        }
+        $searchKey = $request->query('search');
+        $page = $request->query('page', 1);
+        $perPage = $request->query('per_page', 10);
+        $tag = $request->query('tag');
+        $categoryId = $request->query('cat_id');
+        $subCategoryId = $request->query('sub_id');
+        $currency = $request->header('currency', 'KWD');
+        $query = ImportedProduct::whereNull('parent')->with(['childproduct.rates', 'rates']); 
+
+        if ($searchKey) {
+            $query->where(function ($q) use ($searchKey) {
+                $q->where('name', 'like', '%' . $searchKey . '%')
+                  ->orWhere('description', 'like', '%' . $searchKey . '%');
+            });
+        }
+        if ($tag) {
+            $query->where('tags', $tag);
+        }
+        if ($categoryId) {
+            $query->where('categories', $categoryId);
+        }
+        if ($subCategoryId) {
+            $query->where('categories', $subCategoryId);
+        }
+        $products = $query->paginate($perPage, ['*'], 'page', $page);
+        //return ProductResource::collection($products,$userId);
+        $productResources = $products->getCollection()->map(function ($product) use ($userId) {
+            return new ProductResource($product, $userId);
+        });
+        return ApiResponse::send(true, 'Products retrieved successfully', $productResources);
+    }
+    public function productById($productId)
+    {
+        $userId = request()->header('user_id');
+        if ($userId && !User::where('id', $userId)->exists()) {
+            return ApiResponse::send(false, 'User not found', null);
+        }
+        $product = ImportedProduct::find($productId);
+        if ($product) {
+            if ($userId) {
+                $existingHistory = ProductHistory::where('user_id', $userId)
+                                                 ->where('product_id', $productId)
+                                                 ->first();
+    
+                if (!$existingHistory) {
+                    ProductHistory::create([
+                        'user_id' => $userId,
+                        'product_id' => $productId,
+                    ]);
+                }
+            }
+            $productResource = new ProductResource($product, $userId);
+            return ApiResponse::send(true, 'Product retrieved successfully', $productResource);
+        } else {
+            return ApiResponse::send(false, 'Product not found', null);
+        }
     }
     public function categories()
     {
@@ -68,34 +146,6 @@ class BannerProductController extends Controller
         $subcategories = sub_category::where('category_id', $id)->get();
         return SubCategoryResource::collection($subcategories);
     }
-    public function products(Request $request)
-    {
-        $searchKey = $request->query('search');
-        $page = $request->query('page', 1);
-        $perPage = $request->query('per_page', 10);
-        $tag = $request->query('tag');
-        $categoryId = $request->query('cat_id');
-        $subCategoryId = $request->query('sub_id');
-        $currency = $request->header('currency', 'KWD');
-        $query = ImportedProduct::whereNull('parent')->with('childproduct');
-        if ($searchKey) {
-            $query->where(function ($q) use ($searchKey) {
-                $q->where('name->en', 'like', '%' . $searchKey . '%')
-                  ->orWhere('description->en', 'like', '%' . $searchKey . '%');
-            });
-        }
-        if ($tag) {
-            $query->where('tags', $tag);
-        }
-        if ($categoryId) {
-            $query->where('category_id', $categoryId);
-        }
-        if ($subCategoryId) {
-            $query->where('sub_category_id', $subCategoryId);
-        }
-        $products = $query->paginate($perPage, ['*'], 'page', $page);
-        return ProductResource::collection($products)->additional(['currency' => $currency]);
-    }  
     public function getOffers()
     {
         $offers = Offer::all();
@@ -104,86 +154,110 @@ class BannerProductController extends Controller
     public function getOffersByTag(Request $request)
     {
         $perPage = $request->query('per_page', 10);
+        $userId = request()->header('user_id');
+        if (!$userId) {
+            return ApiResponse::send(false, 'User ID is required', [], 400);
+        }
+    
         $offer = Offer::first();
         if ($offer) {
             $offerTag = $offer->getTranslation('tag', 'en');
-            $products = Product::where('tag->en', $offerTag)
-                ->with('productDetails')
+    
+            // Fetch parent products with the offer tag and eager load rates
+            $parentProducts = ImportedProduct::where('tags', $offerTag)
+                ->whereNull('parent') // Ensure only parent products are fetched
+                ->with(['rates', 'childproduct.rates']) // Eager load rates for parent and child products
                 ->paginate($perPage);
+    
+            // Fetch child products for each parent product
+            $productsWithChildren = $parentProducts->map(function ($parentProduct) use ($userId) {
+                $childProducts = ImportedProduct::where('parent', $parentProduct->sku)
+                    ->with('rates') // Eager load rates for child products
+                    ->get();
+    
+                // Format parent and child products using ProductResource
+                $formattedParent = new ProductResource($parentProduct, $userId);
+                $formattedChildren = $childProducts->map(function ($childProduct) use ($userId) {
+                    return new ProductResource($childProduct, $userId);
+                });
+    
+                return [
+                    'parent' => $formattedParent,
+                    'children' => $formattedChildren,
+                ];
+            });
+    
             return ApiResponse::send(true, 'Offer and related products retrieved successfully', [
                 'offer' => new OfferResource($offer),
                 'products' => [
-                    'data' => ProductResource::collection($products),
+                    'data' => $productsWithChildren,
                     'pagination' => [
-                        'total' => $products->total(),
-                        'current_page' => $products->currentPage(),
-                        'per_page' => $products->perPage(),
-                        'last_page' => $products->lastPage(),
-                        'next_page_url' => $products->nextPageUrl(),
-                        'prev_page_url' => $products->previousPageUrl(),
-                    ]
-                ]
+                        'total' => $parentProducts->total(),
+                        'current_page' => $parentProducts->currentPage(),
+                        'per_page' => $parentProducts->perPage(),
+                        'last_page' => $parentProducts->lastPage(),
+                        'next_page_url' => $parentProducts->nextPageUrl(),
+                        'prev_page_url' => $parentProducts->previousPageUrl(),
+                    ],
+                ],
             ]);
         }
+    
         return ApiResponse::send(false, 'No offer found', []);
     }
     public function getProfileByTag(Request $request)
     {
         $perPage = $request->query('per_page', 10);
-        $offer = Profile::first();
-        if ($offer) {
-            $offerTag = $offer->getTranslation('tag', 'en');
-            $products = Product::where('tag->en', $offerTag)
-                ->with('productDetails')
+        $userId = request()->header('user_id');
+        if (!$userId) {
+            return ApiResponse::send(false, 'User ID is required', [], 400);
+        }
+    
+        $profile = Profile::first();
+        if ($profile) {
+            $profileTag = $profile->getTranslation('tag', 'en');
+    
+            // Fetch parent products with the profile tag and eager load rates
+            $parentProducts = ImportedProduct::where('tags', $profileTag)
+                ->whereNull('parent') // Ensure only parent products are fetched
+                ->with(['rates', 'childproduct.rates']) // Eager load rates for parent and child products
                 ->paginate($perPage);
+    
+            // Fetch child products for each parent product
+            $productsWithChildren = $parentProducts->map(function ($parentProduct) use ($userId) {
+                $childProducts = ImportedProduct::where('parent', $parentProduct->sku)
+                    ->with('rates') // Eager load rates for child products
+                    ->get();
+    
+                // Format parent and child products using ProductResource
+                $formattedParent = new ProductResource($parentProduct, $userId);
+                $formattedChildren = $childProducts->map(function ($childProduct) use ($userId) {
+                    return new ProductResource($childProduct, $userId);
+                });
+    
+                return [
+                    'parent' => $formattedParent,
+                    'children' => $formattedChildren,
+                ];
+            });
+    
             return ApiResponse::send(true, 'Profile product and related products retrieved successfully', [
-                'offer' => new ProfileResource($offer),
+                'profile' => new ProfileResource($profile),
                 'products' => [
-                    'data' => ProductResource::collection($products),
+                    'data' => $productsWithChildren,
                     'pagination' => [
-                        'total' => $products->total(),
-                        'current_page' => $products->currentPage(),
-                        'per_page' => $products->perPage(),
-                        'last_page' => $products->lastPage(),
-                        'next_page_url' => $products->nextPageUrl(),
-                        'prev_page_url' => $products->previousPageUrl(),
-                    ]
-                ]
+                        'total' => $parentProducts->total(),
+                        'current_page' => $parentProducts->currentPage(),
+                        'per_page' => $parentProducts->perPage(),
+                        'last_page' => $parentProducts->lastPage(),
+                        'next_page_url' => $parentProducts->nextPageUrl(),
+                        'prev_page_url' => $parentProducts->previousPageUrl(),
+                    ],
+                ],
             ]);
         }
-        return ApiResponse::send(false, 'No offer found', []);
-    }
-    public function productById($productId)
-    {
-        $userId = request()->header('user_id'); // Retrieve the user_id from the request header
-        if ($userId && !User::where('id', $userId)->exists()) {
-            return ApiResponse::send(false, 'User not found', null);
-        }
     
-        $product = Product::where('id', $productId)
-                          ->with('productDetails', 'images')
-                          ->first();
-        
-        if ($product) {
-            if ($userId) {
-                $existingHistory = ProductHistory::where('user_id', $userId)
-                                                 ->where('product_id', $productId)
-                                                 ->first();
-                if (!$existingHistory) {
-                    ProductHistory::create([
-                        'user_id' => $userId,
-                        'product_id' => $productId,
-                    ]);
-                }
-            }
-            
-            // Pass the user_id (which could be null) to the resource
-            $productResource = new ProductResource($product, $userId);
-            return ApiResponse::send(true, 'Product retrieved successfully', $productResource);
-        } else {
-            return ApiResponse::send(false, 'Product not found', null);
-        }
+        return ApiResponse::send(false, 'No profile found', []);
     }
-    
 }
 

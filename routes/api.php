@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Route;
     Route::get('/banners-sections',          [BannerProductController::class, 'getBannersWithProducts']);
     Route::get('/fourth-banner-products',    [BannerProductController::class, 'getFourthBannerProducts']);
     Route::get('/products',                  [BannerProductController::class, 'products']);
+    Route::get('/favorites',                 [FavoriteController::class, 'getFavorites']);
     Route::get('/categories',                [BannerProductController::class, 'categories']);
     Route::get('/subcategory/{id}',          [BannerProductController::class, 'subcategory']);
     Route::get('/offers',                    [BannerProductController::class, 'getOffers']);
@@ -45,7 +46,6 @@ use Illuminate\Support\Facades\Route;
     Route::get('/product/{productId}/rates', [RateController::class, 'getRatesByProduct']);
     Route::middleware('auth:sanctum')->group(function () {
     Route::get('/product-history',           [ProductHistoryController::class, 'getUserHistory']);
-    Route::get('/favorites',                 [FavoriteController::class, 'getFavorites']);
     Route::post('/favorite',                 [FavoriteController::class, 'addFavorite']);
     Route::delete('/favorite/{productId}',   [FavoriteController::class, 'removeFavorite']);
     Route::post('/address',                  [AddressController::class, 'store']);
