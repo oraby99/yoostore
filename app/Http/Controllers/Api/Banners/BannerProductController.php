@@ -26,9 +26,6 @@ class BannerProductController extends Controller
     public function getBannersWithProducts(Request $request)
     {
         $userId = request()->header('user_id');
-        // if (!$userId) {
-        //     return ApiResponse::send(false, 'User ID is required', [], 400);
-        // }
         $banners = Banner::all();
         $response = [];
         foreach ($banners as $index => $banner) {
