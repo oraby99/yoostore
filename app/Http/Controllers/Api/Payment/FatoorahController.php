@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\OrderProductResource;
+use App\Http\Resources\ProductResource;
 use App\Http\Services\FatoorahServices;
 use App\Http\Utils\Notification as UtilsNotification;
 use App\Models\Address;
@@ -190,16 +192,13 @@ class FatoorahController extends Controller
     public function codCheckout(Request $request)
     {
         $user = auth()->user();
-        $defaultAddress = Address::where('user_id', $user->id)
-                                 ->where('is_default', 1)
-                                 ->first();
+        $defaultAddress = Address::where('user_id', $user->id)->where('is_default', 1)->first();
         if (!$defaultAddress) {
             return response()->json([
                 'status'  => false,
                 'message' => 'Default address not found.'
             ], 400);
         }
-    
         $cartItems = Cart::where('user_id', $user->id)->get();
         if ($cartItems->isEmpty()) {
             return response()->json([
@@ -207,103 +206,62 @@ class FatoorahController extends Controller
                 'message' => 'No items found in cart.'
             ], 400);
         }
-    
         \DB::beginTransaction();
         try {
             $totalPrice = $request->total ?? $cartItems->sum('total_price');
             $order = Order::create([
                 'user_id'           => $user->id,
                 'total_price'       => $totalPrice,
-                'order_status_id'   => 1, // Assuming "1" represents a default order status (e.g., "Pending")
+                'order_status_id'   => 1,
                 'payment_method'    => 'cod',
-                'payment_status_id' => 1, // Assuming "1" represents an initial payment status (e.g., "Unpaid")
+                'payment_status_id' => 1,
                 'address_id'        => $defaultAddress->id
             ]);
-    
             foreach ($cartItems as $item) {
-                // Validate if product_detail_id exists in product_details table
-                if ($item->product_detail_id && ProductDetail::find($item->product_detail_id)) {
-                    OrderProduct::create([
-                        'order_id'         => $order->id,
-                        'product_detail_id'=> $item->product_detail_id,
-                        'product_id'       => $item->product_id,
-                        'quantity'         => $item->quantity,
-                        'size'             => $item->size,
-                    ]);
-                } else {
-                    \DB::rollBack();
-                    return response()->json([
-                        'status' => false,
-                        'message' => "Product detail with ID {$item->product_detail_id} not found."
-                    ], 400);
-                }
+                OrderProduct::create([
+                    'order_id'         => $order->id,
+                    'product_id'       => $item->product_id,
+                    'quantity'         => $item->quantity,
+                ]);
             }
-    
-            // Clear the user's cart after successful order creation
             Cart::where('user_id', $user->id)->delete();
-    
-            // Prepare and send FCM notification
-            $deviceToken = $user->device_token;
-            $data = [
-                "registration_ids" => [$deviceToken],
-                "notification" => [
-                    "title" => 'Yoo Store',
-                    "body"  => $user->name . ' created a new order'
-                ],
-                "data" => [
-                    "order_id" => (string)$order->id,
-                    "type"     => "Received",
-                ]
-            ];
-            $response = self::sendFCMNotification($data, 'yoo-store-ed4ba-de6f28257b6d.json');
-    
-            // Log notification in database
-            $this->createNotification($user->id, $order->id, 'New order created successfully.', 'Received');
-    
-            if (!empty($response['error'])) {
-                \Log::error('FCM Error: ' . json_encode($response['error']));
-                return response()->json(['message' => 'Error: ' . $response['error']], 500);
-            }
-    
-            // Prepare order response data
-            $orderProducts = OrderProduct::with(['product', 'productDetail'])
-                ->where('order_id', $order->id)
-                ->get();
-            $productsGrouped = [];
-            foreach ($orderProducts as $orderProduct) {
-                if ($orderProduct->product && $orderProduct->productDetail) {
-                    $uniqueProductKey = $orderProduct->product_id . '-' . $orderProduct->product_detail_id;
-                    $productsGrouped[$uniqueProductKey] = [
-                        'id'           => $orderProduct->product_id,
-                        'name'         => $orderProduct->product->name,
-                        'description'  => $orderProduct->product->description,
-                        'longdescription' => $orderProduct->product->longdescription,
-                        'tag'          => $orderProduct->product->tag,
-                        'discount'     => $orderProduct->product->discount,
-                        'attributes'   => $orderProduct->product->attributes,
-                        'deliverytime' => $orderProduct->product->deliverytime,
-                        'category_id'  => $orderProduct->product->category_id,
-                        'sub_category_id' => $orderProduct->product->sub_category_id,
-                        'created_at'   => $orderProduct->product->created_at,
-                        'updated_at'   => $orderProduct->product->updated_at,
-                        'size'         => $orderProduct->size,
-                        'quantity'     => $orderProduct->quantity,
-                        'product_details' => [
-                            'id'        => $orderProduct->productDetail->id,
-                            'price'     => $orderProduct->productDetail->price,
-                            'image'     => $orderProduct->productDetail->image ,
-                            'color'     => $orderProduct->productDetail->color,
-                            'size'      => $orderProduct->productDetail->size,
-                            'typeprice' => $orderProduct->productDetail->typeprice,
-                            'typeimage' => $orderProduct->productDetail->typeimage ,
-                            'typename'  => $orderProduct->productDetail->typename,
-                            'created_at'=> $orderProduct->productDetail->created_at,
-                            'updated_at'=> $orderProduct->productDetail->updated_at,
-                        ]
-                    ];
+            // Load the necessary relationships
+            $order->load(['orderStatus', 'paymentStatus', 'orderProducts.product.childproduct']);
+            // Prepare the products array - with fix for duplication
+            $addedProductIds = [];
+            $products = [];
+     
+            foreach ($order->orderProducts as $orderProduct) {
+                $product = $orderProduct->product;
+                $productId = $product->id;
+                
+                // Skip if this product was already added
+                if (in_array($productId, $addedProductIds)) {
+                    continue;
+                }
+                
+                // Add this product ID to the list of added products
+                $addedProductIds[] = $productId;
+                
+                // Filter child products based on what was added to the cart
+                $filteredChildProducts = $product->childproduct->filter(function ($childProduct) use ($cartItems) {
+                    return $cartItems->contains('product_id', $childProduct->id);
+                });
+                
+                // If the product has child products, add them to the response
+                if ($filteredChildProducts->isNotEmpty()) {
+                    // Track child product IDs to avoid adding them separately
+                    foreach ($filteredChildProducts as $childProduct) {
+                        $addedProductIds[] = $childProduct->id;
+                    }
+                    
+                    $product->childproduct = $filteredChildProducts;
+                    $products[] = new ProductResource($product, $user->id);
+                } else {
+                    // If it's a product with no child products in the cart, add it directly
+                    $products[] = new ProductResource($product, $user->id);
                 }
             }
-    
             \DB::commit();
             return response()->json([
                 'status'  => true,
@@ -318,7 +276,7 @@ class FatoorahController extends Controller
                     'payment_status'  => $order->paymentStatus->name,
                     'created_at'      => $order->created_at,
                     'updated_at'      => $order->updated_at,
-                    'products'        => array_values($productsGrouped)
+                    'products'        => $products
                 ]
             ], 200);
     

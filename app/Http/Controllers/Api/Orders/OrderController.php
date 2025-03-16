@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Orders;
 use App\Http\Controllers\Api\Payment\FatoorahController;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
+use App\Http\Resources\ProductResource;
 use App\Models\Cart;
 use App\Models\Notification;
 use App\Models\Order;
@@ -199,35 +200,34 @@ class OrderController extends Controller
     
     public function getOrderById($orderId)
     {
-        $order = Order::with(['orderProducts.product', 'orderProducts.productDetail', 'orderStatus', 'paymentStatus', 'user', 'address'])
-                    ->find($orderId);
+        // Fetch the order with its relationships
+        $order = Order::with(['orderProducts.product', 'orderStatus', 'paymentStatus', 'user', 'address'])
+                      ->find($orderId);
+    
+        // Check if the order exists
         if (!$order) {
             return response()->json([
                 'status' => false,
                 'message' => 'Order not found',
             ], 404);
         }
-        $orderData = $this->formatOrder($order);
     
+        // Return the order as a single resource
         return response()->json([
             'status' => true,
-            'data'   => $orderData,
+            'order' => new OrderResource($order),
         ], 200);
     }
     public function getUserOrders()
     {
         $user = auth()->user();
-        $orders = Order::with(['orderProducts.product', 'orderProducts.productDetail', 'orderStatus', 'paymentStatus', 'user', 'address'])
+        $orders = Order::with(['orderProducts.product', 'orderStatus', 'paymentStatus', 'user', 'address'])
                        ->where('user_id', $user->id)
                        ->get();
-        
-        $organizedOrders = $orders->map(function ($order) {
-            return $this->formatOrder($order);
-        })->toArray();
     
         return response()->json([
             'status' => true,
-            'orders' => $organizedOrders,
+            'orders' => OrderResource::collection($orders),
         ], 200);
     }
 }

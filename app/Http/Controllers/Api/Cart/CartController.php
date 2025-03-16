@@ -14,31 +14,17 @@ class CartController extends Controller
     public function addToCart(Request $request)
     {
         $request->validate([
-            'product_id'        => 'required|exists:products,id',
-            'product_detail_id' => 'nullable|exists:product_details,id',
-            'size'              => 'nullable|string',
+            'product_id'        => 'required|exists:imported_products,id',
         ]);    
-        $cartItem = Cart::with(['product', 'productDetail'])
-        ->where('user_id', Auth::id())
+        $cartItem = Cart::where('user_id', Auth::id())
         ->where('product_id', $request->product_id)
-        ->where('product_detail_id', $request->product_detail_id)
-        ->where(function ($query) use ($request) {
-            if ($request->size) {
-                $query->where('size', $request->size);
-            } else {
-                $query->whereNull('size');
-            }
-        })
         ->first();
-
         if ($cartItem) {
             $cartItem->increment('quantity');
         } else {
             $cartItem = Cart::create([
                 'user_id'           => Auth::id(),
                 'product_id'        => $request->product_id,
-                'product_detail_id' => $request->product_detail_id,
-                'size'              => $request->size,
                 'quantity'          => 1,
             ]);
         }
@@ -48,7 +34,7 @@ class CartController extends Controller
             'data'    => new CartResource($cartItem),
         ]);
     }
-    
+
     public function deleteFromCart($cartId)
     {
         $cartItem = Cart::where('user_id', Auth::id())->findOrFail($cartId);
@@ -61,7 +47,7 @@ class CartController extends Controller
     }
     public function getUserCarts()
     {
-        $cartItems = Cart::where('user_id', Auth::id())->with(['product', 'productDetail'])->get();
+        $cartItems = Cart::where('user_id', Auth::id())->get();
         return response()->json([
             'status'  => true,
             'message' => 'All Product cart',

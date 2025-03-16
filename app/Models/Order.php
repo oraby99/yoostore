@@ -33,9 +33,7 @@ class Order extends Model
     }
     public function products()
     {
-        return $this->belongsToMany(Product::class, 'order_product')
-            ->withPivot('product_detail_id', 'quantity', 'size')
-            ->with('productDetails'); // Load product details only
+        return $this->belongsToMany(ImportedProduct::class, 'order_product');
     }
     public function productDetails()
     {

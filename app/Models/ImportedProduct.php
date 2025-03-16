@@ -148,4 +148,5 @@ class ImportedProduct extends Model
 
         return $this->rates->avg('rate');
     }
+    
 }

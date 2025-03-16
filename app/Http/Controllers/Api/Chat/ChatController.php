@@ -9,6 +9,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Resources\ChatResource;
 use App\Http\Resources\ProductResource;
+use App\Models\ImportedProduct;
 use App\Models\Notification;
 
 class ChatController extends Controller
@@ -89,7 +90,7 @@ class ChatController extends Controller
     public function getChatByUserAndProduct(Request $request)
     {
         $validated = $request->validate([
-            'product_id' => 'required|exists:products,id',
+            'product_id' => 'required|exists:imported_products,id',
         ]);
         $user = auth()->user();
         $chats = Chat::where('user_id', $user->id)
@@ -98,7 +99,7 @@ class ChatController extends Controller
         if ($chats->isEmpty()) {
             return ApiResponse::send(false, 'No chats found for this product');
         }
-        $product = Product::find($validated['product_id']);
+        $product = ImportedProduct::find($validated['product_id']);
         if (!$product) {
             return ApiResponse::send(false, 'Product not found');
         }

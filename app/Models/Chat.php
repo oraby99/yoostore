@@ -11,7 +11,7 @@ class Chat extends Model
     protected $fillable = ['user_id', 'product_id', 'message', 'reply'];
     public function product()
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->belongsTo(ImportedProduct::class, 'product_id');
     }
     public function user()
     {
